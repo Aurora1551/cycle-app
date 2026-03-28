@@ -57,7 +57,7 @@ export const VIBES: VibeTheme[] = [
   {
     key: 'lighthearted',
     label: 'Lighthearted',
-    emoji: '😂',
+    emoji: '☀️',
     tagline: 'Funny & joyful',
     bg: '#FFFBF0',
     accent: '#F5A623',
