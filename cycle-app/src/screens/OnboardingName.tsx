@@ -3,13 +3,14 @@ import React, { useState, useRef, useEffect } from 'react'
 interface OnboardingNameProps {
   onBack: () => void
   onContinue: (name: string) => void
+  initialValue?: string
 }
 
 const TOTAL_STEPS = 6
 const STEP = 1
 
-const OnboardingName: React.FC<OnboardingNameProps> = ({ onBack, onContinue }) => {
-  const [name, setName] = useState('')
+const OnboardingName: React.FC<OnboardingNameProps> = ({ onBack, onContinue, initialValue }) => {
+  const [name, setName] = useState(initialValue || '')
   const [visible, setVisible] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
