@@ -63,13 +63,14 @@ const FALLBACK = {
 app.post('/api/generate-day', async (req, res) => {
   const { name, treatment, dayNumber, totalDays, vibe, genres } = req.body
 
-  if (!Anthropic || !process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY) {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY || process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY
+  if (!Anthropic || !anthropicKey) {
     return res.json(FALLBACK[vibe] || FALLBACK.fierce)
   }
 
   try {
     const anthropic = new Anthropic.default({
-      apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+      apiKey: anthropicKey,
       baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
     })
 
@@ -99,7 +100,7 @@ The song MUST match their music taste: ${genres.join(', ')}.
 Return ONLY the JSON, no other text.`
 
     const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }],
     })

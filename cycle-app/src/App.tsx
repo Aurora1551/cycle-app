@@ -14,8 +14,10 @@ import Settings from './screens/Settings'
 import NotificationSettings from './screens/NotificationSettings'
 import EndOfCycle from './screens/EndOfCycle'
 import GiftFlow from './screens/GiftFlow'
+import Progress from './screens/Progress'
 import type { OnboardingData, VibeKey } from './types'
 import { VIBES } from './types'
+import { track } from './lib/posthog'
 
 type Screen =
   | 'splash'
@@ -28,14 +30,16 @@ type Screen =
   | 'summary'
   | 'paywall'
   | 'create-account'
-  | 'day'
-  | 'settings'
   | 'notification-settings'
+  | 'day'
+  | 'progress'
+  | 'settings'
   | 'end-of-cycle'
   | 'gift-flow'
 
-const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'day', 'settings', 'notification-settings', 'end-of-cycle', 'gift-flow']
+const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow']
 const DARK_SCREENS: Screen[] = ['splash', 'summary', 'end-of-cycle']
+const NAV_SCREENS: Screen[] = ['day', 'progress', 'settings']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
   if (screen === 'splash') return '#0E0E0E'
@@ -58,6 +62,7 @@ function App() {
   const [dayNumber, setDayNumber] = useState(() => {
     return parseInt(localStorage.getItem(DAY_KEY) || '1', 10)
   })
+  const [isPremium] = useState(() => localStorage.getItem('cycle_premium') === '1')
 
   const update = (patch: Partial<OnboardingData>) => {
     const next = { ...data, ...patch }
@@ -104,6 +109,17 @@ function App() {
     setScreen('splash')
   }
 
+  const showNav = NAV_SCREENS.includes(screen)
+
+  const navVibe = vibe
+  const navIsDark = navVibe ? ['#1C0F0C', '#0D1F2D', '#120A2A'].includes(navVibe.bg) : false
+  const navBg = navVibe ? navVibe.bg : '#FDF6F0'
+  const navAccent = navVibe ? navVibe.accent : '#C4614A'
+  const navMuted = navVibe
+    ? (navIsDark ? 'rgba(253,246,240,0.35)' : navVibe.muted)
+    : '#9B7B74'
+  const navBorder = navIsDark ? 'rgba(255,255,255,0.08)' : 'rgba(196,97,74,0.12)'
+
   return (
     <div style={{
       width: '100%',
@@ -124,7 +140,7 @@ function App() {
       {screen === 'onboarding-name' && (
         <OnboardingName
           onBack={() => setScreen('splash')}
-          onContinue={name => { update({ name }); setScreen('onboarding-treatment') }}
+          onContinue={name => { update({ name }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-treatment') }}
           initialValue={data.name}
         />
       )}
@@ -132,7 +148,7 @@ function App() {
       {screen === 'onboarding-treatment' && (
         <OnboardingTreatment
           onBack={() => setScreen('onboarding-name')}
-          onContinue={treatment => { update({ treatment }); setScreen('onboarding-cycle-length') }}
+          onContinue={treatment => { update({ treatment }); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-cycle-length') }}
           initialValue={data.treatment}
         />
       )}
@@ -140,7 +156,7 @@ function App() {
       {screen === 'onboarding-cycle-length' && (
         <OnboardingCycleLength
           onBack={() => setScreen('onboarding-treatment')}
-          onContinue={cycleDays => { update({ cycleDays }); setScreen('onboarding-components') }}
+          onContinue={cycleDays => { update({ cycleDays }); track('onboarding_step_completed', { step: 3 }); setScreen('onboarding-components') }}
           initialValue={data.cycleDays}
         />
       )}
@@ -148,7 +164,7 @@ function App() {
       {screen === 'onboarding-components' && (
         <OnboardingComponents
           onBack={() => setScreen('onboarding-cycle-length')}
-          onContinue={components => { update({ components }); setScreen('onboarding-vibe') }}
+          onContinue={components => { update({ components }); track('onboarding_step_completed', { step: 4 }); setScreen('onboarding-vibe') }}
           initialValue={data.components}
         />
       )}
@@ -159,6 +175,7 @@ function App() {
           onContinue={vibeKey => {
             update({ vibe: vibeKey })
             setVibePreview(null)
+            track('onboarding_step_completed', { step: 5 })
             setScreen('onboarding-music')
           }}
           initialValue={data.vibe || null}
@@ -171,6 +188,7 @@ function App() {
           onBack={() => setScreen('onboarding-vibe')}
           onContinue={genres => {
             update({ genres })
+            track('onboarding_step_completed', { step: 6 })
             setScreen('summary')
           }}
           vibe={data.vibe}
@@ -181,8 +199,8 @@ function App() {
       {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && (
         <Summary
           data={data as OnboardingData}
-          onStartFree={() => { setScreen('day') }}
-          onUnlock={() => setScreen('paywall')}
+          onStartFree={() => setScreen('day')}
+          onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }}
         />
       )}
 
@@ -191,6 +209,7 @@ function App() {
           name={data.name}
           onStartFree={() => setScreen('day')}
           onSelectPlan={plan => {
+            track('plan_selected', { plan })
             if (plan === 'gift') setScreen('gift-flow')
             else setScreen('create-account')
           }}
@@ -200,9 +219,16 @@ function App() {
       {screen === 'create-account' && (
         <CreateAccount
           onBack={() => setScreen('paywall')}
-          onSuccess={() => setScreen('day')}
+          onSuccess={() => setScreen('notification-settings')}
           vibeBg={vibe?.bg}
           vibeAccent={vibe?.accent}
+        />
+      )}
+
+      {screen === 'notification-settings' && data.name && data.vibe && data.components && (
+        <NotificationSettings
+          data={data as OnboardingData}
+          onDone={() => setScreen('day')}
         />
       )}
 
@@ -210,33 +236,33 @@ function App() {
         <DayScreen
           data={data as OnboardingData}
           dayNumber={dayNumber}
+          isPremium={isPremium}
           onDayComplete={advanceDay}
           onSettings={() => setScreen('settings')}
         />
       )}
 
-      {screen === 'settings' && data.name && (
-        <Settings
+      {screen === 'progress' && data.name && data.vibe && data.components && (
+        <Progress
           data={data as OnboardingData}
           dayNumber={dayNumber}
-          onBack={() => setScreen('day')}
-          onNotifications={() => setScreen('notification-settings')}
-          onRestartOnboarding={restartJourney}
         />
       )}
 
-      {screen === 'notification-settings' && data.name && (
-        <NotificationSettings
+      {screen === 'settings' && data.name && data.vibe && data.components && (
+        <Settings
           data={data as OnboardingData}
-          onBack={() => setScreen('settings')}
+          dayNumber={dayNumber}
+          onUpdateData={update}
+          onDeleteAccount={restartJourney}
         />
       )}
 
       {screen === 'end-of-cycle' && data.name && data.vibe && data.components && (
         <EndOfCycle
           data={data as OnboardingData}
-          onShareWhatsApp={() => {}}
           onStartNewCycle={restartJourney}
+          onGift={() => setScreen('gift-flow')}
         />
       )}
 
@@ -246,6 +272,57 @@ function App() {
           vibeAccent={vibe?.accent}
           vibeBg={vibe?.bg}
         />
+      )}
+
+      {/* Bottom navigation */}
+      {showNav && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: 390,
+          height: 64,
+          background: navBg,
+          borderTop: `1px solid ${navBorder}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          zIndex: 50,
+        }}>
+          {([
+            { id: 'day', label: 'Today', icon: '☀' },
+            { id: 'progress', label: 'Progress', icon: '○' },
+            { id: 'settings', label: 'Settings', icon: '⚙' },
+          ] as { id: Screen; label: string; icon: string }[]).map(tab => {
+            const isActive = screen === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setScreen(tab.id)}
+                style={{
+                  flex: 1,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 3,
+                  padding: '8px 0',
+                }}
+              >
+                <span style={{ fontSize: isActive ? 20 : 18, color: isActive ? navAccent : navMuted, transition: 'all 0.15s' }}>
+                  {tab.icon}
+                </span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: isActive ? navAccent : navMuted, transition: 'color 0.15s' }}>
+                  {tab.label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       )}
     </div>
   )

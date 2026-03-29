@@ -98,3 +98,49 @@ export interface OnboardingData {
   vibe: VibeKey | null
   genres: string[]
 }
+
+export type VibeTypo = {
+  headingFont: string
+  headingWeight: number
+  headingStyle: 'normal' | 'italic'
+  bodyFont: string
+  bodyWeight: number
+}
+
+export const VIBE_TYPO: Record<VibeKey, VibeTypo> = {
+  fierce: {
+    headingFont: "'Cormorant Garamond', serif",
+    headingWeight: 700,
+    headingStyle: 'normal',
+    bodyFont: "'Karla', sans-serif",
+    bodyWeight: 400,
+  },
+  nurturing: {
+    headingFont: "'Cormorant Garamond', serif",
+    headingWeight: 400,
+    headingStyle: 'italic',
+    bodyFont: "'Karla', sans-serif",
+    bodyWeight: 300,
+  },
+  calm: {
+    headingFont: "'Cormorant Garamond', serif",
+    headingWeight: 300,
+    headingStyle: 'normal',
+    bodyFont: "'Karla', sans-serif",
+    bodyWeight: 300,
+  },
+  lighthearted: {
+    headingFont: "'Nunito', sans-serif",
+    headingWeight: 700,
+    headingStyle: 'normal',
+    bodyFont: "'Nunito', sans-serif",
+    bodyWeight: 400,
+  },
+  spiritual: {
+    headingFont: "'Cormorant Garamond', serif",
+    headingWeight: 400,
+    headingStyle: 'italic',
+    bodyFont: "'Karla', sans-serif",
+    bodyWeight: 300,
+  },
+}

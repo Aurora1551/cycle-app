@@ -96,7 +96,7 @@ const Summary: React.FC<Props> = ({ data, onStartFree, onUnlock }) => {
         <div style={{ flex: 1 }} />
 
         <button onClick={onStartFree} style={{ width: '100%', background: '#C4614A', color: 'white', border: 'none', borderRadius: 14, padding: '16px', fontFamily: "'Karla', sans-serif", fontSize: 15, fontWeight: 600, cursor: 'pointer', letterSpacing: '0.02em' }}>
-          Start free · Day 1 →
+          Begin free · Day 1 →
         </button>
 
         <button onClick={onUnlock} style={{ width: '100%', background: 'transparent', color: '#E8A598', border: '1px solid rgba(232,165,152,0.3)', borderRadius: 14, padding: '15px', fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: 400, cursor: 'pointer' }}>
