@@ -7,15 +7,27 @@ interface ScreenShellProps {
   children: React.ReactNode
   transition?: string
   style?: React.CSSProperties
+  accent?: string
+  text?: string
+  muted?: string
+  cardBg?: string
+  cardBorder?: string
+  typo?: VibeTypo
 }
 
-export const ScreenShell: React.FC<ScreenShellProps> = ({ bg, visible, children, transition = 'opacity 0.4s ease', style }) => (
-  <div style={{
-    width: '100%', maxWidth: 390, minHeight: '100svh',
-    background: bg, display: 'flex', flexDirection: 'column',
-    opacity: visible ? 1 : 0, transition,
+export const ScreenShell: React.FC<ScreenShellProps> = ({
+  bg, visible, children, transition = 'opacity 0.4s ease', style,
+  accent, text, muted, cardBg, cardBorder, typo,
+}) => (
+  <div className="screen" style={{
+    background: bg, opacity: visible ? 1 : 0, transition,
+    '--accent': accent, '--text': text, '--muted': muted, '--bg': bg,
+    '--card-bg': cardBg, '--card-border': cardBorder,
+    '--heading-font': typo?.headingFont, '--heading-weight': typo?.headingWeight,
+    '--heading-style': typo?.headingStyle, '--body-font': typo?.bodyFont,
+    '--body-weight': typo?.bodyWeight,
     ...style,
-  }}>
+  } as React.CSSProperties}>
     {children}
   </div>
 )
@@ -25,10 +37,11 @@ interface CardProps {
   cardBorder: string
   children: React.ReactNode
   style?: React.CSSProperties
+  className?: string
 }
 
-export const Card: React.FC<CardProps> = ({ cardBg, cardBorder, children, style }) => (
-  <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '18px', ...style }}>
+export const Card: React.FC<CardProps> = ({ cardBg, cardBorder, children, style, className }) => (
+  <div className={className} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '18px', ...style }}>
     {children}
   </div>
 )
@@ -39,11 +52,7 @@ interface SectionLabelProps {
 }
 
 export const SectionLabel: React.FC<SectionLabelProps> = ({ color, children }) => (
-  <div style={{
-    fontFamily: "'DM Mono', monospace", fontSize: 8,
-    letterSpacing: '0.2em', textTransform: 'uppercase',
-    color, marginBottom: 10,
-  }}>
+  <div className="mono-hint" style={{ color, marginBottom: 10 }}>
     {children}
   </div>
 )
@@ -86,12 +95,10 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({ accent, typo, onCl
   <button
     onClick={onClick}
     disabled={disabled}
+    className="btn-primary"
     style={{
-      width: '100%', background: disabled ? `${accent}44` : accent,
-      color: 'white', border: 'none', borderRadius: 14, padding: '16px',
-      fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 15,
-      cursor: disabled ? 'default' : 'pointer', letterSpacing: '0.02em',
-      transition: 'background 0.2s ease',
+      background: disabled ? `${accent}44` : accent,
+      fontFamily: typo.bodyFont,
       ...style,
     }}
   >
@@ -111,10 +118,10 @@ interface GhostButtonProps {
 export const GhostButton: React.FC<GhostButtonProps> = ({ color, borderColor, typo, onClick, children, style }) => (
   <button
     onClick={onClick}
+    className="btn-ghost"
     style={{
-      width: '100%', background: 'transparent', color,
-      border: `1.5px solid ${borderColor}`, borderRadius: 14, padding: '15px',
-      fontFamily: typo.bodyFont, fontSize: 14, fontWeight: 400, cursor: 'pointer',
+      color, border: `1.5px solid ${borderColor}`,
+      fontFamily: typo.bodyFont, fontWeight: 400,
       ...style,
     }}
   >
@@ -128,14 +135,7 @@ interface BackButtonProps {
 }
 
 export const BackButton: React.FC<BackButtonProps> = ({ onClick, color }) => (
-  <button
-    onClick={onClick}
-    style={{
-      background: 'none', border: 'none', cursor: 'pointer',
-      fontFamily: "'DM Mono', monospace", fontSize: 11,
-      letterSpacing: '0.1em', color, padding: '20px 24px 0', textAlign: 'left',
-    }}
-  >
+  <button onClick={onClick} className="btn-back" style={{ color }}>
     ← back
   </button>
 )
