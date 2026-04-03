@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import type { OnboardingData } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
 import { ScreenShell, Card, SectionLabel } from '../components/ui'
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay }) => {
+  const { t } = useTranslation()
   const vibe = resolveVibe(data.vibe)
   const typo = resolveTypo(data.vibe)
   const { isDark, textColor, mutedColor, cardBg, cardBorder } = deriveTheme(vibe)
@@ -25,22 +27,22 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay }) => {
   return (
     <ScreenShell bg={vibe.bg} visible={true}>
       <div style={{ padding: '20px 22px 10px' }}>
-        <div className="mono-hint" style={{ color: mutedColor, marginBottom: 4, letterSpacing: '0.18em' }}>Progress</div>
-        <h1 className="heading-sm" style={{ fontFamily: typo.headingFont, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: textColor }}>Your journey</h1>
+        <div className="mono-hint" style={{ color: mutedColor, marginBottom: 4, letterSpacing: '0.18em' }}>{t('progress.sectionLabel')}</div>
+        <h1 className="heading-sm" style={{ fontFamily: typo.headingFont, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: textColor }}>{t('progress.heading')}</h1>
       </div>
 
       <div className="flex-col gap-20" style={{ padding: '16px 22px 100px' }}>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
-          <SectionLabel color={vibe.accent}>Day by day</SectionLabel>
+          <SectionLabel color={vibe.accent}>{t('progress.dayByDay')}</SectionLabel>
           <div className="flex-col gap-14">
             {rows.map((row, wi) => (
               <div key={wi} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, color: mutedColor, width: 18, flexShrink: 0 }}>W{wi + 1}</div>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, color: mutedColor, width: 18, flexShrink: 0 }}>{t('progress.week', { n: wi + 1 })}</div>
                 {row.map(day => {
                   const isDone = localStorage.getItem(`cycle_day_${day}_done`) === '1'
                   const isCurrent = day === dayNumber
                   return (
-                    <button key={day} onClick={() => onGoToDay(day)} title={`Go to Day ${day}`} className="flex-center" style={{
+                    <button key={day} onClick={() => onGoToDay(day)} title={t('progress.goToDay', { day })} className="flex-center" style={{
                       flex: 1, aspectRatio: '1', maxWidth: 34, borderRadius: '50%', padding: 0, cursor: 'pointer',
                       background: isDone ? vibe.accent : isCurrent ? `${vibe.accent}40` : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                       border: isCurrent ? `2px solid ${vibe.accent}` : 'none',
@@ -52,13 +54,13 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay }) => {
               </div>
             ))}
           </div>
-          <div className="mono-xs" style={{ color: mutedColor, marginTop: 10 }}>Tap any day to jump to it</div>
+          <div className="mono-xs" style={{ color: mutedColor, marginTop: 10 }}>{t('progress.tapHint')}</div>
         </Card>
 
         <Card cardBg={cardBg} cardBorder={cardBorder}>
-          <SectionLabel color={vibe.accent}>Stats</SectionLabel>
+          <SectionLabel color={vibe.accent}>{t('progress.stats')}</SectionLabel>
           <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            {[{ val: daysCompleted, label: 'Days done' }, { val: data.cycleDays, label: 'Total days' }].map((s, i) => (
+            {[{ val: daysCompleted, label: t('progress.daysDone') }, { val: data.cycleDays, label: t('progress.totalDays') }].map((s, i) => (
               <div key={i} className="stat">
                 <div className="stat-value" style={{ fontFamily: typo.headingFont, fontSize: 30, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: vibe.accent }}>{s.val}</div>
                 <div className="stat-label" style={{ color: mutedColor }}>{s.label}</div>

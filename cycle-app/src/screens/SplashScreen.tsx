@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { LANGUAGES } from '../i18n'
+import LanguagePicker from '../components/LanguagePicker'
 
 interface SplashScreenProps {
   onBegin: () => void
@@ -7,17 +10,33 @@ interface SplashScreenProps {
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount }) => {
   const [visible, setVisible] = useState(false)
+  const [langOpen, setLangOpen] = useState(false)
+  const { t, i18n } = useTranslation()
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80)
     return () => clearTimeout(t)
   }, [])
 
+  const currentLang = LANGUAGES.find(l => i18n.language === l.code || i18n.language?.startsWith(l.code)) || LANGUAGES[0]
+
   return (
     <div className="screen flex-center" style={{
       background: '#0E0E0E', padding: '40px 32px',
       opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease',
+      position: 'relative',
     }}>
+      {/* Language selector */}
+      <button onClick={() => setLangOpen(true)} style={{
+        position: 'absolute', top: 16, right: 16,
+        display: 'flex', alignItems: 'center', gap: 6,
+        background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+        borderRadius: 20, padding: '6px 12px', cursor: 'pointer',
+      }}>
+        <span style={{ fontSize: 16 }}>{currentLang.flag}</span>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: 'rgba(253,246,240,0.5)', letterSpacing: '0.1em' }}>{currentLang.code.toUpperCase()}</span>
+      </button>
+
       <div className="flex-center" style={{
         width: 80, height: 80, borderRadius: '50%',
         background: 'radial-gradient(circle at 35% 35%, #E8A598, #C4614A)',
@@ -28,24 +47,26 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount }) =
       </div>
 
       <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 48, fontWeight: 700, color: '#FDF6F0', letterSpacing: '-0.5px', marginBottom: 8, lineHeight: 1 }}>
-        Cycle
+        {t('appName')}
       </h1>
 
       <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, fontWeight: 300, color: 'rgba(253,246,240,0.4)', marginBottom: 48, letterSpacing: '0.02em' }}>
-        Daily strength for your journey
+        {t('tagline')}
       </p>
 
       <button onClick={onBegin} className="btn-primary" style={{ background: '#C4614A', marginBottom: 12 }}>
-        Begin →
+        {t('begin')}
       </button>
 
-      <div className="mono-xs" style={{ color: '#333', margin: '4px 0' }}>or</div>
+      <div className="mono-xs" style={{ color: '#333', margin: '4px 0' }}>{t('or')}</div>
 
       <button onClick={onHaveAccount} className="btn-ghost" style={{
         color: 'rgba(253,246,240,0.5)', border: '1px solid rgba(255,255,255,0.12)',
       }}>
-        I have an account
+        {t('haveAccount')}
       </button>
+
+      <LanguagePicker open={langOpen} onClose={() => setLangOpen(false)} />
     </div>
   )
 }

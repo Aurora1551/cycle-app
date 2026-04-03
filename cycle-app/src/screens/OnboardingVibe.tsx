@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { VibeKey } from '../types'
 import { VIBES } from '../types'
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onPreview }) => {
+  const { t } = useTranslation()
   const [selected, setSelected] = useState<VibeKey | null>(initialValue || null)
   const [visible, setVisible] = useState(false)
 
@@ -33,12 +35,12 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
         <div className="progress-fill" style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${accent}, ${accent}bb)`, transition: 'width 0.5s ease, background 0.5s ease' }} />
       </div>
 
-      <button onClick={onBack} className="btn-back" style={{ color: muted, transition: 'color 0.5s ease' }}>← back</button>
+      <button onClick={onBack} className="btn-back" style={{ color: muted, transition: 'color 0.5s ease' }}>{t('back')}</button>
 
       <div className="content-sm">
-        <div className="step-label" style={{ color: accent, transition: 'color 0.5s ease' }}>Step 5 of 6</div>
-        <h1 className="heading" style={{ color: text, transition: 'color 0.5s ease' }}>What's your vibe?</h1>
-        <p className="subtext" style={{ color: muted, transition: 'color 0.5s ease' }}>This shapes your whole experience — try each one.</p>
+        <div className="step-label" style={{ color: accent, transition: 'color 0.5s ease' }}>{t('stepOf', { step: 5 })}</div>
+        <h1 className="heading" style={{ color: text, transition: 'color 0.5s ease' }}>{t('onboardingVibe.heading')}</h1>
+        <p className="subtext" style={{ color: muted, transition: 'color 0.5s ease' }}>{t('onboardingVibe.subtext')}</p>
 
         <div className="grid-2">
           {VIBES.map(v => {
@@ -57,8 +59,8 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
               >
                 {sel && <div className="check-circle" style={{ position: 'absolute', top: 8, right: 10, width: 16, height: 16, background: accent, fontSize: 9 }}>✓</div>}
                 <div style={{ fontSize: 26, marginBottom: 6 }}>{v.emoji}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, fontFamily: "'Karla', sans-serif", color: text, marginBottom: 3, transition: 'color 0.25s ease' }}>{v.label}</div>
-                <div style={{ fontSize: 10, color: muted, lineHeight: 1.3, transition: 'color 0.25s ease' }}>{v.tagline}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, fontFamily: "'Karla', sans-serif", color: text, marginBottom: 3, transition: 'color 0.25s ease' }}>{t(`vibes.${v.key}`)}</div>
+                <div style={{ fontSize: 10, color: muted, lineHeight: 1.3, transition: 'color 0.25s ease' }}>{t(`vibeTaglines.${v.key}`)}</div>
               </button>
             )
           })}
@@ -68,10 +70,8 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
           <div className="info-banner" style={{ background: `${accent}11`, border: `1px solid ${accent}33`, display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.4s ease' }}>
             <span style={{ fontSize: 20 }}>{activeVibe?.emoji}</span>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: text, fontFamily: "'Karla', sans-serif" }}>{activeVibe?.label} vibe selected</div>
-              <div style={{ fontSize: 11, color: muted }}>{
-                ({ fierce: 'You were born to conquer.', nurturing: 'You deserve gentle, radical care.', calm: 'Stillness is your superpower.', lighthearted: 'Joy looks so good on you.', spiritual: 'Your spirit knows the way.' } as Record<string, string>)[selected!] || ''
-              }</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: text, fontFamily: "'Karla', sans-serif" }}>{t(`vibes.${selected}`)} {t('onboardingVibe.vibeSelected')}</div>
+              <div style={{ fontSize: 11, color: muted }}>{t(`vibeTaglines.${selected}`)}</div>
             </div>
           </div>
         )}
@@ -79,7 +79,7 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
         <div className="spacer" />
         <button onClick={() => selected && onContinue(selected)} disabled={!selected}
           className="btn-primary" style={{ background: selected ? accent : `${accent}44`, transition: 'background 0.4s ease' }}>
-          Continue →
+          {t('continue')}
         </button>
       </div>
     </div>

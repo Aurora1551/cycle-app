@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import SplashScreen from './screens/SplashScreen'
 import OnboardingName from './screens/OnboardingName'
 import OnboardingTreatment from './screens/OnboardingTreatment'
@@ -18,6 +19,7 @@ import Progress from './screens/Progress'
 import type { OnboardingData, VibeKey } from './types'
 import { VIBES } from './types'
 import { track } from './lib/posthog'
+import { saveProfile } from './lib/db'
 
 type Screen =
   | 'splash' | 'onboarding-name' | 'onboarding-treatment'
@@ -42,6 +44,7 @@ const DATA_KEY = 'cycle_onboarding_data'
 const DAY_KEY = 'cycle_current_day'
 
 function App() {
+  const { t } = useTranslation()
   const [screen, setScreen] = useState<Screen>('splash')
   const [data, setData] = useState<Partial<OnboardingData>>(() => {
     try { return JSON.parse(localStorage.getItem(DATA_KEY) || '{}') } catch { return {} }
@@ -54,6 +57,19 @@ function App() {
     const next = { ...data, ...patch }
     setData(next)
     localStorage.setItem(DATA_KEY, JSON.stringify(next))
+    // Persist to SQLite if profile is complete
+    if (next.name && next.treatment && next.cycleDays && next.components && next.vibe && next.genres) {
+      saveProfile({
+        id: next.name,
+        name: next.name,
+        treatment: next.treatment,
+        cycleDays: next.cycleDays,
+        components: next.components,
+        vibe: next.vibe,
+        genres: next.genres,
+        currentDay: dayNumber,
+      })
+    }
   }
 
   useEffect(() => {
@@ -84,6 +100,9 @@ function App() {
     const next = dayNumber + 1
     localStorage.setItem(DAY_KEY, String(next))
     setDayNumber(next)
+    if (data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres) {
+      saveProfile({ id: data.name, name: data.name, treatment: data.treatment, cycleDays: data.cycleDays, components: data.components, vibe: data.vibe, genres: data.genres, currentDay: next })
+    }
     if (data.cycleDays && next > data.cycleDays) setScreen('end-of-cycle')
   }
 
@@ -123,8 +142,8 @@ function App() {
       {showNav && (
         <div className="bottom-nav" style={{ background: vibe?.bg || '#FDF6F0', borderTop: `1px solid ${navBorder}` }}>
           {([
-            { id: 'day' as Screen, label: 'Today', icon: '☀' },
-            { id: 'progress' as Screen, label: 'Progress', icon: '○' },
+            { id: 'day' as Screen, label: t('nav.today'), icon: '☀' },
+            { id: 'progress' as Screen, label: t('nav.progress'), icon: '○' },
           ]).map(tab => {
             const isActive = screen === tab.id
             const color = isActive ? navAccent : navMuted

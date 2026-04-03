@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { isDarkBg } from '../lib/theme'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, BackButton } from '../components/ui'
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C', vibeAccent = '#C4614A' }) => {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -48,24 +50,24 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C',
     <ScreenShell bg={vibeBg} visible={visible}>
       <BackButton onClick={onBack} color={mutedColor} />
       <div className="content" style={{ gap: 14 }}>
-        <div className="step-label" style={{ color: vibeAccent }}>Save your journey</div>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: textColor, lineHeight: 1.1, margin: 0 }}>Create an account</h1>
-        <p className="subtext" style={{ color: mutedColor }}>Create an account so you never lose your progress.</p>
+        <div className="step-label" style={{ color: vibeAccent }}>{t('createAccount.saveJourney')}</div>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: textColor, lineHeight: 1.1, margin: 0 }}>{t('createAccount.heading')}</h1>
+        <p className="subtext" style={{ color: mutedColor }}>{t('createAccount.subtext')}</p>
 
         <div style={fieldStyle}>
-          <div className="field-label" style={{ color: mutedColor }}>Email</div>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" style={inputStyle} />
+          <div className="field-label" style={{ color: mutedColor }}>{t('createAccount.email')}</div>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={t('createAccount.emailPlaceholder')} style={inputStyle} />
         </div>
         <div style={fieldStyle}>
-          <div className="field-label" style={{ color: mutedColor }}>Password</div>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimum 8 characters" style={inputStyle} />
+          <div className="field-label" style={{ color: mutedColor }}>{t('createAccount.password')}</div>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t('createAccount.passwordPlaceholder')} style={inputStyle} />
         </div>
 
         {error && <div style={{ fontSize: 12, color: '#E8907A', background: 'rgba(232,144,122,0.1)', borderRadius: 8, padding: '8px 12px' }}>{error}</div>}
 
         <div className="divider" style={{ margin: '4px 0' }}>
           <div className="divider-line" style={{ background: divider }} />
-          <span className="mono-sm" style={{ color: mutedColor }}>or</span>
+          <span className="mono-sm" style={{ color: mutedColor }}>{t('or')}</span>
           <div className="divider-line" style={{ background: divider }} />
         </div>
 
@@ -75,20 +77,20 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C',
             border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(196,97,74,0.15)'}`,
             borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 500, color: textColor, cursor: 'pointer', gap: 8,
           }}>
-            <span style={{ fontSize: 16 }}>{provider === 'Google' ? '🌐' : '🍎'}</span> Continue with {provider}
+            <span style={{ fontSize: 16 }}>{provider === 'Google' ? '🌐' : '🍎'}</span> {provider === 'Google' ? t('createAccount.continueGoogle') : t('createAccount.continueApple')}
           </button>
         ))}
 
         <div className="spacer" />
         <button onClick={handleEmailSignUp} disabled={loading || !email || !password}
           className="btn-primary" style={{ background: email && password ? vibeAccent : `${vibeAccent}44` }}>
-          {loading ? 'Creating account...' : 'Create account and start →'}
+          {loading ? t('createAccount.creating') : t('createAccount.createButton')}
         </button>
         <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.8 }}>
-          Already have an account?{' '}
-          <button onClick={onSuccess} className="btn-icon" style={{ color: vibeAccent, fontSize: 11, padding: 0, textDecoration: 'underline' }}>Log in</button>
+          {t('createAccount.alreadyHaveAccount')}{' '}
+          <button onClick={onSuccess} className="btn-icon" style={{ color: vibeAccent, fontSize: 11, padding: 0, textDecoration: 'underline' }}>{t('createAccount.logIn')}</button>
         </div>
-        <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.5 }}>By continuing you agree to our privacy policy.<br />Your data is never shared or sold.</div>
+        <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.5 }}>{t('createAccount.legalText')}</div>
       </div>
     </ScreenShell>
   )

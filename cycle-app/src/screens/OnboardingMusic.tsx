@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { VibeKey } from '../types'
 import { VIBES, ALL_EXTRA_GENRES } from '../types'
 
@@ -9,9 +10,13 @@ interface Props {
   initialValue?: string[]
 }
 
+const LATIN_GENRES = ['Latin pop', 'Reggaeton', 'Latin ballads']
+
 const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialValue }) => {
+  const { t, i18n } = useTranslation()
   const vibeTheme = VIBES.find(v => v.key === vibe) || VIBES[0]
-  const defaultGenres = vibeTheme.genres
+  const isLatinLang = i18n.language?.startsWith('es') || i18n.language?.startsWith('pt')
+  const defaultGenres = isLatinLang ? LATIN_GENRES : vibeTheme.genres
   const [selected, setSelected] = useState<string[]>(initialValue || [...defaultGenres])
   const [visible, setVisible] = useState(false)
 
@@ -33,12 +38,12 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
       <div className="progress-track" style={{ background: `${accent}22` }}>
         <div className="progress-fill" style={{ width: '100%', background: `linear-gradient(90deg, ${accent}, ${accent}bb)` }} />
       </div>
-      <button onClick={onBack} className="btn-back" style={{ color: muted }}>← back</button>
+      <button onClick={onBack} className="btn-back" style={{ color: muted }}>{t('back')}</button>
 
       <div className="content" style={{ gap: 14 }}>
-        <div className="step-label" style={{ color: accent }}>Step 6 of 6</div>
-        <h1 className="heading" style={{ color: text }}>Your music taste</h1>
-        <p className="subtext" style={{ color: muted, marginTop: -4 }}>Suggested for {vibeTheme.emoji} {vibeTheme.label} — swap any out.</p>
+        <div className="step-label" style={{ color: accent }}>{t('stepOf', { step: 6 })}</div>
+        <h1 className="heading" style={{ color: text }}>{t('onboardingMusic.heading')}</h1>
+        <p className="subtext" style={{ color: muted, marginTop: -4 }}>{t('onboardingMusic.subtext', { emoji: vibeTheme.emoji, vibe: vibeTheme.label })}</p>
 
         <div>
           <div className="flex-wrap">
@@ -52,7 +57,7 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
         <div style={{ height: 1, background: `${accent}20` }} />
 
         <div>
-          <div className="mono-hint" style={{ color: muted, marginBottom: 10 }}>Add more</div>
+          <div className="mono-hint" style={{ color: muted, marginBottom: 10 }}>{t('onboardingMusic.addMore')}</div>
           <div className="flex-wrap">
             {extraGenres.map(genre => {
               const isOn = selected.includes(genre)
@@ -61,11 +66,11 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
           </div>
         </div>
 
-        <div className="mono-sm text-center" style={{ color: muted }}>{selected.length} genre{selected.length !== 1 ? 's' : ''} selected</div>
+        <div className="mono-sm text-center" style={{ color: muted }}>{selected.length} {t('onboardingMusic.genresSelected')}</div>
         <div className="spacer" />
         <button onClick={() => selected.length > 0 && onContinue(selected)} disabled={selected.length === 0}
           className="btn-primary" style={{ background: selected.length > 0 ? accent : `${accent}44` }}>
-          See my journey →
+          {t('onboardingMusic.seeJourney')}
         </button>
       </div>
     </div>

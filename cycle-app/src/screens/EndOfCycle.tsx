@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { OnboardingData } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
 import { TREATMENT_LABELS } from '../lib/constants'
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
+  const { t } = useTranslation()
   const visible = useFadeIn(80)
   const [orb, setOrb] = useState(false)
 
@@ -37,18 +39,18 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
           <div className="flex-center" style={{ width: 80, height: 80, borderRadius: '50%', background: `radial-gradient(circle at 35% 35%, ${vibe.accent}cc, ${vibe.accent}55)`, fontSize: 36, animation: orb ? 'pulse-orb 2.5s ease-in-out infinite' : 'none' }}>{vibe.emoji}</div>
         </div>
 
-        <SectionLabel color={vibe.accent}>Cycle complete</SectionLabel>
+        <SectionLabel color={vibe.accent}>{t('endOfCycle.sectionLabel')}</SectionLabel>
         <h1 className="heading-xl" style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, color: textColor }}>
-          You did it,<br /><span style={{ color: vibe.accent }}>{data.name}.</span>
+          {(() => { const full = t('endOfCycle.heading', { name: data.name }); const idx = full.indexOf(data.name); if (idx === -1) return full; return <>{full.slice(0, idx)}<br /><span style={{ color: vibe.accent }}>{full.slice(idx)}</span></> })()}
         </h1>
         <p style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 16, color: mutedColor, lineHeight: 1.6, textAlign: 'center', maxWidth: 280 }}>
-          {data.cycleDays} days of showing up for yourself. That takes incredible strength.
+          {t('endOfCycle.message', { days: data.cycleDays })}
         </p>
 
         <Card cardBg={cardBg} cardBorder={cardBorder} style={{ width: '100%' }}>
-          <SectionLabel color={vibe.accent}>Your journey</SectionLabel>
+          <SectionLabel color={vibe.accent}>{t('endOfCycle.yourJourney')}</SectionLabel>
           <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            {[{ val: daysCompleted, label: 'Days done' }, { val: daysCompleted, label: 'Songs played' }, { val: daysCompleted, label: 'Quotes read' }].map((s, i) => (
+            {[{ val: daysCompleted, label: t('endOfCycle.daysDone') }, { val: daysCompleted, label: t('endOfCycle.songsPlayed') }, { val: daysCompleted, label: t('endOfCycle.quotesRead') }].map((s, i) => (
               <div key={i} className="stat">
                 <div className="stat-value" style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 32, fontWeight: typo.headingWeight, color: vibe.accent }}>{s.val}</div>
                 <div className="stat-label" style={{ color: mutedColor }}>{s.label}</div>
@@ -57,10 +59,10 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
           </div>
         </Card>
 
-        <PrimaryButton accent={vibe.accent} typo={typo} onClick={onStartNewCycle}>Start a new cycle →</PrimaryButton>
-        <GhostButton color={vibe.accent} borderColor={`${vibe.accent}50`} typo={typo} onClick={onGift}>Gift this to a friend 🎁</GhostButton>
-        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', background: '#25D366', color: 'white', border: 'none', borderRadius: 14, padding: '15px', fontFamily: typo.bodyFont, fontSize: 14, fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Share via WhatsApp 💚</a>
-        <div className="mono-xs text-center" style={{ color: mutedColor }}>Wishing you all the love in the world {vibe.emoji}</div>
+        <PrimaryButton accent={vibe.accent} typo={typo} onClick={onStartNewCycle}>{t('endOfCycle.newCycle')}</PrimaryButton>
+        <GhostButton color={vibe.accent} borderColor={`${vibe.accent}50`} typo={typo} onClick={onGift}>{t('endOfCycle.giftFriend')}</GhostButton>
+        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', background: '#25D366', color: 'white', border: 'none', borderRadius: 14, padding: '15px', fontFamily: typo.bodyFont, fontSize: 14, fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>{t('endOfCycle.shareWhatsApp')}</a>
+        <div className="mono-xs text-center" style={{ color: mutedColor }}>{t('endOfCycle.closingMessage', { emoji: vibe.emoji })}</div>
       </div>
     </ScreenShell>
   )
