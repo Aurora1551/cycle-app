@@ -27,7 +27,7 @@ type Screen =
   | 'day' | 'progress' | 'settings' | 'end-of-cycle' | 'gift-flow'
 
 const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow']
-const NAV_SCREENS: Screen[] = ['day', 'progress', 'settings']
+const NAV_SCREENS: Screen[] = ['day', 'progress']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
   if (screen === 'splash') return '#0E0E0E'
@@ -110,7 +110,7 @@ function App() {
       {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onDone={() => setScreen('day')} />}
       {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={advanceDay} onSettings={() => setScreen('settings')} />}
       {screen === 'progress' && data.name && data.vibe && data.components && <Progress data={data as OnboardingData} dayNumber={dayNumber} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen('day') }} />}
-      {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} />}
+      {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onBack={() => setScreen('day')} />}
       {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={restartJourney} onGift={() => setScreen('gift-flow')} />}
       {screen === 'gift-flow' && <GiftFlow onBack={() => setScreen('paywall')} vibeAccent={vibe?.accent} vibeBg={vibe?.bg} />}
 
@@ -119,7 +119,6 @@ function App() {
           {([
             { id: 'day' as Screen, label: 'Today', icon: '☀' },
             { id: 'progress' as Screen, label: 'Progress', icon: '○' },
-            { id: 'settings' as Screen, label: 'Settings', icon: '⚙' },
           ]).map(tab => {
             const isActive = screen === tab.id
             const color = isActive ? navAccent : navMuted

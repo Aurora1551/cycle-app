@@ -13,11 +13,12 @@ interface Props {
   onUpdateData: (patch: Partial<OnboardingData>) => void
   onDeleteAccount: () => void
   onLogout: () => void
+  onBack: () => void
 }
 
 type EditMode = null | 'vibe' | 'genres' | 'components'
 
-const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout }) => {
+const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onBack }) => {
   const visible = useFadeIn()
   const [editMode, setEditMode] = useState<EditMode>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -68,6 +69,11 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
   return (
     <ScreenShell bg={vibe.bg} visible={visible}>
       <div style={{ padding: '20px 24px 16px' }}>
+        <div className="flex-between" style={{ marginBottom: 8 }}>
+          <button onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
+            <span style={{ fontSize: 16 }}>‹</span> Back
+          </button>
+        </div>
         <SectionLabel color={vibe.accent}>Settings</SectionLabel>
         <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 30, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, margin: 0 }}>Your journey</h1>
       </div>
