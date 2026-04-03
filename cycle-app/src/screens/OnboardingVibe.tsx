@@ -69,7 +69,9 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
             <span style={{ fontSize: 20 }}>{activeVibe?.emoji}</span>
             <div>
               <div style={{ fontSize: 12, fontWeight: 600, color: text, fontFamily: "'Karla', sans-serif" }}>{activeVibe?.label} vibe selected</div>
-              <div style={{ fontSize: 11, color: muted }}>Music: {activeVibe?.genres.join(' · ')}</div>
+              <div style={{ fontSize: 11, color: muted }}>{
+                ({ fierce: 'You were born to conquer.', nurturing: 'You deserve gentle, radical care.', calm: 'Stillness is your superpower.', lighthearted: 'Joy looks so good on you.', spiritual: 'Your spirit knows the way.' } as Record<string, string>)[selected!] || ''
+              }</div>
             </div>
           </div>
         )}

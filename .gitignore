@@ -1,0 +1,4 @@
+node_modules/
+cycle-app/.env
+*.log
+.env

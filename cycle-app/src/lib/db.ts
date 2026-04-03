@@ -18,6 +18,7 @@ import type { VibeKey } from '../types'
     quote text, quote_author text,
     song_title text, song_artist text,
     journal_prompt text, affirmation text, gratitude_prompt text,
+    breathing_opening text, breathing_closing text,
     generated_at timestamptz default now(),
     unique(user_id, day_number)
   );
@@ -43,6 +44,8 @@ export interface DayContent {
   journalPrompt: string
   affirmation: string
   gratitudePrompt: string
+  breathingOpening?: string
+  breathingClosing?: string
 }
 
 export interface ProfileData {
@@ -85,6 +88,8 @@ export async function getDayContent(userId: string, dayNumber: number): Promise<
     journalPrompt: data.journal_prompt,
     affirmation: data.affirmation,
     gratitudePrompt: data.gratitude_prompt,
+    breathingOpening: data.breathing_opening || undefined,
+    breathingClosing: data.breathing_closing || undefined,
   }
 }
 
@@ -99,6 +104,8 @@ export async function saveDayContent(userId: string, dayNumber: number, content:
     journal_prompt: content.journalPrompt,
     affirmation: content.affirmation,
     gratitude_prompt: content.gratitudePrompt,
+    breathing_opening: content.breathingOpening || null,
+    breathing_closing: content.breathingClosing || null,
   })
   if (error) console.error('saveDayContent error:', error)
 }

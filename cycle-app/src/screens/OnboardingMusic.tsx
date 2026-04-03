@@ -41,7 +41,6 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
         <p className="subtext" style={{ color: muted, marginTop: -4 }}>Suggested for {vibeTheme.emoji} {vibeTheme.label} — swap any out.</p>
 
         <div>
-          <div className="mono-hint" style={{ color: accent, marginBottom: 10 }}>Your picks</div>
           <div className="flex-wrap">
             {defaultGenres.map(genre => {
               const isOn = selected.includes(genre)

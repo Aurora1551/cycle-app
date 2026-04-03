@@ -21,6 +21,8 @@ const FALLBACK = {
     journalPrompt: 'What does choosing this path say about your strength?',
     affirmation: 'I am doing something extraordinary for my future self.',
     gratitudePrompt: 'Name three things about your body you are grateful for today.',
+    breathingOpening: 'Take a moment just for you.',
+    breathingClosing: "You've got this, warrior.",
   },
   nurturing: {
     quote: 'Be gentle with yourself — you are a child of the universe.',
@@ -30,6 +32,8 @@ const FALLBACK = {
     journalPrompt: 'What feels tender today, and how can you hold that gently?',
     affirmation: 'I am held, I am loved, I am exactly where I need to be.',
     gratitudePrompt: 'What small act of kindness has someone shown you recently?',
+    breathingOpening: 'Let yourself be held right now.',
+    breathingClosing: 'You are so deeply loved.',
   },
   calm: {
     quote: 'You are the sky. Everything else is just the weather.',
@@ -39,6 +43,8 @@ const FALLBACK = {
     journalPrompt: 'What would it feel like to fully surrender to today?',
     affirmation: 'I breathe in peace and release what I cannot control.',
     gratitudePrompt: 'What moment of stillness have you found today?',
+    breathingOpening: 'Be still and breathe deeply.',
+    breathingClosing: 'Peace lives inside you always.',
   },
   lighthearted: {
     quote: 'Keep your face always toward the sunshine.',
@@ -48,6 +54,8 @@ const FALLBACK = {
     journalPrompt: 'What made you smile or laugh recently, and why?',
     affirmation: 'Joy is my birthright and I welcome it in fully.',
     gratitudePrompt: 'What genuinely delighted you today?',
+    breathingOpening: 'Smile and breathe with me.',
+    breathingClosing: 'Your light is absolutely radiant.',
   },
   spiritual: {
     quote: 'For I know the plans I have for you.',
@@ -57,6 +65,8 @@ const FALLBACK = {
     journalPrompt: 'How have you felt held or guided today, even in small ways?',
     affirmation: 'I trust the journey my soul has chosen.',
     gratitudePrompt: 'What grace or blessing have you noticed today?',
+    breathingOpening: 'Centre your spirit right here.',
+    breathingClosing: 'Your faith carries you forward.',
   },
 }
 
@@ -91,7 +101,9 @@ Return ONLY a valid JSON object with these exact fields:
   "songArtist": "the real artist name",
   "journalPrompt": "a gentle, specific reflective question for day ${dayNumber} (not generic)",
   "affirmation": "a powerful present-tense affirmation for this stage of their treatment",
-  "gratitudePrompt": "a specific gratitude prompt related to their body or this process"
+  "gratitudePrompt": "a specific gratitude prompt related to their body or this process",
+  "breathingOpening": "a warm, personal one-sentence opening line for a breathing exercise using their name and/or day number (e.g. '${name}, take a moment just for you.' or 'Day ${dayNumber}, ${name} — breathe before anything else.')",
+  "breathingClosing": "a warm, personal one-sentence closing line after the breathing exercise, different from the opening (e.g. 'You've got this, ${name}.' or 'That strength is all yours, ${name}.')"
 }
 
 Tailor everything to day ${dayNumber} of ${totalDays} — early days feel hopeful, middle days feel grounding, later days feel triumphant.
