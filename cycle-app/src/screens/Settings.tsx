@@ -186,14 +186,14 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             <div className="grid-2" style={{ margin: '12px 0 20px' }}>
               {VIBES.map(v => (
                 <button key={v.key} onClick={() => { onUpdateData({ vibe: v.key }); setEditMode(null) }} style={{
-                  background: data.vibe === v.key ? v.bg : `${v.bg}44`,
+                  background: data.vibe === v.key ? `${v.accent}18` : `${v.accent}08`,
                   border: data.vibe === v.key ? `2px solid ${v.accent}` : `1.5px solid ${v.accent}33`,
                   borderRadius: 14, padding: '14px 10px', textAlign: 'center', cursor: 'pointer',
                   boxShadow: data.vibe === v.key ? `0 0 0 3px ${v.accent}33` : 'none',
                 }}>
                   <div style={{ fontSize: 24, marginBottom: 4 }}>{v.emoji}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: v.text }}>{v.label}</div>
-                  <div style={{ fontSize: 10, color: v.muted }}>{v.tagline}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: textColor }}>{v.label}</div>
+                  <div style={{ fontSize: 10, color: mutedColor }}>{v.tagline}</div>
                 </button>
               ))}
             </div>
