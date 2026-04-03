@@ -21,7 +21,7 @@ function speak(text: string): Promise<void> {
     if (!('speechSynthesis' in window)) { resolve(); return }
     window.speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(text)
-    u.rate = 0.72
+    u.rate = 0.65
     u.pitch = 0.95
     u.onend = () => resolve()
     u.onerror = () => resolve()
@@ -82,9 +82,10 @@ interface GuidedBreathingProps {
   closingLine: string
   genres: string[]
   onComplete: () => void
+  onStop: () => void
 }
 
-function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onComplete }: GuidedBreathingProps) {
+function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onComplete, onStop }: GuidedBreathingProps) {
   const [stage, setStage] = useState<'opening' | 'breathing' | 'done'>('opening')
   const [cycle, setCycle] = useState(0)
   const [phaseIdx, setPhaseIdx] = useState(0)
@@ -93,16 +94,21 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
   const ambientRef = React.useRef<ReturnType<typeof createAmbientMusic>>(null)
   const phase = PHASES[phaseIdx]
 
+  const stopMeditation = () => {
+    window.speechSynthesis?.cancel()
+    ambientRef.current?.stop()
+    onStop()
+  }
+
   // Start ambient music + speak opening line, then transition after speech finishes
   useEffect(() => {
     ambientRef.current = createAmbientMusic()
     ambientRef.current?.start()
     setOpeningFade(1)
 
-    // Wait for speech to finish, then add a gentle pause before breathing starts
     const run = async () => {
       await speak(openingLine)
-      await new Promise(r => setTimeout(r, 1800))
+      await new Promise(r => setTimeout(r, 2000))
       setStage('breathing')
     }
     run()
@@ -110,7 +116,7 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
     return () => { window.speechSynthesis?.cancel(); ambientRef.current?.stop() }
   }, [])
 
-  // Breathing timer — slower pace (1.2s per count instead of 1s)
+  // Breathing timer — 2s per count for a calm, natural pace
   useEffect(() => {
     if (stage !== 'breathing') return
     speak(phase.spokenCounts[count - 1])
@@ -137,7 +143,7 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
       } else {
         setCount(c => c + 1)
       }
-    }, 1200)
+    }, 2000)
     return () => clearTimeout(interval)
   }, [stage, cycle, phaseIdx, count])
 
@@ -147,6 +153,7 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
         <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${vibe.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🌿</div>
         <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 20, color: vibe.accent, textAlign: 'center', lineHeight: 1.5, maxWidth: 260 }}>{openingLine}</div>
         <div className="mono-hint" style={{ color: vibe.muted, fontSize: 11 }}>preparing your breath...</div>
+        <button onClick={stopMeditation} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: vibe.muted, marginTop: 4 }}>Stop</button>
       </div>
     )
   }
@@ -188,6 +195,7 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
       </div>
       <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 18, color: vibe.accent }}>{phase.label}</div>
       <div className="mono-hint" style={{ color: vibe.muted }}>cycle {cycle + 1} of {TOTAL_CYCLES}</div>
+      <button onClick={stopMeditation} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: vibe.muted, marginTop: 4 }}>Stop</button>
     </div>
   )
 }
@@ -303,7 +311,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
         <SectionLabel color={vibe.accent}>Guided Breathing</SectionLabel>
         {!meditationStarted ? (
           <button onClick={() => { setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `${vibe.accent}15`, border: `1px solid ${vibe.accent}30`, borderRadius: 12, padding: '20px', cursor: 'pointer', fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 14, color: vibe.accent }}>
-            Begin · 3 cycles · ~45 seconds
+            Start meditation · ~1.5 min
           </button>
         ) : (
           <GuidedBreathing
@@ -313,6 +321,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
             closingLine={content?.breathingClosing || `You've got this, ${data.name}.`}
             genres={data.genres}
             onComplete={() => track('breathing_completed', { day_number: dayNumber })}
+            onStop={() => setMeditationStarted(false)}
           />
         )}
       </Card>
