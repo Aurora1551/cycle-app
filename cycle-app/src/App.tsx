@@ -74,6 +74,12 @@ function App() {
   const appBg = getAppBg(screen, data.vibe || null, vibePreview)
   const vibe = VIBES.find(v => v.key === (data.vibe || null)) || null
 
+  // Sync body background with vibe so no black shows behind content
+  useEffect(() => {
+    document.documentElement.style.background = appBg
+    document.body.style.background = appBg
+  }, [appBg])
+
   const advanceDay = () => {
     const next = dayNumber + 1
     localStorage.setItem(DAY_KEY, String(next))
