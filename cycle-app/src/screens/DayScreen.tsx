@@ -203,6 +203,7 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
 const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete, onSettings }) => {
   const [content, setContent] = useState<DayContent | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [journalText, setJournalText] = useState('')
   const [journalSaved, setJournalSaved] = useState(false)
   const [dayDone, setDayDone] = useState(false)
@@ -213,31 +214,49 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
   const typo = resolveTypo(data.vibe)
   const { isDark, textColor, mutedColor, cardBg, cardBorder } = deriveTheme(vibe)
   const isLocked = !isPremium && dayNumber > 3
-  const localKey = `cycle_day_${dayNumber}`
+  // Cache key includes user name + vibe to bust cache when profile changes
+  const localKey = `cycle_content_${data.name}_${data.vibe}_day${dayNumber}`
 
   useEffect(() => {
-    if (localStorage.getItem(`${localKey}_done`) === '1') setDayDone(true)
-    setJournalText(localStorage.getItem(`${localKey}_journal`) || '')
+    if (localStorage.getItem(`cycle_day_${dayNumber}_done`) === '1') setDayDone(true)
+    setJournalText(localStorage.getItem(`cycle_day_${dayNumber}_journal`) || '')
   }, [])
 
   useEffect(() => {
-    const localContent = localStorage.getItem(localKey)
-    if (localContent) { try { setContent(JSON.parse(localContent)); setLoading(false); return } catch {} }
+    // Check localStorage cache for this specific user+day combo
+    const cached = localStorage.getItem(localKey)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        // Only use cache if it has real API content (not placeholder)
+        if (parsed.quote && parsed.quoteAuthor && !parsed.error) {
+          setContent(parsed)
+          setLoading(false)
+          return
+        }
+      } catch {}
+    }
     fetchContent()
     track('day_screen_viewed', { day_number: dayNumber, treatment_type: TREATMENT_LABELS[data.treatment] || data.treatment })
   }, [dayNumber])
 
   const fetchContent = async () => {
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch('/api/generate-day', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: data.name, treatment: TREATMENT_LABELS[data.treatment] || data.treatment, dayNumber, totalDays: data.cycleDays, vibe: data.vibe, genres: data.genres }),
+        body: JSON.stringify({ name: data.name, treatment: TREATMENT_LABELS[data.treatment] || data.treatment, dayNumber, totalDays: data.cycleDays, vibe: data.vibe, genres: data.genres, userId: data.name }),
       })
-      if (res.ok) { const c = await res.json(); setContent(c); localStorage.setItem(localKey, JSON.stringify(c)) }
-      else throw new Error('fetch failed')
-    } catch {
-      setContent({ quote: 'You are doing something extraordinary.', quoteAuthor: 'Your future self', songTitle: 'Golden Hour', songArtist: 'JVKE', journalPrompt: 'What does it mean to choose this path for yourself?', affirmation: `I am ${data.name}, and I am doing enough.`, gratitudePrompt: 'What is your body doing right now that you are grateful for?', breathingOpening: `${data.name}, take a moment just for you.`, breathingClosing: `You've got this, ${data.name}.` })
+      const body = await res.json()
+      if (!res.ok || body.error) {
+        throw new Error(body.message || 'Content generation failed')
+      }
+      setContent(body)
+      localStorage.setItem(localKey, JSON.stringify(body))
+    } catch (err: any) {
+      setError(err.message || 'Unable to load your content right now')
+      setContent(null)
     } finally { setLoading(false) }
   }
 
@@ -342,7 +361,16 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
       {loading ? (
         <div className="flex-center" style={{ flex: 1, flexDirection: 'column', gap: 14 }}>
           <div className="spinner" style={{ width: 40, height: 40, border: `2px solid ${vibe.accent}40`, borderTop: `2px solid ${vibe.accent}` }} />
-          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 15, color: mutedColor }}>Preparing your day...</div>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 15, color: mutedColor }}>Creating your personalised content...</div>
+        </div>
+      ) : error ? (
+        <div className="flex-center" style={{ flex: 1, flexDirection: 'column', gap: 14, padding: '0 24px' }}>
+          <div style={{ fontSize: 32 }}>✨</div>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 16, color: textColor, textAlign: 'center', lineHeight: 1.4 }}>Your content is being prepared</div>
+          <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, textAlign: 'center', lineHeight: 1.5 }}>{error}</div>
+          <button onClick={fetchContent} style={{ marginTop: 8, background: vibe.accent, color: 'white', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont }}>
+            Try again
+          </button>
         </div>
       ) : isLocked ? (
         <div className="flex-col gap-12" style={{ padding: '0 18px 160px', flex: 1 }}>

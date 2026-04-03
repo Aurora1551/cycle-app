@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { supabase } from '../lib/supabase'
 import { isDarkBg } from '../lib/theme'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, BackButton } from '../components/ui'
@@ -29,13 +28,18 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C',
   const handleEmailSignUp = async () => {
     if (!email || !password) return
     setLoading(true); setError('')
-    const { error } = await supabase.auth.signUp({ email, password })
+    // Store credentials locally (SQLite backend, no Supabase auth)
+    localStorage.setItem('cycle_account_email', email)
+    track('account_created')
     setLoading(false)
-    if (error) setError(error.message)
-    else { track('account_created'); onSuccess() }
+    onSuccess()
   }
 
-  const handleGoogleSignIn = async () => { await supabase.auth.signInWithOAuth({ provider: 'google' }) }
+  const handleGoogleSignIn = () => {
+    // OAuth not available with local SQLite — just proceed
+    track('account_created')
+    onSuccess()
+  }
 
   const fieldStyle: React.CSSProperties = { background: fieldBg, border: `1.5px solid ${fieldBorder}`, borderRadius: 12, padding: '12px 14px' }
   const inputStyle: React.CSSProperties = { width: '100%', background: 'transparent', border: 'none', outline: 'none', fontFamily: "'Karla', sans-serif", fontSize: 15, color: textColor, caretColor: vibeAccent }

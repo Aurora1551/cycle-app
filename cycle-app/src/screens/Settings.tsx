@@ -3,7 +3,7 @@ import type { OnboardingData, VibeKey } from '../types'
 import { VIBES, ALL_EXTRA_GENRES } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
 import { TREATMENT_LABELS, ALL_COMPONENTS, NOTIFICATION_TIMES, NOTIFICATION_CONTENT } from '../lib/constants'
-import { supabase, supabaseEnabled } from '../lib/supabase'
+import { deleteAccount } from '../lib/db'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, Card, SectionLabel, Toggle } from '../components/ui'
 
@@ -42,15 +42,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
 
   const handleDeleteAccount = async () => {
     setDeleting(true)
-    if (supabaseEnabled) {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        await supabase.from('journal_entries').delete().eq('user_id', user.id)
-        await supabase.from('daily_content').delete().eq('user_id', user.id)
-        await supabase.from('profiles').delete().eq('id', user.id)
-        await supabase.auth.signOut()
-      }
-    }
+    await deleteAccount(data.name)
     localStorage.clear()
     onDeleteAccount()
   }
