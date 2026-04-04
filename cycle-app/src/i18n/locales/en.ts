@@ -26,6 +26,7 @@ const en = {
     },
     onboardingTreatment: {
       heading: 'What are you going through?',
+      otherPlaceholder: 'Tell us about your journey...',
     },
     onboardingCycleLength: {
       heading: 'How many days?',
@@ -53,18 +54,14 @@ const en = {
 
     // Treatments
     treatments: {
-      'egg-freezing': 'Egg Freezing',
       ivf: 'IVF',
       iui: 'IUI',
+      'egg-freezing': 'Egg Freezing',
       'egg-donation': 'Egg Donation',
+      'embryo-transfer': 'Embryo Transfer (FET)',
+      surrogacy: 'Surrogacy',
+      preparing: 'Preparing for a cycle',
       other: 'Other',
-    },
-    treatmentDescriptions: {
-      'egg-freezing': 'Oocyte cryopreservation',
-      ivf: 'In vitro fertilization',
-      iui: 'Intrauterine insemination',
-      'egg-donation': 'Egg Donation',
-      other: '',
     },
 
     // Components
@@ -145,11 +142,43 @@ const en = {
       passwordPlaceholder: 'Minimum 8 characters',
       continueGoogle: 'Continue with Google',
       continueApple: 'Continue with Apple',
+      confirmPassword: 'Confirm password',
+      confirmPasswordPlaceholder: 'Re-enter your password',
+      passwordMismatch: 'Passwords do not match',
+      passwordTooShort: 'Password must be at least 8 characters',
+      accountExists: 'An account with this email already exists. Try logging in instead.',
+      genericError: 'Something went wrong. Please try again.',
+      networkError: 'Unable to connect. Please try again.',
       creating: 'Creating account...',
       createButton: 'Create account and start →',
       alreadyHaveAccount: 'Already have an account?',
       logIn: 'Log in',
       legalText: 'By continuing you agree to our privacy policy. Your data is never shared or sold.',
+    },
+
+    // Login
+    login: {
+      heading: 'Welcome back',
+      subtext: 'Log in to continue your journey.',
+      email: 'Email',
+      emailPlaceholder: 'you@example.com',
+      password: 'Password',
+      passwordPlaceholder: 'Your password',
+      button: 'Log in →',
+      loggingIn: 'Logging in...',
+      noAccount: "Don't have an account?",
+      signUp: 'Sign up',
+      error: 'Invalid email or password',
+      networkError: 'Unable to connect. Please try again.',
+    },
+
+    // Register Gate
+    registerGate: {
+      heading: 'Save your progress',
+      subtext: 'Your free days are done! Create an account to keep your journal, quotes, and progress safe. Without an account, clearing your browser data will lose everything.',
+      createAccount: 'Create account →',
+      continueAsGuest: 'Continue without saving',
+      guestWarning: 'Your data may be lost if browser data is cleared',
     },
 
     // Notification Settings

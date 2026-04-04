@@ -2,7 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
-const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser } = require('./db')
+const bcrypt = require('bcryptjs')
+const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount } = require('./db')
 
 const app = express()
 app.use(cors({ origin: '*' }))
@@ -380,6 +381,47 @@ function getFallbackContent(dayNumber, name) {
   entry.breathingClosing = entry.breathingClosing.replace(/NAME/g, name || 'love')
   return entry
 }
+
+// --- Auth endpoints ---
+
+app.post('/api/register', async (req, res) => {
+  const { email, password, profileId } = req.body
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required' })
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
+
+  const existing = getAccountByEmail(email)
+  if (existing) return res.status(409).json({ error: 'Account already exists' })
+
+  const passwordHash = await bcrypt.hash(password, 10)
+  const account = createAccount(email, passwordHash, profileId || null)
+  res.json({ success: true, accountId: account.id, email })
+})
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required' })
+
+  const account = getAccountByEmail(email)
+  if (!account) return res.status(401).json({ error: 'Invalid email or password' })
+
+  const valid = await bcrypt.compare(password, account.password_hash)
+  if (!valid) return res.status(401).json({ error: 'Invalid email or password' })
+
+  // Load profile if linked
+  let profile = null
+  if (account.profile_id) {
+    profile = getProfile(account.profile_id)
+  }
+
+  res.json({ success: true, accountId: account.id, email: account.email, profile })
+})
+
+app.post('/api/link-profile', (req, res) => {
+  const { email, profileId } = req.body
+  if (!email || !profileId) return res.status(400).json({ error: 'Email and profileId required' })
+  linkProfileToAccount(email, profileId)
+  res.json({ success: true })
+})
 
 // --- Content generation endpoint ---
 

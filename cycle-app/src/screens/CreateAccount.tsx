@@ -4,18 +4,23 @@ import { isDarkBg } from '../lib/theme'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, BackButton } from '../components/ui'
 import { track } from '../lib/posthog'
+import type { OnboardingData } from '../types'
 
 interface Props {
   onBack: () => void
   onSuccess: () => void
+  onLogin: () => void
   vibeBg?: string
   vibeAccent?: string
+  profileData?: OnboardingData
+  dayNumber?: number
 }
 
-const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C', vibeAccent = '#C4614A' }) => {
+const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '#1C0F0C', vibeAccent = '#C4614A', profileData, dayNumber }) => {
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const visible = useFadeIn()
@@ -29,18 +34,51 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C',
 
   const handleEmailSignUp = async () => {
     if (!email || !password) return
+    if (password !== confirmPassword) {
+      setError(t('createAccount.passwordMismatch'))
+      return
+    }
+    if (password.length < 8) {
+      setError(t('createAccount.passwordTooShort'))
+      return
+    }
     setLoading(true); setError('')
-    // Store credentials locally (SQLite backend, no Supabase auth)
-    localStorage.setItem('cycle_account_email', email)
-    track('account_created')
-    setLoading(false)
-    onSuccess()
-  }
+    try {
+      const profileId = profileData?.name || localStorage.getItem('cycle_onboarding_data') ? JSON.parse(localStorage.getItem('cycle_onboarding_data') || '{}').name : null
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, profileId }),
+      })
+      const body = await res.json()
+      if (!res.ok) {
+        if (body.error === 'Account already exists') {
+          setError(t('createAccount.accountExists'))
+        } else {
+          setError(body.error || t('createAccount.genericError'))
+        }
+        setLoading(false)
+        return
+      }
 
-  const handleGoogleSignIn = () => {
-    // OAuth not available with local SQLite — just proceed
-    track('account_created')
-    onSuccess()
+      // Link profile to account if we have profile data
+      if (profileId) {
+        await fetch('/api/link-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, profileId }),
+        })
+      }
+
+      localStorage.setItem('cycle_account_email', email)
+      localStorage.setItem('cycle_is_guest', '0')
+      track('account_created')
+      setLoading(false)
+      onSuccess()
+    } catch {
+      setError(t('createAccount.networkError'))
+      setLoading(false)
+    }
   }
 
   const fieldStyle: React.CSSProperties = { background: fieldBg, border: `1.5px solid ${fieldBorder}`, borderRadius: 12, padding: '12px 14px' }
@@ -62,33 +100,21 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, vibeBg = '#1C0F0C',
           <div className="field-label" style={{ color: mutedColor }}>{t('createAccount.password')}</div>
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t('createAccount.passwordPlaceholder')} style={inputStyle} />
         </div>
+        <div style={fieldStyle}>
+          <div className="field-label" style={{ color: mutedColor }}>{t('createAccount.confirmPassword')}</div>
+          <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t('createAccount.confirmPasswordPlaceholder')} style={inputStyle} onKeyDown={e => e.key === 'Enter' && handleEmailSignUp()} />
+        </div>
 
         {error && <div style={{ fontSize: 12, color: '#E8907A', background: 'rgba(232,144,122,0.1)', borderRadius: 8, padding: '8px 12px' }}>{error}</div>}
 
-        <div className="divider" style={{ margin: '4px 0' }}>
-          <div className="divider-line" style={{ background: divider }} />
-          <span className="mono-sm" style={{ color: mutedColor }}>{t('or')}</span>
-          <div className="divider-line" style={{ background: divider }} />
-        </div>
-
-        {(['Google', 'Apple'] as const).map(provider => (
-          <button key={provider} onClick={provider === 'Google' ? handleGoogleSignIn : undefined} className="flex-center" style={{
-            width: '100%', background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.8)',
-            border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(196,97,74,0.15)'}`,
-            borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 500, color: textColor, cursor: 'pointer', gap: 8,
-          }}>
-            <span style={{ fontSize: 16 }}>{provider === 'Google' ? '🌐' : '🍎'}</span> {provider === 'Google' ? t('createAccount.continueGoogle') : t('createAccount.continueApple')}
-          </button>
-        ))}
-
         <div className="spacer" />
-        <button onClick={handleEmailSignUp} disabled={loading || !email || !password}
-          className="btn-primary" style={{ background: email && password ? vibeAccent : `${vibeAccent}44` }}>
+        <button onClick={handleEmailSignUp} disabled={loading || !email || !password || !confirmPassword}
+          className="btn-primary" style={{ background: email && password && confirmPassword ? vibeAccent : `${vibeAccent}44` }}>
           {loading ? t('createAccount.creating') : t('createAccount.createButton')}
         </button>
         <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.8 }}>
           {t('createAccount.alreadyHaveAccount')}{' '}
-          <button onClick={onSuccess} className="btn-icon" style={{ color: vibeAccent, fontSize: 11, padding: 0, textDecoration: 'underline' }}>{t('createAccount.logIn')}</button>
+          <button onClick={onLogin} className="btn-icon" style={{ color: vibeAccent, fontSize: 11, padding: 0, textDecoration: 'underline' }}>{t('createAccount.logIn')}</button>
         </div>
         <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.5 }}>{t('createAccount.legalText')}</div>
       </div>

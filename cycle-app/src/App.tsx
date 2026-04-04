@@ -16,23 +16,26 @@ import NotificationSettings from './screens/NotificationSettings'
 import EndOfCycle from './screens/EndOfCycle'
 import GiftFlow from './screens/GiftFlow'
 import Progress from './screens/Progress'
+import LoginScreen from './screens/LoginScreen'
+import RegisterGate from './screens/RegisterGate'
 import type { OnboardingData, VibeKey } from './types'
 import { VIBES } from './types'
 import { track } from './lib/posthog'
 import { saveProfile } from './lib/db'
 
 type Screen =
-  | 'splash' | 'onboarding-name' | 'onboarding-treatment'
+  | 'splash' | 'login' | 'onboarding-name' | 'onboarding-treatment'
   | 'onboarding-cycle-length' | 'onboarding-components'
   | 'onboarding-vibe' | 'onboarding-music' | 'summary'
   | 'paywall' | 'create-account' | 'notification-settings'
   | 'day' | 'progress' | 'settings' | 'end-of-cycle' | 'gift-flow'
+  | 'register-gate'
 
 const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow']
 const NAV_SCREENS: Screen[] = ['day', 'progress']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
-  if (screen === 'splash') return '#0E0E0E'
+  if (screen === 'splash' || screen === 'login' || screen === 'register-gate') return '#0E0E0E'
   const activeVibe = preview || vibe
   if (ONBOARDING_VIBE_SCREENS.includes(screen) && activeVibe) {
     return VIBES.find(v => v.key === activeVibe)?.bg || '#FDF6F0'
@@ -109,6 +112,10 @@ function App() {
   const restartJourney = () => {
     localStorage.removeItem(DATA_KEY)
     localStorage.removeItem(DAY_KEY)
+    localStorage.removeItem('cycle_is_guest')
+    localStorage.removeItem('cycle_guest_start')
+    localStorage.removeItem('cycle_register_dismissed')
+    localStorage.removeItem('cycle_account_email')
     setData({})
     setDayNumber(1)
     setScreen('splash')
@@ -122,7 +129,8 @@ function App() {
 
   return (
     <div style={{ width: '100%', minHeight: '100svh', display: 'flex', justifyContent: 'center', background: appBg, transition: 'background 0.5s ease' }}>
-      {screen === 'splash' && <SplashScreen onBegin={() => setScreen('onboarding-name')} onHaveAccount={() => setScreen('onboarding-name')} />}
+      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-name') }} onHaveAccount={() => setScreen('login')} />}
+      {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('onboarding-name')} />}
       {screen === 'onboarding-name' && <OnboardingName onBack={() => setScreen('splash')} onContinue={name => { update({ name }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-treatment') }} initialValue={data.name} />}
       {screen === 'onboarding-treatment' && <OnboardingTreatment onBack={() => setScreen('onboarding-name')} onContinue={treatment => { update({ treatment }); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-cycle-length') }} initialValue={data.treatment} />}
       {screen === 'onboarding-cycle-length' && <OnboardingCycleLength onBack={() => setScreen('onboarding-treatment')} onContinue={cycleDays => { update({ cycleDays }); track('onboarding_step_completed', { step: 3 }); setScreen('onboarding-components') }} initialValue={data.cycleDays} />}
@@ -131,9 +139,10 @@ function App() {
       {screen === 'onboarding-music' && data.vibe && <OnboardingMusic onBack={() => setScreen('onboarding-vibe')} onContinue={genres => { update({ genres }); track('onboarding_step_completed', { step: 6 }); setScreen('summary') }} vibe={data.vibe} initialValue={data.genres} />}
       {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => setScreen('day')} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
       {screen === 'paywall' && <Paywall name={data.name} onStartFree={() => setScreen('day')} onSelectPlan={plan => { track('plan_selected', { plan }); setScreen(plan === 'gift' ? 'gift-flow' : 'create-account') }} />}
-      {screen === 'create-account' && <CreateAccount onBack={() => setScreen('paywall')} onSuccess={() => setScreen('notification-settings')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} />}
+      {screen === 'create-account' && <CreateAccount onBack={() => setScreen('paywall')} onSuccess={() => { localStorage.setItem('cycle_is_guest', '0'); setScreen('notification-settings') }} onLogin={() => setScreen('login')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} profileData={data as OnboardingData} dayNumber={dayNumber} />}
       {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onDone={() => setScreen('day')} />}
-      {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={advanceDay} onSettings={() => setScreen('settings')} />}
+      {screen === 'register-gate' && <RegisterGate onCreateAccount={() => setScreen('create-account')} onContinueGuest={() => setScreen('day')} />}
+      {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3 && localStorage.getItem('cycle_register_dismissed') !== '1') { advanceDay(); setScreen('register-gate'); return } advanceDay() }} onSettings={() => setScreen('settings')} />}
       {screen === 'progress' && data.name && data.vibe && data.components && <Progress data={data as OnboardingData} dayNumber={dayNumber} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen('day') }} />}
       {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onBack={() => setScreen('day')} />}
       {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={restartJourney} onGift={() => setScreen('gift-flow')} />}

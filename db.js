@@ -52,6 +52,14 @@ db.exec(`
 
   CREATE UNIQUE INDEX IF NOT EXISTS idx_journal_unique
     ON journal_entries(user_id, day_number);
+
+  CREATE TABLE IF NOT EXISTS accounts (
+    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    profile_id TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `)
 
 console.log('[DB] SQLite database ready at', DB_PATH)
@@ -92,6 +100,10 @@ const stmts = {
   deleteUserData: db.prepare('DELETE FROM daily_content WHERE user_id = ?'),
   deleteUserJournals: db.prepare('DELETE FROM journal_entries WHERE user_id = ?'),
   deleteUserProfile: db.prepare('DELETE FROM profiles WHERE id = ?'),
+
+  getAccountByEmail: db.prepare('SELECT * FROM accounts WHERE email = ?'),
+  createAccount: db.prepare('INSERT INTO accounts (email, password_hash, profile_id) VALUES (@email, @passwordHash, @profileId)'),
+  linkProfileToAccount: db.prepare('UPDATE accounts SET profile_id = @profileId WHERE email = @email'),
 }
 
 // --- Exported functions ---
@@ -163,6 +175,19 @@ function saveJournal(userId, dayNumber, content) {
   stmts.upsertJournal.run({ userId, dayNumber, content })
 }
 
+function getAccountByEmail(email) {
+  return stmts.getAccountByEmail.get(email) || null
+}
+
+function createAccount(email, passwordHash, profileId) {
+  stmts.createAccount.run({ email, passwordHash, profileId })
+  return stmts.getAccountByEmail.get(email)
+}
+
+function linkProfileToAccount(email, profileId) {
+  stmts.linkProfileToAccount.run({ email, profileId })
+}
+
 function deleteUser(userId) {
   stmts.deleteUserData.run(userId)
   stmts.deleteUserJournals.run(userId)
@@ -177,4 +202,7 @@ module.exports = {
   saveDayContent,
   saveJournal,
   deleteUser,
+  getAccountByEmail,
+  createAccount,
+  linkProfileToAccount,
 }
