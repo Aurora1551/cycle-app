@@ -41,6 +41,23 @@ db.exec(`
 
   CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_content_unique
     ON daily_content(user_id, day_number, cycle_id);
+`)
+
+// Add friend_note column if missing (migration for existing DBs)
+try {
+  db.exec(`ALTER TABLE daily_content ADD COLUMN friend_note TEXT`)
+} catch (e) {
+  // Column already exists — ignore
+}
+
+// Add plan column to accounts if missing
+try {
+  db.exec(`ALTER TABLE accounts ADD COLUMN plan TEXT DEFAULT 'free'`)
+} catch (e) {
+  // Column already exists — ignore
+}
+
+db.exec(`
 
   CREATE TABLE IF NOT EXISTS journal_entries (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
@@ -59,6 +76,27 @@ db.exec(`
     password_hash TEXT NOT NULL,
     profile_id TEXT,
     created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS spotify_tokens (
+    user_id TEXT PRIMARY KEY,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL,
+    token_expiry TEXT NOT NULL,
+    spotify_user_id TEXT,
+    spotify_display_name TEXT,
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS purchases (
+    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    user_id TEXT NOT NULL,
+    plan TEXT NOT NULL,
+    stripe_payment_id TEXT UNIQUE,
+    amount INTEGER NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'gbp',
+    status TEXT NOT NULL DEFAULT 'succeeded',
+    purchased_at TEXT DEFAULT (datetime('now'))
   );
 `)
 
@@ -82,13 +120,13 @@ const stmts = {
   ),
 
   upsertDayContent: db.prepare(`
-    INSERT INTO daily_content (user_id, day_number, cycle_id, quote, quote_author, song_title, song_artist, song_spotify_search, journal_prompt, affirmation, gratitude_prompt, breathing_opening, breathing_closing)
-    VALUES (@userId, @dayNumber, @cycleId, @quote, @quoteAuthor, @songTitle, @songArtist, @songSpotifySearch, @journalPrompt, @affirmation, @gratitudePrompt, @breathingOpening, @breathingClosing)
+    INSERT INTO daily_content (user_id, day_number, cycle_id, quote, quote_author, song_title, song_artist, song_spotify_search, journal_prompt, affirmation, gratitude_prompt, breathing_opening, breathing_closing, friend_note)
+    VALUES (@userId, @dayNumber, @cycleId, @quote, @quoteAuthor, @songTitle, @songArtist, @songSpotifySearch, @journalPrompt, @affirmation, @gratitudePrompt, @breathingOpening, @breathingClosing, @friendNote)
     ON CONFLICT(user_id, day_number, cycle_id) DO UPDATE SET
       quote=@quote, quote_author=@quoteAuthor, song_title=@songTitle, song_artist=@songArtist,
       song_spotify_search=@songSpotifySearch, journal_prompt=@journalPrompt, affirmation=@affirmation,
       gratitude_prompt=@gratitudePrompt, breathing_opening=@breathingOpening, breathing_closing=@breathingClosing,
-      generated_at=datetime('now')
+      friend_note=@friendNote, generated_at=datetime('now')
   `),
 
   upsertJournal: db.prepare(`
@@ -104,6 +142,23 @@ const stmts = {
   getAccountByEmail: db.prepare('SELECT * FROM accounts WHERE email = ?'),
   createAccount: db.prepare('INSERT INTO accounts (email, password_hash, profile_id) VALUES (@email, @passwordHash, @profileId)'),
   linkProfileToAccount: db.prepare('UPDATE accounts SET profile_id = @profileId WHERE email = @email'),
+
+  upsertSpotifyTokens: db.prepare(`
+    INSERT INTO spotify_tokens (user_id, access_token, refresh_token, token_expiry, spotify_user_id, spotify_display_name)
+    VALUES (@userId, @accessToken, @refreshToken, @tokenExpiry, @spotifyUserId, @spotifyDisplayName)
+    ON CONFLICT(user_id) DO UPDATE SET
+      access_token=@accessToken, refresh_token=@refreshToken, token_expiry=@tokenExpiry,
+      spotify_user_id=@spotifyUserId, spotify_display_name=@spotifyDisplayName, updated_at=datetime('now')
+  `),
+  getSpotifyTokens: db.prepare('SELECT * FROM spotify_tokens WHERE user_id = ?'),
+  deleteSpotifyTokens: db.prepare('DELETE FROM spotify_tokens WHERE user_id = ?'),
+
+  insertPurchase: db.prepare(`
+    INSERT INTO purchases (user_id, plan, stripe_payment_id, amount, currency, status)
+    VALUES (@userId, @plan, @stripePaymentId, @amount, @currency, @status)
+  `),
+  getPurchaseByStripeId: db.prepare('SELECT * FROM purchases WHERE stripe_payment_id = ?'),
+  updateAccountPlan: db.prepare('UPDATE accounts SET plan = @plan WHERE email = @email'),
 }
 
 // --- Exported functions ---
@@ -150,6 +205,7 @@ function getDayContent(userId, dayNumber, cycleId = 'cycle_1') {
     gratitudePrompt: row.gratitude_prompt,
     breathingOpening: row.breathing_opening,
     breathingClosing: row.breathing_closing,
+    friendNote: row.friend_note || null,
   }
 }
 
@@ -168,6 +224,7 @@ function saveDayContent(userId, dayNumber, cycleId, content) {
     gratitudePrompt: content.gratitudePrompt,
     breathingOpening: content.breathingOpening || null,
     breathingClosing: content.breathingClosing || null,
+    friendNote: content.friendNote || null,
   })
 }
 
@@ -192,6 +249,53 @@ function deleteUser(userId) {
   stmts.deleteUserData.run(userId)
   stmts.deleteUserJournals.run(userId)
   stmts.deleteUserProfile.run(userId)
+  stmts.deleteSpotifyTokens.run(userId)
+}
+
+function saveSpotifyTokens(userId, data) {
+  stmts.upsertSpotifyTokens.run({
+    userId,
+    accessToken: data.accessToken,
+    refreshToken: data.refreshToken,
+    tokenExpiry: data.tokenExpiry,
+    spotifyUserId: data.spotifyUserId || null,
+    spotifyDisplayName: data.spotifyDisplayName || null,
+  })
+}
+
+function getSpotifyTokens(userId) {
+  const row = stmts.getSpotifyTokens.get(userId)
+  if (!row) return null
+  return {
+    accessToken: row.access_token,
+    refreshToken: row.refresh_token,
+    tokenExpiry: row.token_expiry,
+    spotifyUserId: row.spotify_user_id,
+    spotifyDisplayName: row.spotify_display_name,
+  }
+}
+
+function deleteSpotifyTokens(userId) {
+  stmts.deleteSpotifyTokens.run(userId)
+}
+
+function savePurchase(data) {
+  stmts.insertPurchase.run({
+    userId: data.userId,
+    plan: data.plan,
+    stripePaymentId: data.stripePaymentId,
+    amount: data.amount,
+    currency: data.currency || 'gbp',
+    status: data.status || 'succeeded',
+  })
+}
+
+function getPurchaseByStripeId(stripePaymentId) {
+  return stmts.getPurchaseByStripeId.get(stripePaymentId) || null
+}
+
+function updateAccountPlan(email, plan) {
+  stmts.updateAccountPlan.run({ email, plan })
 }
 
 module.exports = {
@@ -205,4 +309,10 @@ module.exports = {
   getAccountByEmail,
   createAccount,
   linkProfileToAccount,
+  saveSpotifyTokens,
+  getSpotifyTokens,
+  deleteSpotifyTokens,
+  savePurchase,
+  getPurchaseByStripeId,
+  updateAccountPlan,
 }

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle Admin</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; padding: 24px; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .subtitle { color: #888; font-size: 13px; margin-bottom: 32px; }
+  .stats { display: flex; gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 20px 24px; min-width: 160px; }
+  .stat-card .num { font-size: 28px; font-weight: 700; color: #fff; }
+  .stat-card .label { font-size: 12px; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .tab { background: transparent; border: 1px solid #333; color: #aaa; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+  .tab:hover { border-color: #555; color: #ddd; }
+  .tab.active { background: #fff; color: #000; border-color: #fff; }
+  .table-wrap { overflow-x: auto; border: 1px solid #2a2a2a; border-radius: 10px; background: #1a1a1a; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 12px 16px; border-bottom: 1px solid #2a2a2a; color: #888; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; position: sticky; top: 0; background: #1a1a1a; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1f1f1f; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td.wrap { white-space: normal; max-width: 400px; }
+  tr:hover td { background: #222; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+  .badge-vibe { background: #2a1a2a; color: #d4a; }
+  .badge-treatment { background: #1a2a2a; color: #4da; }
+  .empty { text-align: center; padding: 48px; color: #555; }
+  .refresh-btn { background: #2a2a2a; border: 1px solid #333; color: #ccc; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: auto; }
+  .refresh-btn:hover { background: #333; }
+  .header-row { display: flex; align-items: center; margin-bottom: 32px; }
+  .header-row h1 { margin-bottom: 0; }
+  .expand-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 11px; padding: 2px 6px; }
+  .expand-btn:hover { color: #aaa; }
+</style>
+</head>
+<body>
+
+<div class="header-row">
+  <div>
+    <h1>Cycle Admin</h1>
+    <div class="subtitle">SQLite database viewer</div>
+  </div>
+  <button class="refresh-btn" onclick="loadAll()">Refresh</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="profiles">Profiles</button>
+  <button class="tab" data-tab="content">Daily Content</button>
+  <button class="tab" data-tab="journals">Journal Entries</button>
+</div>
+
+<div id="profiles" class="table-wrap"></div>
+<div id="content" class="table-wrap" style="display:none"></div>
+<div id="journals" class="table-wrap" style="display:none"></div>
+
+<script>
+const tabs = document.querySelectorAll('.tab')
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'))
+  t.classList.add('active')
+  document.querySelectorAll('.table-wrap').forEach(w => w.style.display = 'none')
+  document.getElementById(t.dataset.tab).style.display = 'block'
+}))
+
+function esc(s) {
+  if (s == null) return '<span style="color:#555">null</span>'
+  const d = document.createElement('div')
+  d.textContent = String(s)
+  return d.innerHTML
+}
+
+function renderTable(rows, columns) {
+  if (!rows.length) return '<div class="empty">No data</div>'
+  let html = '<table><tr>'
+  columns.forEach(c => html += `<th>${esc(c.label || c.key)}</th>`)
+  html += '</tr>'
+  rows.forEach(row => {
+    html += '<tr>'
+    columns.forEach(c => {
+      const val = c.render ? c.render(row[c.key], row) : esc(row[c.key])
+      html += `<td class="${c.wrap ? 'wrap' : ''}">${val}</td>`
+    })
+    html += '</tr>'
+  })
+  html += '</table>'
+  return html
+}
+
+function badge(text, cls) {
+  return `<span class="badge ${cls}">${esc(text)}</span>`
+}
+
+function arr(val) {
+  if (Array.isArray(val)) return val.map(v => esc(v)).join(', ')
+  return esc(val)
+}
+
+async function loadAll() {
+  const [stats, profiles, content, journals] = await Promise.all([
+    fetch('/api/admin/stats').then(r => r.json()),
+    fetch('/api/admin/profiles').then(r => r.json()),
+    fetch('/api/admin/content').then(r => r.json()),
+    fetch('/api/admin/journals').then(r => r.json()),
+  ])
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="num">${stats.profiles}</div><div class="label">Profiles</div></div>
+    <div class="stat-card"><div class="num">${stats.content}</div><div class="label">Generated Days</div></div>
+    <div class="stat-card"><div class="num">${stats.journals}</div><div class="label">Journal Entries</div></div>
+  `
+
+  document.getElementById('profiles').innerHTML = renderTable(profiles, [
+    { key: 'name', label: 'Name' },
+    { key: 'treatment', label: 'Treatment', render: v => badge(v, 'badge-treatment') },
+    { key: 'cycle_days', label: 'Cycle Days' },
+    { key: 'vibe', label: 'Vibe', render: v => badge(v, 'badge-vibe') },
+    { key: 'components', label: 'Components', render: arr },
+    { key: 'genres', label: 'Genres', render: arr },
+    { key: 'current_day', label: 'Current Day' },
+    { key: 'created_at', label: 'Created' },
+  ])
+
+  document.getElementById('content').innerHTML = renderTable(content, [
+    { key: 'user_id', label: 'User' },
+    { key: 'day_number', label: 'Day' },
+    { key: 'cycle_id', label: 'Cycle' },
+    { key: 'quote', label: 'Quote', wrap: true },
+    { key: 'quote_author', label: 'Author' },
+    { key: 'song_title', label: 'Song' },
+    { key: 'song_artist', label: 'Artist' },
+    { key: 'affirmation', label: 'Affirmation', wrap: true },
+    { key: 'journal_prompt', label: 'Journal Prompt', wrap: true },
+    { key: 'generated_at', label: 'Generated' },
+  ])
+
+  document.getElementById('journals').innerHTML = renderTable(journals, [
+    { key: 'user_id', label: 'User' },
+    { key: 'day_number', label: 'Day' },
+    { key: 'content', label: 'Entry', wrap: true },
+    { key: 'created_at', label: 'Created' },
+  ])
+}
+
+loadAll()
+</script>
+</body>
+</html>

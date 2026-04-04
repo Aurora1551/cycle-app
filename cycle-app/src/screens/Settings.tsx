@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import type { OnboardingData, VibeKey } from '../types'
 import { VIBES, ALL_EXTRA_GENRES } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
-import { TREATMENT_LABELS, ALL_COMPONENTS, NOTIFICATION_CONTENT } from '../lib/constants'
+import { TREATMENT_LABELS, TREATMENT_EMOJIS, ALL_COMPONENTS, NOTIFICATION_CONTENT } from '../lib/constants'
 import { deleteAccount } from '../lib/db'
+import { startSpotifyAuth, getSpotifyStatus, disconnectSpotify, isSpotifyConfigured } from '../lib/spotify'
+import { track } from '../lib/posthog'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, Card, SectionLabel, Toggle } from '../components/ui'
 import LanguagePicker from '../components/LanguagePicker'
@@ -27,11 +29,59 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
   const [editMode, setEditMode] = useState<EditMode>(null)
   const [editName, setEditName] = useState(data.name)
   const [editCycleDays, setEditCycleDays] = useState(data.cycleDays)
+  const [editTreatment, setEditTreatment] = useState(data.treatment)
+  const [editOtherText, setEditOtherText] = useState('')
   const [editHour, setEditHour] = useState(8)
   const [editMinute, setEditMinute] = useState(0)
   const [editPeriod, setEditPeriod] = useState<'AM' | 'PM'>('AM')
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [spotifyConnected, setSpotifyConnected] = useState(() => localStorage.getItem('spotify_connected') === '1')
+  const [spotifyDisplayName, setSpotifyDisplayName] = useState(() => localStorage.getItem('spotify_display_name') || '')
+  const [spotifyLoading, setSpotifyLoading] = useState(false)
+  const [spotifyError, setSpotifyError] = useState<string | null>(() => {
+    const err = localStorage.getItem('spotify_auth_error')
+    if (err) localStorage.removeItem('spotify_auth_error')
+    return err
+  })
+  const spotifyConfigured = isSpotifyConfigured()
+
+  // Check Spotify status on mount
+  React.useEffect(() => {
+    if (!spotifyConfigured) return
+    getSpotifyStatus(data.name).then(status => {
+      setSpotifyConnected(status.connected)
+      if (status.connected && status.displayName) {
+        setSpotifyDisplayName(status.displayName)
+        localStorage.setItem('spotify_connected', '1')
+        localStorage.setItem('spotify_display_name', status.displayName)
+      } else if (!status.connected) {
+        localStorage.removeItem('spotify_connected')
+        localStorage.removeItem('spotify_display_name')
+      }
+    })
+  }, [data.name])
+
+  const handleSpotifyConnect = () => {
+    if (!spotifyConfigured) return
+    setSpotifyError(null)
+    setSpotifyLoading(true)
+    startSpotifyAuth()
+  }
+
+  const handleSpotifyDisconnect = async () => {
+    setSpotifyLoading(true)
+    const ok = await disconnectSpotify(data.name)
+    if (ok) {
+      setSpotifyConnected(false)
+      setSpotifyDisplayName('')
+      localStorage.removeItem('spotify_connected')
+      localStorage.removeItem('spotify_display_name')
+      track('spotify_disconnected', {})
+    }
+    setSpotifyLoading(false)
+  }
+
   const [notifyEnabled, setNotifyEnabled] = useState(() => localStorage.getItem('notify_enabled') !== '0')
   const [notifyContent, setNotifyContent] = useState(() => localStorage.getItem('notify_content') || 'surprise')
   const [eveningReflection, setEveningReflection] = useState(() => localStorage.getItem('notify_evening') === '1')
@@ -107,7 +157,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
       <div className="flex-col gap-16" style={{ padding: '0 24px 120px' }}>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {row('👤', t('settings.name'), data.name, () => { setEditName(data.name); setEditMode('name') })}
-          {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => setEditMode('treatment'))}
+          {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => { setEditTreatment(data.treatment); setEditOtherText(''); setEditMode('treatment') })}
           {row('📅', t('settings.cycle'), t('settings.daysDay', { days: data.cycleDays, day: dayNumber }), () => { setEditCycleDays(data.cycleDays); setEditMode('cycleDays') })}
           {row(vibe.emoji, t('settings.vibe'), t(`vibes.${data.vibe}`), () => setEditMode('vibe'))}
           {row('🎵', t('settings.musicGenres'), data.genres.slice(0, 3).join(' · ') + (data.genres.length > 3 ? ` +${data.genres.length - 3}` : ''), () => setEditMode('genres'))}
@@ -115,12 +165,69 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           {(() => { const cl = LANGUAGES.find(l => i18n.language === l.code || i18n.language?.startsWith(l.code)) || LANGUAGES[0]; return row(`${cl.flag}`, t('settings.language'), cl.label, () => setEditMode('language')) })()}
         </Card>
 
+        {/* Music / Spotify section */}
+        <div className="mono-hint" style={{ color: mutedColor }}>MUSIC</div>
+        <Card cardBg={cardBg} cardBorder={cardBorder}>
+          {!spotifyConfigured ? (
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={mutedColor}><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                <span style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: mutedColor }}>Spotify</span>
+              </div>
+              <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, lineHeight: 1.5 }}>
+                Spotify connection is not configured yet.
+              </div>
+            </div>
+          ) : spotifyConnected ? (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: '#1DB954', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{spotifyDisplayName}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1DB954' }} />
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#1DB954', letterSpacing: '0.1em' }}>CONNECTED</span>
+                  </div>
+                </div>
+              </div>
+              <button onClick={handleSpotifyDisconnect} disabled={spotifyLoading} style={{
+                width: '100%', background: 'transparent', border: `1px solid ${cardBorder}`,
+                borderRadius: 10, padding: '10px', cursor: 'pointer',
+                fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor,
+              }}>
+                {spotifyLoading ? 'Disconnecting...' : 'Disconnect Spotify'}
+              </button>
+            </div>
+          ) : (
+            <div>
+              {spotifyError && (
+                <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: '#E8675A', textAlign: 'center', marginBottom: 10, lineHeight: 1.4 }}>
+                  {spotifyError}
+                </div>
+              )}
+              <button onClick={handleSpotifyConnect} disabled={spotifyLoading} style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                background: '#1DB954', border: 'none', borderRadius: 12, padding: '14px 20px',
+                cursor: 'pointer', transition: 'opacity 0.15s',
+                opacity: spotifyLoading ? 0.7 : 1,
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+              <span style={{ fontFamily: typo.bodyFont, fontWeight: 700, fontSize: 14, color: 'white' }}>
+                {spotifyLoading ? 'Connecting...' : 'Connect Spotify'}
+              </span>
+            </button>
+            </div>
+          )}
+        </Card>
+
         <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.notificationsSection')}</div>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div className="flex-between" style={{ marginBottom: 16 }}>
             <div>
-              <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{t('settings.morningReminder')}</div>
-              <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 11, color: mutedColor }}>{t('settings.dailyNudge')}</div>
+              <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>Your daily dose of love</div>
+              <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 11, color: mutedColor }}>A little reminder to open your heart</div>
             </div>
             <Toggle value={notifyEnabled} onChange={v => { setNotifyEnabled(v); saveNotifications() }} accent={vibe.accent} isDark={isDark} />
           </div>
@@ -160,17 +267,6 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </>
           )}
 
-          <div className="flex-between" style={{ marginBottom: 12 }}>
-            <div>
-              <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{t('settings.eveningReflection')}</div>
-              <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 11, color: mutedColor }}>{t('settings.offByDefault')}</div>
-            </div>
-            <Toggle value={eveningReflection} onChange={v => { setEveningReflection(v); saveNotifications() }} accent={vibe.accent} isDark={isDark} />
-          </div>
-
-          <div style={{ background: `${vibe.accent}10`, borderRadius: 10, padding: '8px 12px' }}>
-            <div className="mono-xs" style={{ color: mutedColor }}>{t('settings.maxNotifications')}</div>
-          </div>
         </Card>
 
         <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.account')}</div>
@@ -231,18 +327,44 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           <div className="modal-sheet" style={{ background: vibe.bg }}>
             <SectionLabel color={vibe.accent}>{t('settings.treatmentPlan')}</SectionLabel>
             <div className="flex-col gap-6" style={{ margin: '12px 0 20px' }}>
-              {Object.entries(TREATMENT_LABELS).map(([key, label]) => (
-                <button key={key} onClick={() => { onUpdateData({ treatment: key }); setEditMode(null) }} style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  background: data.treatment === key ? `${vibe.accent}15` : 'transparent',
-                  border: `1px solid ${data.treatment === key ? vibe.accent : cardBorder}`,
-                  borderRadius: 10, padding: '12px 14px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
-                }}>
-                  <div className="radio" style={{ borderColor: data.treatment === key ? vibe.accent : mutedColor, background: data.treatment === key ? vibe.accent : 'transparent' }} />
-                  <span style={{ fontFamily: typo.bodyFont, fontSize: 14, color: textColor, fontWeight: data.treatment === key ? 600 : typo.bodyWeight }}>{t(`treatments.${key}`)}</span>
-                </button>
-              ))}
+              {Object.entries(TREATMENT_LABELS).map(([key, label]) => {
+                const sel = editTreatment === key || (key === 'other' && editTreatment !== '' && !Object.keys(TREATMENT_LABELS).includes(editTreatment))
+                return (
+                  <div key={key}>
+                    <button onClick={() => setEditTreatment(key)} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                      background: sel ? `${vibe.accent}15` : 'transparent',
+                      border: `1px solid ${sel ? vibe.accent : cardBorder}`,
+                      borderRadius: 10, padding: '12px 14px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
+                    }}>
+                      <span style={{ fontSize: 18 }}>{TREATMENT_EMOJIS[key] || '✨'}</span>
+                      <span style={{ fontFamily: typo.bodyFont, fontSize: 14, color: textColor, fontWeight: sel ? 600 : typo.bodyWeight, flex: 1 }}>{t(`treatments.${key}`) || label}</span>
+                      {sel && <div style={{ width: 14, height: 14, borderRadius: '50%', background: vibe.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>✓</div>}
+                    </button>
+                    {key === 'other' && sel && (
+                      <input
+                        autoFocus
+                        value={editOtherText}
+                        onChange={e => setEditOtherText(e.target.value)}
+                        placeholder="What are you going through?"
+                        style={{
+                          width: '100%', boxSizing: 'border-box', marginTop: 8, padding: '12px 14px',
+                          background: isDark ? 'rgba(255,255,255,0.07)' : `${vibe.accent}08`,
+                          border: `1.5px solid ${vibe.accent}40`, borderRadius: 10,
+                          fontFamily: typo.bodyFont, fontSize: 14, color: textColor, outline: 'none',
+                        }}
+                      />
+                    )}
+                  </div>
+                )
+              })}
             </div>
+            <button onClick={() => {
+              const isOther = editTreatment === 'other' || (!Object.keys(TREATMENT_LABELS).includes(editTreatment) && editTreatment !== '')
+              const val = isOther ? (editOtherText.trim() || 'other') : editTreatment
+              onUpdateData({ treatment: val })
+              setEditMode(null)
+            }} className="btn-primary" style={{ background: vibe.accent, marginBottom: 10 }}>{t('save')}</button>
             <button onClick={() => setEditMode(null)} style={{ width: '100%', background: `${vibe.accent}20`, border: `1px solid ${vibe.accent}40`, borderRadius: 14, padding: '14px', fontSize: 14, color: vibe.accent, cursor: 'pointer' }}>{t('cancel')}</button>
           </div>
         </div>
@@ -252,21 +374,13 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         <div className="modal-overlay modal-bottom">
           <div className="modal-sheet" style={{ background: vibe.bg }}>
             <SectionLabel color={vibe.accent}>{t('settings.cycleDuration')}</SectionLabel>
-            <div style={{ margin: '12px 0 8px', textAlign: 'center' }}>
-              <span style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 48, fontWeight: typo.headingWeight, color: textColor }}>{editCycleDays}</span>
-              <span style={{ fontFamily: typo.bodyFont, fontSize: 14, color: mutedColor, marginLeft: 8 }}>{t('onboardingCycleLength.daysInCycle')}</span>
-            </div>
-            <input
-              type="range"
-              min={5}
-              max={60}
-              value={editCycleDays}
-              onChange={e => setEditCycleDays(Number(e.target.value))}
-              style={{ width: '100%', accentColor: vibe.accent, margin: '0 0 20px' }}
-            />
-            <div className="flex-between" style={{ marginBottom: 20 }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor }}>{t('settings.days5')}</span>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor }}>{t('settings.days60')}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '16px 0 20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', background: isDark ? 'rgba(255,255,255,0.06)' : 'white', border: `1.5px solid ${vibe.accent}25`, borderRadius: 12, overflow: 'hidden' }}>
+                <button onClick={() => setEditCycleDays(d => Math.max(1, d - 1))} style={{ width: 48, height: 56, background: 'none', border: 'none', color: vibe.accent, fontSize: 22, cursor: 'pointer', fontWeight: 300 }}>−</button>
+                <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 32, fontWeight: typo.headingWeight, color: textColor, width: 60, textAlign: 'center', borderLeft: `1px solid ${vibe.accent}20`, borderRight: `1px solid ${vibe.accent}20`, lineHeight: '56px' }}>{editCycleDays}</div>
+                <button onClick={() => setEditCycleDays(d => Math.min(30, d + 1))} style={{ width: 48, height: 56, background: 'none', border: 'none', color: vibe.accent, fontSize: 22, cursor: 'pointer', fontWeight: 300 }}>+</button>
+              </div>
+              <span style={{ fontFamily: typo.bodyFont, fontSize: 14, color: mutedColor }}>{t('onboardingCycleLength.daysInCycle')}</span>
             </div>
             <button onClick={() => { onUpdateData({ cycleDays: editCycleDays }); setEditMode(null) }} className="btn-primary" style={{ background: vibe.accent, marginBottom: 10 }}>{t('save')}</button>
             <button onClick={() => setEditMode(null)} style={{ width: '100%', background: `${vibe.accent}20`, border: `1px solid ${vibe.accent}40`, borderRadius: 14, padding: '14px', fontSize: 14, color: vibe.accent, cursor: 'pointer' }}>{t('cancel')}</button>

@@ -384,6 +384,22 @@ const en = {
       backToDay: 'Back to my day',
     },
 
+    // Payment
+    payment: {
+      label: 'Complete payment',
+      payNow: 'Pay now',
+      processing: 'Processing...',
+      loading: 'Setting up payment...',
+      secureByStripe: 'Secure payment by Stripe',
+      noSubscription: 'No subscription \u00b7 one-time payment only',
+      confirming: 'Confirming your payment...',
+      successHeading: 'Payment confirmed',
+      successMessage: "You're all set. Let's begin your journey.",
+      errorHeading: 'Something went wrong',
+      statusFailed: 'Payment was not completed. Please try again.',
+      returnToApp: 'Return to app',
+    },
+
     // Navigation
     nav: {
       today: 'Today',

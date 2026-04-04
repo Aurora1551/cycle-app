@@ -18,10 +18,13 @@ import GiftFlow from './screens/GiftFlow'
 import Progress from './screens/Progress'
 import LoginScreen from './screens/LoginScreen'
 import RegisterGate from './screens/RegisterGate'
+import PaymentScreen from './screens/PaymentScreen'
+import PaymentSuccess from './screens/PaymentSuccess'
 import type { OnboardingData, VibeKey } from './types'
 import { VIBES } from './types'
 import { track } from './lib/posthog'
 import { saveProfile } from './lib/db'
+import { handleSpotifyCallback, verifySpotifyState } from './lib/spotify'
 
 type Screen =
   | 'splash' | 'login' | 'onboarding-name' | 'onboarding-treatment'
@@ -29,9 +32,9 @@ type Screen =
   | 'onboarding-vibe' | 'onboarding-music' | 'summary'
   | 'paywall' | 'create-account' | 'notification-settings'
   | 'day' | 'progress' | 'settings' | 'end-of-cycle' | 'gift-flow'
-  | 'register-gate'
+  | 'register-gate' | 'payment' | 'payment-success'
 
-const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow']
+const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow', 'payment', 'payment-success']
 const NAV_SCREENS: Screen[] = ['day', 'progress']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
@@ -54,7 +57,8 @@ function App() {
   })
   const [vibePreview, setVibePreview] = useState<VibeKey | null>(null)
   const [dayNumber, setDayNumber] = useState(() => parseInt(localStorage.getItem(DAY_KEY) || '1', 10))
-  const [isPremium] = useState(() => localStorage.getItem('cycle_premium') === '1')
+  const [isPremium, setIsPremium] = useState(() => localStorage.getItem('cycle_premium') === '1')
+  const [selectedPlan, setSelectedPlan] = useState<'one_cycle' | 'gift'>('one_cycle')
 
   const update = (patch: Partial<OnboardingData>) => {
     const next = { ...data, ...patch }
@@ -76,6 +80,54 @@ function App() {
   }
 
   useEffect(() => {
+    // Handle Stripe payment success redirect
+    if (window.location.pathname === '/payment/success') {
+      setScreen('payment-success')
+      return // Don't process Spotify callback on payment redirect
+    }
+
+    // Handle Spotify OAuth callback
+    const params = new URLSearchParams(window.location.search)
+    const spotifyCode = params.get('code')
+    const spotifyError = params.get('error')
+    const spotifyState = params.get('state')
+    const isSpotifyCallback = window.location.pathname === '/auth/spotify/callback' || sessionStorage.getItem('spotify_code_verifier')
+
+    if (isSpotifyCallback && (spotifyCode || spotifyError)) {
+      // Clean URL immediately
+      window.history.replaceState({}, '', '/')
+
+      if (spotifyError) {
+        // User cancelled or Spotify returned an error
+        console.warn('[Spotify] Auth error:', spotifyError)
+        localStorage.setItem('spotify_auth_error', spotifyError === 'access_denied' ? 'Connection cancelled — try again' : `Spotify error: ${spotifyError}`)
+        sessionStorage.removeItem('spotify_code_verifier')
+        localStorage.removeItem('spotify_auth_state')
+      } else if (spotifyCode) {
+        // Verify CSRF state
+        if (!verifySpotifyState(spotifyState)) {
+          localStorage.setItem('spotify_auth_error', 'Connection failed — security check failed. Please try again.')
+          sessionStorage.removeItem('spotify_code_verifier')
+        } else {
+          const saved = localStorage.getItem(DATA_KEY)
+          let userId = 'default'
+          if (saved) {
+            try { userId = JSON.parse(saved).name || 'default' } catch {}
+          }
+          handleSpotifyCallback(spotifyCode, userId).then(result => {
+            if (result.success) {
+              localStorage.setItem('spotify_connected', '1')
+              localStorage.setItem('spotify_display_name', result.displayName || '')
+              localStorage.removeItem('spotify_auth_error')
+              track('spotify_connected', { spotify_user: result.displayName || '' })
+            } else {
+              localStorage.setItem('spotify_auth_error', result.error || 'Connection failed — try again')
+            }
+          })
+        }
+      }
+    }
+
     const saved = localStorage.getItem(DATA_KEY)
     if (saved) {
       try {
@@ -84,7 +136,12 @@ function App() {
           setData(d)
           const day = parseInt(localStorage.getItem(DAY_KEY) || '1', 10)
           setDayNumber(day)
-          setScreen(day > (d.cycleDays || 28) ? 'end-of-cycle' : 'day')
+          // If returning from Spotify callback, go to settings; otherwise normal flow
+          if (isSpotifyCallback && (spotifyCode || spotifyError)) {
+            setScreen('settings')
+          } else {
+            setScreen(day > (d.cycleDays || 28) ? 'end-of-cycle' : 'day')
+          }
         }
       } catch {}
     }
@@ -109,6 +166,14 @@ function App() {
     if (data.cycleDays && next > data.cycleDays) setScreen('end-of-cycle')
   }
 
+  const clearDayDoneKeys = () => {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('cycle_day_') && k.endsWith('_done'))
+    keys.forEach(k => localStorage.removeItem(k))
+    // Also clear cached content keys
+    const contentKeys = Object.keys(localStorage).filter(k => k.startsWith('cycle_content_'))
+    contentKeys.forEach(k => localStorage.removeItem(k))
+  }
+
   const restartJourney = () => {
     localStorage.removeItem(DATA_KEY)
     localStorage.removeItem(DAY_KEY)
@@ -116,6 +181,7 @@ function App() {
     localStorage.removeItem('cycle_guest_start')
     localStorage.removeItem('cycle_register_dismissed')
     localStorage.removeItem('cycle_account_email')
+    clearDayDoneKeys()
     setData({})
     setDayNumber(1)
     setScreen('splash')
@@ -137,16 +203,53 @@ function App() {
       {screen === 'onboarding-components' && <OnboardingComponents onBack={() => setScreen('onboarding-cycle-length')} onContinue={components => { update({ components }); track('onboarding_step_completed', { step: 4 }); setScreen('onboarding-vibe') }} initialValue={data.components} />}
       {screen === 'onboarding-vibe' && <OnboardingVibe onBack={() => { setVibePreview(null); setScreen('onboarding-components') }} onContinue={vibeKey => { update({ vibe: vibeKey }); setVibePreview(null); track('onboarding_step_completed', { step: 5 }); setScreen('onboarding-music') }} initialValue={data.vibe || null} onPreview={setVibePreview} />}
       {screen === 'onboarding-music' && data.vibe && <OnboardingMusic onBack={() => setScreen('onboarding-vibe')} onContinue={genres => { update({ genres }); track('onboarding_step_completed', { step: 6 }); setScreen('summary') }} vibe={data.vibe} initialValue={data.genres} />}
-      {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => setScreen('day')} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
-      {screen === 'paywall' && <Paywall name={data.name} onStartFree={() => setScreen('day')} onSelectPlan={plan => { track('plan_selected', { plan }); setScreen(plan === 'gift' ? 'gift-flow' : 'create-account') }} />}
-      {screen === 'create-account' && <CreateAccount onBack={() => setScreen('paywall')} onSuccess={() => { localStorage.setItem('cycle_is_guest', '0'); setScreen('notification-settings') }} onLogin={() => setScreen('login')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} profileData={data as OnboardingData} dayNumber={dayNumber} />}
+      {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
+      {screen === 'paywall' && <Paywall name={data.name} onBack={() => setScreen('day')} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onSelectPlan={plan => {
+        track('plan_selected', { plan })
+        if (plan === 'free') { setScreen('day'); return }
+        setSelectedPlan(plan === 'gift' ? 'gift' : 'one_cycle')
+        // Check if logged in — if not, create account first
+        const hasAccount = localStorage.getItem('cycle_account_email')
+        if (hasAccount) { setScreen('payment') } else { setScreen('create-account') }
+      }} />}
+      {screen === 'create-account' && <CreateAccount onBack={() => setScreen('paywall')} onSuccess={() => {
+        localStorage.setItem('cycle_is_guest', '0')
+        // If a paid plan was selected, go to payment; otherwise notification settings
+        if (selectedPlan === 'one_cycle' || selectedPlan === 'gift') {
+          setScreen('payment')
+        } else {
+          setScreen('notification-settings')
+        }
+      }} onLogin={() => setScreen('login')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} profileData={data as OnboardingData} dayNumber={dayNumber} />}
       {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onDone={() => setScreen('day')} />}
       {screen === 'register-gate' && <RegisterGate onCreateAccount={() => setScreen('create-account')} onContinueGuest={() => setScreen('day')} />}
-      {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3 && localStorage.getItem('cycle_register_dismissed') !== '1') { advanceDay(); setScreen('register-gate'); return } advanceDay() }} onSettings={() => setScreen('settings')} />}
+      {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3 && localStorage.getItem('cycle_register_dismissed') !== '1') { advanceDay(); setScreen('register-gate'); return } advanceDay() }} onSettings={() => setScreen('settings')} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)) }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} onEndOfCycle={() => setScreen('end-of-cycle')} />}
       {screen === 'progress' && data.name && data.vibe && data.components && <Progress data={data as OnboardingData} dayNumber={dayNumber} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen('day') }} />}
       {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onBack={() => setScreen('day')} />}
       {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={restartJourney} onGift={() => setScreen('gift-flow')} />}
       {screen === 'gift-flow' && <GiftFlow onBack={() => setScreen('paywall')} vibeAccent={vibe?.accent} vibeBg={vibe?.bg} />}
+      {screen === 'payment' && <PaymentScreen
+        plan={selectedPlan}
+        onSuccess={plan => {
+          localStorage.setItem('cycle_premium', '1')
+          setIsPremium(true)
+          track('payment_completed', { plan })
+          if (plan === 'gift') { setScreen('gift-flow') } else { setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }
+        }}
+        onBack={() => setScreen('paywall')}
+        vibeBg={vibe?.bg}
+        vibeAccent={vibe?.accent}
+        email={localStorage.getItem('cycle_account_email') || ''}
+        userId={data.name || ''}
+      />}
+      {screen === 'payment-success' && <PaymentSuccess
+        onComplete={plan => {
+          setIsPremium(true)
+          if (plan === 'gift') { setScreen('gift-flow') } else { setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }
+        }}
+        vibeBg={vibe?.bg}
+        vibeAccent={vibe?.accent}
+      />}
 
       {showNav && (
         <div className="bottom-nav" style={{ background: vibe?.bg || '#FDF6F0', borderTop: `1px solid ${navBorder}` }}>

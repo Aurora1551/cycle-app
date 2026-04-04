@@ -9,6 +9,7 @@ export interface DayContent {
   gratitudePrompt: string
   breathingOpening?: string
   breathingClosing?: string
+  friendNote?: string
 }
 
 export interface ProfileData {

@@ -3,10 +3,71 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const bcrypt = require('bcryptjs')
-const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount } = require('./db')
+const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan } = require('./db')
 
 const app = express()
 app.use(cors({ origin: '*' }))
+
+// --- Stripe setup ---
+const Stripe = require('stripe')
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY
+const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
+
+if (!STRIPE_SECRET_KEY) console.error('[WARNING] STRIPE_SECRET_KEY is not set. Stripe payments will not work.')
+else console.log('[OK] STRIPE_SECRET_KEY is set')
+if (!STRIPE_PUBLISHABLE_KEY) console.error('[WARNING] STRIPE_PUBLISHABLE_KEY is not set. Frontend payments will not work.')
+else console.log('[OK] STRIPE_PUBLISHABLE_KEY is set')
+if (!STRIPE_WEBHOOK_SECRET) console.error('[WARNING] STRIPE_WEBHOOK_SECRET is not set. Stripe webhooks will not be verified.')
+else console.log('[OK] STRIPE_WEBHOOK_SECRET is set')
+
+const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY) : null
+
+// Stripe webhook must use raw body — mount BEFORE express.json()
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  if (!stripe || !STRIPE_WEBHOOK_SECRET) {
+    console.error('[Stripe] Webhook received but Stripe is not configured')
+    return res.status(500).json({ error: 'Stripe not configured' })
+  }
+
+  let event
+  try {
+    event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], STRIPE_WEBHOOK_SECRET)
+  } catch (err) {
+    console.error('[Stripe] Webhook signature verification failed:', err.message)
+    return res.status(400).json({ error: 'Invalid signature' })
+  }
+
+  if (event.type === 'payment_intent.succeeded') {
+    const pi = event.data.object
+    const userId = pi.metadata?.user_id
+    const plan = pi.metadata?.plan
+    const email = pi.metadata?.email
+
+    console.log(`[Stripe] payment_intent.succeeded: ${pi.id}, user=${userId}, plan=${plan}`)
+
+    // Save purchase as backup
+    const existing = getPurchaseByStripeId(pi.id)
+    if (!existing) {
+      savePurchase({
+        userId: userId || 'unknown',
+        plan: plan || 'one_cycle',
+        stripePaymentId: pi.id,
+        amount: pi.amount,
+        currency: pi.currency,
+      })
+    }
+
+    // Update account plan
+    if (email) {
+      updateAccountPlan(email, plan || 'one_cycle')
+      console.log(`[Stripe] Updated plan for ${email} to ${plan}`)
+    }
+  }
+
+  res.json({ received: true })
+})
+
 app.use(express.json())
 
 // --- Validate Anthropic SDK + API key at startup ---
@@ -33,7 +94,81 @@ if (Anthropic && anthropicKey) {
 
 // --- Prompts ---
 
-const SYSTEM_PROMPT = `You are a warm, empowering companion for women going through fertility treatment. Generate deeply personal, emotionally rich daily content. Never use generic wellness clichés. Write as if you know this woman personally and understand exactly what she is going through today.`
+const BASE_SYSTEM_PROMPT = `You are a warm, empowering companion for women going through fertility treatment. Generate deeply personal, emotionally rich daily content. Never use generic wellness clichés. Write as if you know this woman personally and understand exactly what she is going through today.`
+
+// Vibe-specific tone descriptions for Claude API content generation
+const VIBE_TONES = {
+  fierce: {
+    overall: 'bold, fierce, warrior energy — make her feel unstoppable',
+    quote: "TODAY'S FIRE — bold, fierce, warrior energy, make her feel unstoppable",
+    anthem: "TODAY'S ANTHEM — powerful, pump-up energy",
+    affirmation: 'YOUR POWER — fierce first-person declaration of strength',
+    journal: 'YOUR FIRE — bold reflective prompt about courage and strength',
+    gratitude: "TODAY'S GRATITUDE — strong and proud not soft",
+    breathing: 'BREATHE — energising breath',
+    friendNote: 'Write as a fierce, proud best friend. Example tone: "I am so proud of you. Every single injection. Every early morning. You are doing something extraordinary." Make it bold, warm, and warrior-like.',
+  },
+  nurturing: {
+    overall: 'warm, gentle, held, comforting — make her feel loved and safe',
+    quote: "TODAY'S LIGHT — warm, gentle, held, comforting",
+    anthem: "TODAY'S MELODY — soft, warm, soothing",
+    affirmation: 'YOU ARE HELD — gentle reassurance, soft first person',
+    journal: 'YOUR HEART — gentle reflective prompt about feelings and self compassion',
+    gratitude: "TODAY'S GRATITUDE — soft and tender",
+    breathing: 'BREATHE GENTLY — slow, soft, calming',
+    friendNote: 'Write as a warm, loving best friend. Example tone: "You are so loved. Every step of this journey, every hard moment. I am holding your hand." Make it gentle, tender, and full of love.',
+  },
+  calm: {
+    overall: 'grounded, peaceful, present — make her feel centred and still',
+    quote: "TODAY'S STILLNESS — grounded, peaceful, present",
+    anthem: "TODAY'S SOUNDTRACK — ambient, meditative",
+    affirmation: 'YOUR GROUND — centred, rooted, peaceful first person',
+    journal: 'YOUR STILLNESS — quiet reflective prompt about presence and acceptance',
+    gratitude: "TODAY'S GRATITUDE — simple and grounded",
+    breathing: 'FIND YOUR BREATH — slow, meditative',
+    friendNote: 'Write as a calm, reassuring best friend. Example tone: "You are exactly where you need to be. Breathe. I am with you." Make it grounded, still, and peaceful.',
+  },
+  lighthearted: {
+    overall: 'joyful, fun, uplifting — make her smile or laugh',
+    quote: "TODAY'S SUNSHINE — joyful, fun, uplifting, makes her smile",
+    anthem: "TODAY'S BANGER — fun, danceable, energy",
+    affirmation: 'YOUR JOY — playful, fun, light first person declaration',
+    journal: 'YOUR SMILE — light fun reflective prompt that makes her laugh or smile',
+    gratitude: "TODAY'S GRATITUDE — joyful and fun",
+    breathing: 'SUNSHINE BREATH — light and energising',
+    friendNote: 'Write as a funny, hyped-up best friend. Example tone: "Day 5, you are absolutely killing it. Honestly. Someone get this woman a trophy." Make it funny, warm, and celebratory — reference the specific day number.',
+  },
+  spiritual: {
+    overall: 'faith-led, hopeful, sacred — make her feel guided and blessed',
+    quote: "TODAY'S BLESSING — faith-led, hopeful, sacred",
+    anthem: "TODAY'S HYMN — soulful, devotional, uplifting",
+    affirmation: 'YOUR GRACE — faithful, hopeful, sacred first person',
+    journal: 'YOUR SOUL — spiritual reflective prompt about faith and trust',
+    gratitude: "TODAY'S GRATITUDE — reverent and hopeful",
+    breathing: 'SACRED BREATH — gentle, prayerful',
+    friendNote: 'Write as a faith-filled, spiritual best friend. Example tone: "You are being guided, [name]. Every step of this path has purpose. I believe in you completely." Make it sacred, hopeful, and full of faith — use her name.',
+  },
+}
+
+function getSystemPrompt(vibe) {
+  const tone = VIBE_TONES[vibe]
+  if (!tone) return BASE_SYSTEM_PROMPT
+  return `${BASE_SYSTEM_PROMPT}
+
+The user's vibe is "${vibe}". Generate ALL content in the following tone: ${tone.overall}.
+
+Content labels and their tone:
+- Quote: ${tone.quote}
+- Song: ${tone.anthem}
+- Affirmation: ${tone.affirmation}
+- Journal prompt: ${tone.journal}
+- Gratitude prompt: ${tone.gratitude}
+- Breathing exercise: ${tone.breathing}
+
+Friend note from her person: ${tone.friendNote}
+
+Every single piece of content must feel cohesive and emotionally consistent with the ${vibe} tone. A Fierce user should feel like a warrior reading her content. A Nurturing user should feel held and loved. A Calm user should feel grounded and peaceful. A Lighthearted user should smile or laugh. A Spiritual user should feel guided and blessed.`
+}
 
 const LANGUAGE_NAMES = {
   en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese'
@@ -54,8 +189,9 @@ Generate:
 5) A gratitude prompt that is short and gentle.
 6) A breathing exercise opening line using her name, warm and specific to her day.
 7) A breathing exercise closing line using her name, different from the opening.
+8) A friend note — a short warm personal message (2-3 sentences) written as if from her closest person, using her name and referencing Day ${dayNumber}. Match the vibe tone exactly.
 
-Return the response as a JSON object with keys: quote, quote_author, song_title, song_artist, song_spotify_search, affirmation, journal_prompt, gratitude_prompt, breathing_opening, breathing_closing.
+Return the response as a JSON object with keys: quote, quote_author, song_title, song_artist, song_spotify_search, affirmation, journal_prompt, gratitude_prompt, breathing_opening, breathing_closing, friend_note.
 
 Return ONLY the JSON object, no markdown fences, no other text.${langInstruction}`
 }
@@ -423,6 +559,54 @@ app.post('/api/link-profile', (req, res) => {
   res.json({ success: true })
 })
 
+// --- Stripe payment endpoints ---
+
+const PLAN_AMOUNTS = { one_cycle: 599, gift: 1299 }
+
+app.post('/api/create-payment-intent', async (req, res) => {
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured' })
+
+  const { plan, userId, email } = req.body
+  const amount = PLAN_AMOUNTS[plan]
+  if (!amount) return res.status(400).json({ error: 'Invalid plan. Must be one_cycle or gift.' })
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'gbp',
+      metadata: { user_id: userId || 'unknown', plan, email: email || '' },
+    })
+    console.log(`[Stripe] Created PaymentIntent ${paymentIntent.id} for plan=${plan}, amount=${amount}`)
+    res.json({ clientSecret: paymentIntent.client_secret })
+  } catch (err) {
+    console.error('[Stripe] PaymentIntent creation failed:', err.message)
+    res.status(500).json({ error: 'Payment setup failed. Please try again.' })
+  }
+})
+
+app.get('/api/stripe/config', (_, res) => {
+  res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY || '' })
+})
+
+app.post('/api/purchase/confirm', (req, res) => {
+  const { stripePaymentId, plan, userId, email } = req.body
+  if (!stripePaymentId || !plan || !email) return res.status(400).json({ error: 'Missing required fields' })
+
+  const existing = getPurchaseByStripeId(stripePaymentId)
+  if (!existing) {
+    savePurchase({
+      userId: userId || 'unknown',
+      plan,
+      stripePaymentId,
+      amount: PLAN_AMOUNTS[plan] || 0,
+      currency: 'gbp',
+    })
+  }
+  updateAccountPlan(email, plan)
+  console.log(`[Purchase] Confirmed plan=${plan} for ${email}, stripe_id=${stripePaymentId}`)
+  res.json({ success: true })
+})
+
 // --- Content generation endpoint ---
 
 app.post('/api/generate-day', async (req, res) => {
@@ -446,7 +630,7 @@ app.post('/api/generate-day', async (req, res) => {
       const message = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
-        system: SYSTEM_PROMPT,
+        system: getSystemPrompt(vibe),
         messages: [{
           role: 'user',
           content: buildUserPrompt({ name, treatment, dayNumber, totalDays, vibe, genres, language }),
@@ -471,6 +655,7 @@ app.post('/api/generate-day', async (req, res) => {
         gratitudePrompt: raw.gratitude_prompt || raw.gratitudePrompt,
         breathingOpening: raw.breathing_opening || raw.breathingOpening,
         breathingClosing: raw.breathing_closing || raw.breathingClosing,
+        friendNote: raw.friend_note || raw.friendNote || null,
       }
 
       // Save to SQLite
@@ -564,6 +749,199 @@ app.get('/api/admin/stats', (_, res) => {
   const content = db.prepare('SELECT COUNT(*) as count FROM daily_content').get().count
   const journals = db.prepare('SELECT COUNT(*) as count FROM journal_entries').get().count
   res.json({ profiles, content, journals })
+})
+
+// --- Spotify integration ---
+
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || ''
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || ''
+
+if (SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_ID !== 'your-spotify-client-id') {
+  console.log('[OK] SPOTIFY_CLIENT_ID is set')
+} else {
+  console.warn('[WARNING] SPOTIFY_CLIENT_ID is not set or is still the placeholder. Spotify OAuth will not work. Go to developer.spotify.com, create an app called "Cycle", and set the Client ID in your .env file.')
+}
+if (!SPOTIFY_REDIRECT_URI) {
+  console.warn('[WARNING] SPOTIFY_REDIRECT_URI is not set. Spotify OAuth callbacks will fail.')
+}
+
+// Exchange authorization code for tokens (PKCE flow — no client secret needed)
+app.post('/api/spotify/exchange', async (req, res) => {
+  const { code, codeVerifier, redirectUri, userId } = req.body
+  if (!code || !codeVerifier || !userId) {
+    return res.status(400).json({ error: 'Missing code, codeVerifier, or userId' })
+  }
+
+  try {
+    const tokenRes = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri || SPOTIFY_REDIRECT_URI,
+        client_id: SPOTIFY_CLIENT_ID,
+        code_verifier: codeVerifier,
+      }),
+    })
+
+    const tokenData = await tokenRes.json()
+    if (tokenData.error) {
+      console.error('[Spotify] Token exchange error:', tokenData)
+      return res.status(400).json({ error: tokenData.error_description || tokenData.error })
+    }
+
+    const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
+
+    // Fetch Spotify user profile
+    const profileRes = await fetch('https://api.spotify.com/v1/me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    })
+    const profile = await profileRes.json()
+
+    saveSpotifyTokens(userId, {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenExpiry: expiresAt,
+      spotifyUserId: profile.id || null,
+      spotifyDisplayName: profile.display_name || profile.id || null,
+    })
+
+    console.log(`[Spotify] Connected for user ${userId} (${profile.display_name})`)
+    res.json({
+      success: true,
+      spotifyUserId: profile.id,
+      spotifyDisplayName: profile.display_name || profile.id,
+    })
+  } catch (err) {
+    console.error('[Spotify] Exchange error:', err.message)
+    res.status(500).json({ error: 'Token exchange failed' })
+  }
+})
+
+// Refresh expired access token
+app.post('/api/spotify/refresh', async (req, res) => {
+  const { userId } = req.body
+  if (!userId) return res.status(400).json({ error: 'Missing userId' })
+
+  const tokens = getSpotifyTokens(userId)
+  if (!tokens) return res.status(404).json({ error: 'No Spotify connection found' })
+
+  try {
+    const tokenRes = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: tokens.refreshToken,
+        client_id: SPOTIFY_CLIENT_ID,
+      }),
+    })
+
+    const tokenData = await tokenRes.json()
+    if (tokenData.error) {
+      console.error('[Spotify] Refresh error:', tokenData)
+      return res.status(400).json({ error: tokenData.error_description || tokenData.error })
+    }
+
+    const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
+
+    saveSpotifyTokens(userId, {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token || tokens.refreshToken,
+      tokenExpiry: expiresAt,
+      spotifyUserId: tokens.spotifyUserId,
+      spotifyDisplayName: tokens.spotifyDisplayName,
+    })
+
+    res.json({ success: true, accessToken: tokenData.access_token, tokenExpiry: expiresAt })
+  } catch (err) {
+    console.error('[Spotify] Refresh error:', err.message)
+    res.status(500).json({ error: 'Token refresh failed' })
+  }
+})
+
+// Search for a track on Spotify
+app.post('/api/spotify/search', async (req, res) => {
+  const { userId, query } = req.body
+  if (!userId || !query) return res.status(400).json({ error: 'Missing userId or query' })
+
+  let tokens = getSpotifyTokens(userId)
+  if (!tokens) return res.status(404).json({ error: 'No Spotify connection' })
+
+  // Auto-refresh if expired
+  if (new Date(tokens.tokenExpiry) <= new Date()) {
+    try {
+      const refreshRes = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: tokens.refreshToken,
+          client_id: SPOTIFY_CLIENT_ID,
+        }),
+      })
+      const refreshData = await refreshRes.json()
+      if (refreshData.access_token) {
+        const expiresAt = new Date(Date.now() + refreshData.expires_in * 1000).toISOString()
+        saveSpotifyTokens(userId, {
+          accessToken: refreshData.access_token,
+          refreshToken: refreshData.refresh_token || tokens.refreshToken,
+          tokenExpiry: expiresAt,
+          spotifyUserId: tokens.spotifyUserId,
+          spotifyDisplayName: tokens.spotifyDisplayName,
+        })
+        tokens = { ...tokens, accessToken: refreshData.access_token }
+      }
+    } catch (err) {
+      console.error('[Spotify] Auto-refresh failed:', err.message)
+    }
+  }
+
+  try {
+    const searchRes = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
+      { headers: { Authorization: `Bearer ${tokens.accessToken}` } }
+    )
+    const searchData = await searchRes.json()
+    const track = searchData.tracks?.items?.[0]
+
+    if (track) {
+      res.json({
+        found: true,
+        trackId: track.id,
+        trackUri: track.uri,
+        trackUrl: track.external_urls?.spotify,
+        trackName: track.name,
+        trackArtist: track.artists?.map(a => a.name).join(', '),
+      })
+    } else {
+      res.json({ found: false })
+    }
+  } catch (err) {
+    console.error('[Spotify] Search error:', err.message)
+    res.status(500).json({ error: 'Search failed' })
+  }
+})
+
+// Get Spotify connection status
+app.get('/api/spotify/status/:userId', (req, res) => {
+  const tokens = getSpotifyTokens(req.params.userId)
+  if (!tokens) return res.json({ connected: false })
+  res.json({
+    connected: true,
+    spotifyUserId: tokens.spotifyUserId,
+    spotifyDisplayName: tokens.spotifyDisplayName,
+  })
+})
+
+// Disconnect Spotify
+app.post('/api/spotify/disconnect', (req, res) => {
+  const { userId } = req.body
+  if (!userId) return res.status(400).json({ error: 'Missing userId' })
+  deleteSpotifyTokens(userId)
+  console.log(`[Spotify] Disconnected for user ${userId}`)
+  res.json({ success: true })
 })
 
 // --- Health check ---

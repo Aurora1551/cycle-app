@@ -17,9 +17,6 @@ const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialVal
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t) }, [])
 
-  const totalDots = Math.min(days, 28)
-  const filledDots = Math.ceil(totalDots * 0.3)
-
   const counterBtn: React.CSSProperties = {
     width: 48, height: 56, background: 'none', border: 'none',
     color: A, fontSize: 22, cursor: 'pointer', fontWeight: 300,
@@ -36,24 +33,38 @@ const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialVal
           <div style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1.5px solid rgba(196,97,74,0.15)', borderRadius: 12, overflow: 'hidden' }}>
             <button onClick={() => setDays(d => Math.max(1, d - 1))} className="flex-center" style={counterBtn}>−</button>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: T, width: 60, textAlign: 'center', borderLeft: '1px solid rgba(196,97,74,0.12)', borderRight: '1px solid rgba(196,97,74,0.12)', lineHeight: '56px' }}>{days}</div>
-            <button onClick={() => setDays(d => Math.min(60, d + 1))} className="flex-center" style={counterBtn}>+</button>
+            <button onClick={() => setDays(d => Math.min(30, d + 1))} className="flex-center" style={counterBtn}>+</button>
           </div>
           <p className="subtext">{t('onboardingCycleLength.daysInCycle')}</p>
         </div>
 
+        {/* Journey preview — simple dot timeline */}
         <div style={{ background: 'white', border: '1px solid rgba(196,97,74,0.12)', borderRadius: 12, padding: '14px 16px', marginTop: 4 }}>
-          <div className="mono-hint" style={{ color: M, marginBottom: 10 }}>{t('onboardingCycleLength.preview')}</div>
-          <div className="flex-wrap" style={{ gap: 5 }}>
-            {Array.from({ length: totalDots }).map((_, i) => (
-              <div key={i} className="dot" style={{
-                width: 10, height: 10,
-                background: i < filledDots ? A : 'rgba(196,97,74,0.12)',
-                boxShadow: i === filledDots - 1 ? `0 0 6px ${A}88` : 'none',
-              }} />
-            ))}
-            {days > 28 && <div className="mono-sm" style={{ color: M, alignSelf: 'center', marginLeft: 2 }}>+{days - 28} more</div>}
+          <div className="mono-hint" style={{ color: M, marginBottom: 10 }}>YOUR JOURNEY</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {/* Start marker */}
+            <div style={{
+              width: 10, height: 10, borderRadius: '50%', background: A, flexShrink: 0,
+              boxShadow: `0 0 6px ${A}88`,
+            }} />
+            {/* Connecting line with gradient */}
+            <div style={{
+              flex: 1, height: 2, borderRadius: 1,
+              background: `linear-gradient(to right, ${A}, ${A}40)`,
+            }} />
+            {/* End marker */}
+            <div style={{
+              width: 10, height: 10, borderRadius: '50%', background: `${A}30`, flexShrink: 0,
+              border: `1.5px solid ${A}50`,
+            }} />
           </div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: M, marginTop: 8 }}>{filledDots} of {days} days shown · {t('onboardingCycleLength.firstFree')}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: A, letterSpacing: '0.1em' }}>DAY 1</span>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em' }}>DAY {days}</span>
+          </div>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: M, marginTop: 8, textAlign: 'center' }}>
+            {days} days of daily content made just for you
+          </div>
         </div>
 
         <div className="spacer" />

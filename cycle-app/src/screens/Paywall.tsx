@@ -4,12 +4,13 @@ import { useTranslation } from 'react-i18next'
 interface Props {
   onStartFree: () => void
   onSelectPlan: (plan: 'free' | 'one-cycle' | 'gift') => void
+  onBack?: () => void
   name?: string
 }
 
 const A = '#C4614A', T = '#1C0F0C', M = '#9B7B74'
 
-const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan }) => {
+const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
   const { t } = useTranslation()
   const [selected, setSelected] = useState<'free' | 'one-cycle' | 'gift'>('one-cycle')
   const [visible, setVisible] = useState(false)
@@ -24,6 +25,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan }) => {
   return (
     <div className="screen fade-in" style={{ background: '#FDF6F0', opacity: visible ? 1 : 0 }}>
       <div className="content" style={{ padding: '32px 24px 24px', gap: 12 }}>
+        {onBack && <button onClick={onBack} className="btn-back" style={{ color: M }}>{t('back')}</button>}
         <div className="step-label" style={{ color: A }}>{t('paywall.unlock')}</div>
         <h1 className="heading-lg" style={{ color: T }}>{t('paywall.choosePlan')}</h1>
         <p className="subtext" style={{ marginBottom: 4 }}>{t('paywall.subtext')}</p>
@@ -57,11 +59,6 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan }) => {
           </div>
           <div style={{ fontSize: 11, color: M }}>{t('paywall.giftDetails')}</div>
         </button>
-
-        <div className="info-banner" style={{ background: 'rgba(196,97,74,0.05)', border: '1px solid rgba(196,97,74,0.12)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px' }}>
-          <span style={{ fontSize: 14 }}>🎁</span>
-          <span style={{ fontSize: 11, color: T, lineHeight: 1.4, fontFamily: "'Karla', sans-serif" }}>{t('paywall.giftBanner')}</span>
-        </div>
 
         <div className="spacer" />
         <button onClick={() => { if (selected === 'free') onStartFree(); else onSelectPlan(selected) }} className="btn-primary" style={{ background: A }}>
