@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle App — Latest Changes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Karla:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 48px; }
+
+  .change { margin-bottom: 56px; }
+  .change-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: #C4614A; margin-bottom: 6px; }
+  .change-desc { color: rgba(253,246,240,0.5); font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+  .screens { display: flex; gap: 20px; overflow-x: auto; padding: 0 0 16px; scroll-snap-type: x mandatory; }
+  .screens::-webkit-scrollbar { height: 4px; }
+  .screens::-webkit-scrollbar-thumb { background: rgba(196,97,74,0.3); border-radius: 2px; }
+  .arrow { display: flex; align-items: center; color: rgba(253,246,240,0.15); font-size: 24px; flex-shrink: 0; }
+
+  .phone { width: 300px; min-width: 300px; border-radius: 28px; overflow: hidden; flex-shrink: 0; scroll-snap-align: start; border: 2px solid rgba(255,255,255,0.06); position: relative; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.25); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .phone-inner { padding: 28px 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+
+  .fierce { background: #1C0F0C; }
+  .light { background: #FDF6F0; }
+
+  .card { border-radius: 14px; padding: 14px 16px; }
+  .card-dark { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+  .card-light { background: rgba(255,255,255,0.8); border: 1px solid rgba(196,97,74,0.12); }
+  .accent { color: #C4614A; }
+  .muted { color: rgba(253,246,240,0.4); }
+  .muted-light { color: #9B7B74; }
+  .text-light { color: #1C0F0C; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .heading { font-family: 'Cormorant Garamond', serif; font-weight: 700; }
+  .btn { width: 100%; border-radius: 14px; padding: 14px; font-family: 'Karla', sans-serif; font-size: 14px; font-weight: 700; border: none; text-align: center; }
+  .btn-accent { background: #C4614A; color: white; }
+  .highlight { background: rgba(196,97,74,0.12); border: 1.5px solid rgba(196,97,74,0.3); border-radius: 10px; padding: 8px 12px; }
+  .new-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(196,97,74,0.15); color: #C4614A; border: 1px solid rgba(196,97,74,0.25); padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
+  .compare { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+  .compare-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .compare-before { color: rgba(253,246,240,0.3); }
+  .compare-after { color: #7BD4A0; }
+</style>
+</head>
+<body>
+
+<h1>What Changed</h1>
+<p class="subtitle">Visual overview of all new features</p>
+
+<!-- ======================== MOOD SELECTOR ======================== -->
+<div class="change">
+  <div class="change-title">Mood Check-in</div>
+  <div class="change-desc">5-emoji mood selector at the top of the day screen. Tapping selects your mood for the day (tapping again deselects). Saves per day, feeds into AI content tone.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Before selecting</div>
+      <div class="phone fierce">
+        <div class="phone-inner">
+          <div class="card card-dark" style="padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em;">YOU'RE ON DAY</div>
+                <div class="heading" style="font-size: 44px; color: #FDF6F0; line-height: 1;">5</div>
+                <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em;">OF 28 DAYS</div>
+                <div class="mono" style="font-size: 10px; color: #C4614A; margin-top: 6px;">&#127793; 4 days of loving yourself</div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #F5C842; box-shadow: 0 0 6px rgba(245,200,66,0.5);"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 6px;">
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128525;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Great</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128522;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Good</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128528;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Okay</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128532;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Tough</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128557;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Hard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">After selecting "Good"</div>
+      <div class="phone fierce">
+        <div class="phone-inner">
+          <div class="card card-dark" style="padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em;">YOU'RE ON DAY</div>
+                <div class="heading" style="font-size: 44px; color: #FDF6F0; line-height: 1;">5</div>
+                <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em;">OF 28 DAYS</div>
+                <div class="mono" style="font-size: 10px; color: #C4614A; margin-top: 6px;">&#127793; 4 days of loving yourself</div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #C4614A;"></div>
+                <div style="width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #F5C842; box-shadow: 0 0 6px rgba(245,200,66,0.5);"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 6px;">
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; opacity: 0.4; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128525;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Great</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; background: rgba(196,97,74,0.2); border: 1.5px solid rgba(196,97,74,0.4);">
+              <div style="font-size: 20px;">&#128522;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Good</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; opacity: 0.4; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128528;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Okay</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; opacity: 0.4; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128532;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Tough</div>
+            </div>
+            <div style="border-radius: 10px; padding: 6px 10px; text-align: center; opacity: 0.4; border: 1.5px solid transparent;">
+              <div style="font-size: 20px;">&#128557;</div>
+              <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4);">Hard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== QUOTE CARD ======================== -->
+<div class="change">
+  <div class="change-title">Quote Card — Save + Share</div>
+  <div class="change-desc">Heart icon to save favorites (shown in Progress tab). Share icon opens native share sheet or WhatsApp with the quote + author.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Before (no actions)</div>
+      <div class="phone fierce">
+        <div class="phone-inner">
+          <div class="card card-dark">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">&#128293; TODAY'S FIRE</div>
+            <div class="heading" style="font-size: 22px; font-style: italic; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+            <div class="mono" style="font-size: 11px; color: #C4614A;">— Atticus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">After (save + share)</div>
+      <div class="phone fierce">
+        <div class="phone-inner">
+          <div class="card card-dark">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">&#128293; TODAY'S FIRE</div>
+            <div class="heading" style="font-size: 22px; font-style: italic; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="mono" style="font-size: 11px; color: #C4614A;">— Atticus</div>
+              <div style="display: flex; gap: 8px;">
+                <span style="font-size: 16px; color: #E8707A; cursor: pointer;">&#9829;</span>
+                <span style="font-size: 16px; opacity: 0.5; cursor: pointer;">&#8599;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== AFFIRMATION CARD ======================== -->
+<div class="change">
+  <div class="change-title">Affirmation Card — Save</div>
+  <div class="change-desc">Heart icon to save affirmations to favorites.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">With save heart</div>
+      <div class="phone fierce">
+        <div class="phone-inner">
+          <div class="card card-dark" style="text-align: center;">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px; text-align: left;">&#9889; YOUR POWER</div>
+            <div class="heading" style="font-size: 18px; font-style: italic; color: #C4614A; line-height: 1.4; padding: 8px 0;">I am stronger than the uncertainty I feel today.</div>
+            <span style="font-size: 16px; opacity: 0.35; cursor: pointer;">&#9825;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== COMPLETE DAY ======================== -->
+<div class="change">
+  <div class="change-title">Day Completion — Micro-celebration + Undo</div>
+  <div class="change-desc">Three states: "I showed up today" (not done) &rarr; celebration glow (3 seconds) &rarr; "Day X done · undo" (settled state).</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Not done</div>
+      <div class="phone fierce" style="height: 120px;">
+        <div style="padding: 20px; display: flex; align-items: center; gap: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.3); font-size: 18px;">&#8249;</div>
+          <div style="flex: 1; height: 48px; border-radius: 14px; background: #C4614A; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white;">I showed up today &#10003;</div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #C4614A; display: flex; align-items: center; justify-content: center; color: #C4614A; font-size: 18px;">&#8250;</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">Celebration (3s)</div>
+      <div class="phone fierce" style="height: 120px;">
+        <div style="padding: 20px; display: flex; align-items: center; gap: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.3); font-size: 18px;">&#8249;</div>
+          <div style="flex: 1; height: 48px; border-radius: 14px; background: rgba(196,97,74,0.2); border: 1.5px solid rgba(196,97,74,0.4); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #C4614A;">&#10024; Day 5 — you showed up &#10024;</div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #C4614A; display: flex; align-items: center; justify-content: center; color: #C4614A; font-size: 18px;">&#8250;</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">Done (with undo)</div>
+      <div class="phone fierce" style="height: 120px;">
+        <div style="padding: 20px; display: flex; align-items: center; gap: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.3); font-size: 18px;">&#8249;</div>
+          <div style="flex: 1; height: 48px; border-radius: 14px; background: transparent; border: 1.5px solid rgba(196,97,74,0.4); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600; color: #C4614A;">
+            <span>&#10003; Day 5 done</span>
+            <span style="font-size: 11px; opacity: 0.5;">undo</span>
+          </div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #C4614A; display: flex; align-items: center; justify-content: center; color: #C4614A; font-size: 18px;">&#8250;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== STREAK ======================== -->
+<div class="change">
+  <div class="change-title">Streak Counter</div>
+  <div class="change-desc">Shows below "of X days" in the day card. Counts consecutive completed days. Current day counts only after marking done.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Day 5, 4 days completed</div>
+      <div class="phone fierce" style="height: auto;">
+        <div style="padding: 20px;">
+          <div class="card card-dark" style="padding: 18px 20px;">
+            <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em;">YOU'RE ON DAY</div>
+            <div class="heading" style="font-size: 44px; color: #FDF6F0; line-height: 1;">5</div>
+            <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em; margin-top: 2px;">OF 28 DAYS</div>
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.08em; margin-top: 6px; opacity: 0.8;">&#127793; 4 days of loving yourself</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">After marking day 5 done</div>
+      <div class="phone fierce" style="height: auto;">
+        <div style="padding: 20px;">
+          <div class="card card-dark" style="padding: 18px 20px;">
+            <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em;">YOU'RE ON DAY</div>
+            <div class="heading" style="font-size: 44px; color: #FDF6F0; line-height: 1;">5</div>
+            <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.15em; margin-top: 2px;">OF 28 DAYS</div>
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.08em; margin-top: 6px; opacity: 0.8;">&#127793; 5 days of loving yourself</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== BREATHING CTA ======================== -->
+<div class="change">
+  <div class="change-title">Breathing CTA Rename</div>
+  <div class="change-desc">"Take a moment" &rarr; "Breathe with me" — more calming, creates intimacy.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Before</div>
+      <div class="phone fierce" style="height: auto;">
+        <div style="padding: 20px;">
+          <div class="card card-dark">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">&#10024; YOUR MOMENT</div>
+            <div style="width: 100%; background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 20px; text-align: center; font-weight: 600; font-size: 14px; color: #C4614A;">Take a moment &middot; ~35s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">After</div>
+      <div class="phone fierce" style="height: auto;">
+        <div style="padding: 20px;">
+          <div class="card card-dark">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">&#10024; YOUR MOMENT</div>
+            <div style="width: 100%; background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 20px; text-align: center; font-weight: 600; font-size: 14px; color: #C4614A;">Breathe with me &middot; 35s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== PAYWALL PREVIEW ======================== -->
+<div class="change">
+  <div class="change-title">Paywall — "What You'll Get" Preview</div>
+  <div class="change-desc">Feature list with icons below the plan cards. Shows users exactly what they're paying for.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">New paywall section</div>
+      <div class="phone light">
+        <div class="phone-inner">
+          <div style="background: rgba(196,97,74,0.04); border: 1px solid rgba(196,97,74,0.1); border-radius: 14px; padding: 14px 16px;">
+            <div class="mono" style="font-size: 9px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">WHAT YOU'LL GET EVERY DAY</div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;"><span style="font-size: 14px;">&#128172;</span><span style="font-size: 13px; color: #1C0F0C;">Personalised daily quote</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;"><span style="font-size: 14px;">&#127925;</span><span style="font-size: 13px; color: #1C0F0C;">Curated music for your mood</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;"><span style="font-size: 14px;">&#9998;</span><span style="font-size: 13px; color: #1C0F0C;">Guided journaling prompts</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;"><span style="font-size: 14px;">&#10024;</span><span style="font-size: 13px; color: #1C0F0C;">35-second breathing exercise</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;"><span style="font-size: 14px;">&#9889;</span><span style="font-size: 13px; color: #1C0F0C;">Daily affirmation</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;"><span style="font-size: 14px;">&#128155;</span><span style="font-size: 13px; color: #1C0F0C;">A note from your person</span></div>
+          </div>
+          <div class="btn btn-accent" style="margin-top: 12px;">Start Journey</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== END OF CYCLE REFLECTION ======================== -->
+<div class="change">
+  <div class="change-title">End of Cycle — Reflection Prompt</div>
+  <div class="change-desc">Before showing stats, asks "What's one thing you want to remember from this cycle?" Optional journal entry saved locally.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Reflection card (before stats)</div>
+      <div class="phone fierce">
+        <div class="phone-inner" style="align-items: center; text-align: center;">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(196,97,74,0.8), rgba(196,97,74,0.35)); display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 0 40px rgba(196,97,74,0.4);">&#128293;</div>
+          <div class="heading" style="font-size: 28px; color: #FDF6F0; margin-top: 8px;">You did it,<br><span style="color: #C4614A;">Sarah.</span></div>
+          <div class="card card-dark" style="width: 100%; text-align: left; margin-top: 8px;">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">&#128140; BEFORE YOU GO</div>
+            <div class="heading" style="font-size: 16px; font-style: italic; color: #FDF6F0; line-height: 1.5; margin-bottom: 12px;">What's one thing you want to remember from this cycle?</div>
+            <div style="background: rgba(196,97,74,0.08); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; font-size: 14px; color: rgba(253,246,240,0.4); font-style: italic; min-height: 60px;">This is just for you...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== PROGRESS SAVED ======================== -->
+<div class="change">
+  <div class="change-title">Progress Tab — Saved Favorites</div>
+  <div class="change-desc">Quotes and affirmations you've hearted appear in a "Saved" section on the Progress tab.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Saved section in Progress</div>
+      <div class="phone fierce">
+        <div class="phone-inner">
+          <div class="card card-dark">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 12px;">&#9829; SAVED</div>
+            <div style="padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+              <div class="heading" style="font-size: 15px; font-style: italic; color: #FDF6F0; line-height: 1.4;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+              <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.4); margin-top: 4px;">— Atticus &middot; QUOTE &middot; DAY 2</div>
+            </div>
+            <div>
+              <div class="heading" style="font-size: 15px; font-style: italic; color: #FDF6F0; line-height: 1.4;">I am stronger than the uncertainty I feel today.</div>
+              <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.4); margin-top: 4px;">AFFIRMATION &middot; DAY 5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== SKIP FOR NOW ======================== -->
+<div class="change">
+  <div class="change-title">Onboarding — Skip for Now</div>
+  <div class="change-desc">Subtle "Skip for now" link on steps 2-6. Step 1 (name) stays required — every piece of content uses the name. Defaults: IVF, 28 days, calm vibe, all components, pop+ambient.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Step 2 — Treatment</div>
+      <div class="phone light">
+        <div class="phone-inner">
+          <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em;">STEP 2 OF 6</div>
+          <div class="heading" style="font-size: 28px; color: #1C0F0C;">What treatment are you going through?</div>
+          <div style="border-radius: 14px; border: 1.5px solid rgba(196,97,74,0.2); padding: 12px 14px; color: #1C0F0C; font-size: 13px;">IVF</div>
+          <div style="border-radius: 14px; border: 1.5px solid rgba(196,97,74,0.2); padding: 12px 14px; color: #1C0F0C; font-size: 13px;">Egg Freezing</div>
+          <div style="border-radius: 14px; border: 1.5px solid rgba(196,97,74,0.2); padding: 12px 14px; color: #1C0F0C; font-size: 13px;">IUI</div>
+          <div style="flex: 1;"></div>
+          <div class="btn btn-accent" style="opacity: 0.4;">Continue</div>
+          <div style="text-align: center; font-size: 12px; color: #9B7B74; padding-top: 10px;">Skip for now</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== TAKE A BREAK ======================== -->
+<div class="change">
+  <div class="change-title">Take a Break (Settings)</div>
+  <div class="change-desc">Pause your cycle from Settings. Freezes the day counter. Welcome-back overlay on return.</div>
+  <div class="screens">
+    <div>
+      <div class="phone-label">Settings — pause row</div>
+      <div class="phone fierce" style="height: auto;">
+        <div style="padding: 20px;">
+          <div class="card card-dark" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer;">
+            <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(196,97,74,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px;">&#127769;</div>
+            <div style="flex: 1;">
+              <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 2px;">TAKE A BREAK</div>
+              <div style="font-size: 13px; color: #FDF6F0;">Pause your cycle — no pressure, no guilt.</div>
+            </div>
+            <div style="color: rgba(253,246,240,0.4); font-size: 16px;">&#8250;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">&rarr;</div>
+    <div>
+      <div class="phone-label">Welcome back overlay</div>
+      <div class="phone fierce">
+        <div class="phone-inner" style="align-items: center; justify-content: center; text-align: center; min-height: 400px;">
+          <div style="font-size: 48px;">&#127800;</div>
+          <div class="heading" style="font-size: 32px; color: #FDF6F0; margin-top: 12px;">Welcome back, Sarah</div>
+          <div style="font-size: 14px; color: rgba(253,246,240,0.5); line-height: 1.6; max-width: 260px; margin-top: 8px;">You took a break, and that's okay. You're here now, and that's what matters.</div>
+          <div class="btn btn-accent" style="margin-top: 20px;">Continue my journey</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center; padding: 40px 0 20px; color: rgba(253,246,240,0.12); font-family: 'DM Mono', monospace; font-size: 10px;">
+  Cycle App — Changes Overview — 2026-04-05
+</div>
+
+</body>
+</html>

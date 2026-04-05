@@ -9,30 +9,30 @@
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; padding: 24px; }
   h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
   .subtitle { color: #888; font-size: 13px; margin-bottom: 32px; }
-  .stats { display: flex; gap: 16px; margin-bottom: 32px; }
-  .stat-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 20px 24px; min-width: 160px; }
-  .stat-card .num { font-size: 28px; font-weight: 700; color: #fff; }
-  .stat-card .label { font-size: 12px; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
-  .tab { background: transparent; border: 1px solid #333; color: #aaa; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+  .stats { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .stat-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 16px 20px; min-width: 120px; }
+  .stat-card .num { font-size: 24px; font-weight: 700; color: #fff; }
+  .stat-card .label { font-size: 11px; color: #888; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab { background: transparent; border: 1px solid #333; color: #aaa; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
   .tab:hover { border-color: #555; color: #ddd; }
   .tab.active { background: #fff; color: #000; border-color: #fff; }
-  .table-wrap { overflow-x: auto; border: 1px solid #2a2a2a; border-radius: 10px; background: #1a1a1a; }
+  .table-wrap { overflow-x: auto; border: 1px solid #2a2a2a; border-radius: 10px; background: #1a1a1a; max-height: 600px; overflow-y: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 12px 16px; border-bottom: 1px solid #2a2a2a; color: #888; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; position: sticky; top: 0; background: #1a1a1a; }
+  th { text-align: left; padding: 12px 16px; border-bottom: 1px solid #2a2a2a; color: #888; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; position: sticky; top: 0; background: #1a1a1a; z-index: 1; }
   td { padding: 10px 16px; border-bottom: 1px solid #1f1f1f; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   td.wrap { white-space: normal; max-width: 400px; }
   tr:hover td { background: #222; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
   .badge-vibe { background: #2a1a2a; color: #d4a; }
   .badge-treatment { background: #1a2a2a; color: #4da; }
+  .badge-mood { background: #2a2a1a; color: #da4; }
+  .badge-event { background: #1a1a2a; color: #4ad; }
   .empty { text-align: center; padding: 48px; color: #555; }
   .refresh-btn { background: #2a2a2a; border: 1px solid #333; color: #ccc; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: auto; }
   .refresh-btn:hover { background: #333; }
   .header-row { display: flex; align-items: center; margin-bottom: 32px; }
   .header-row h1 { margin-bottom: 0; }
-  .expand-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 11px; padding: 2px 6px; }
-  .expand-btn:hover { color: #aaa; }
 </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
 <div class="header-row">
   <div>
     <h1>Cycle Admin</h1>
-    <div class="subtitle">SQLite database viewer</div>
+    <div class="subtitle">Full database overview</div>
   </div>
   <button class="refresh-btn" onclick="loadAll()">Refresh</button>
 </div>
@@ -49,13 +49,23 @@
 
 <div class="tabs">
   <button class="tab active" data-tab="profiles">Profiles</button>
-  <button class="tab" data-tab="content">Daily Content</button>
-  <button class="tab" data-tab="journals">Journal Entries</button>
+  <button class="tab" data-tab="accounts">Accounts</button>
+  <button class="tab" data-tab="completions">Day Completions</button>
+  <button class="tab" data-tab="moods">Moods</button>
+  <button class="tab" data-tab="favorites">Saved Content</button>
+  <button class="tab" data-tab="content">AI Content</button>
+  <button class="tab" data-tab="journals">Journals</button>
+  <button class="tab" data-tab="events">Events</button>
 </div>
 
 <div id="profiles" class="table-wrap"></div>
+<div id="accounts" class="table-wrap" style="display:none"></div>
+<div id="completions" class="table-wrap" style="display:none"></div>
+<div id="moods" class="table-wrap" style="display:none"></div>
+<div id="favorites" class="table-wrap" style="display:none"></div>
 <div id="content" class="table-wrap" style="display:none"></div>
 <div id="journals" class="table-wrap" style="display:none"></div>
+<div id="events" class="table-wrap" style="display:none"></div>
 
 <script>
 const tabs = document.querySelectorAll('.tab')
@@ -67,14 +77,14 @@ tabs.forEach(t => t.addEventListener('click', () => {
 }))
 
 function esc(s) {
-  if (s == null) return '<span style="color:#555">null</span>'
+  if (s == null) return '<span style="color:#555">—</span>'
   const d = document.createElement('div')
   d.textContent = String(s)
   return d.innerHTML
 }
 
 function renderTable(rows, columns) {
-  if (!rows.length) return '<div class="empty">No data</div>'
+  if (!rows.length) return '<div class="empty">No data yet</div>'
   let html = '<table><tr>'
   columns.forEach(c => html += `<th>${esc(c.label || c.key)}</th>`)
   html += '</tr>'
@@ -90,58 +100,108 @@ function renderTable(rows, columns) {
   return html
 }
 
-function badge(text, cls) {
-  return `<span class="badge ${cls}">${esc(text)}</span>`
+function badge(text, cls) { return `<span class="badge ${cls}">${esc(text)}</span>` }
+function arr(val) { return Array.isArray(val) ? val.map(v => esc(v)).join(', ') : esc(val) }
+function timeAgo(ts) {
+  if (!ts) return '—'
+  const d = new Date(ts + 'Z')
+  const now = new Date()
+  const mins = Math.floor((now - d) / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return mins + 'm ago'
+  if (mins < 1440) return Math.floor(mins/60) + 'h ago'
+  return Math.floor(mins/1440) + 'd ago'
 }
 
-function arr(val) {
-  if (Array.isArray(val)) return val.map(v => esc(v)).join(', ')
-  return esc(val)
-}
+const MOOD_EMOJI = { great: '😍', good: '😊', okay: '😐', tough: '😔', hard: '😢' }
 
 async function loadAll() {
-  const [stats, profiles, content, journals] = await Promise.all([
+  const [stats, profiles, accounts, content, journals, moods, favorites, completions, events] = await Promise.all([
     fetch('/api/admin/stats').then(r => r.json()),
     fetch('/api/admin/profiles').then(r => r.json()),
+    fetch('/api/admin/accounts').then(r => r.json()),
     fetch('/api/admin/content').then(r => r.json()),
     fetch('/api/admin/journals').then(r => r.json()),
+    fetch('/api/admin/moods').then(r => r.json()),
+    fetch('/api/admin/favorites').then(r => r.json()),
+    fetch('/api/admin/completions').then(r => r.json()),
+    fetch('/api/admin/events').then(r => r.json()),
   ])
 
   document.getElementById('stats').innerHTML = `
     <div class="stat-card"><div class="num">${stats.profiles}</div><div class="label">Profiles</div></div>
-    <div class="stat-card"><div class="num">${stats.content}</div><div class="label">Generated Days</div></div>
-    <div class="stat-card"><div class="num">${stats.journals}</div><div class="label">Journal Entries</div></div>
+    <div class="stat-card"><div class="num">${stats.accounts}</div><div class="label">Accounts</div></div>
+    <div class="stat-card"><div class="num">${stats.completions}</div><div class="label">Days Done</div></div>
+    <div class="stat-card"><div class="num">${stats.moods}</div><div class="label">Moods</div></div>
+    <div class="stat-card"><div class="num">${stats.favorites}</div><div class="label">Saved</div></div>
+    <div class="stat-card"><div class="num">${stats.content}</div><div class="label">AI Content</div></div>
+    <div class="stat-card"><div class="num">${stats.journals}</div><div class="label">Journals</div></div>
+    <div class="stat-card"><div class="num">${stats.events}</div><div class="label">Events</div></div>
   `
 
   document.getElementById('profiles').innerHTML = renderTable(profiles, [
     { key: 'name', label: 'Name' },
     { key: 'treatment', label: 'Treatment', render: v => badge(v, 'badge-treatment') },
-    { key: 'cycle_days', label: 'Cycle Days' },
+    { key: 'cycle_days', label: 'Days' },
     { key: 'vibe', label: 'Vibe', render: v => badge(v, 'badge-vibe') },
     { key: 'components', label: 'Components', render: arr },
     { key: 'genres', label: 'Genres', render: arr },
-    { key: 'current_day', label: 'Current Day' },
-    { key: 'created_at', label: 'Created' },
+    { key: 'current_day', label: 'Day' },
+    { key: 'created_at', label: 'Created', render: timeAgo },
+  ])
+
+  document.getElementById('accounts').innerHTML = renderTable(accounts, [
+    { key: 'email', label: 'Email' },
+    { key: 'profile_id', label: 'Profile' },
+    { key: 'plan', label: 'Plan', render: v => v ? badge(v, 'badge-treatment') : '<span style="color:#555">free</span>' },
+    { key: 'created_at', label: 'Created', render: timeAgo },
+  ])
+
+  document.getElementById('completions').innerHTML = renderTable(completions, [
+    { key: 'user_id', label: 'User' },
+    { key: 'day_number', label: 'Day' },
+    { key: 'completed_at', label: 'Completed', render: timeAgo },
+  ])
+
+  document.getElementById('moods').innerHTML = renderTable(moods, [
+    { key: 'user_id', label: 'User' },
+    { key: 'day_number', label: 'Day' },
+    { key: 'mood', label: 'Mood', render: v => `${MOOD_EMOJI[v] || ''} ${esc(v)}` },
+    { key: 'logged_at', label: 'Logged', render: timeAgo },
+  ])
+
+  document.getElementById('favorites').innerHTML = renderTable(favorites, [
+    { key: 'user_id', label: 'User' },
+    { key: 'day_number', label: 'Day' },
+    { key: 'type', label: 'Type', render: v => badge(v, 'badge-mood') },
+    { key: 'content', label: 'Content', wrap: true },
+    { key: 'author', label: 'Author' },
+    { key: 'saved_at', label: 'Saved', render: timeAgo },
   ])
 
   document.getElementById('content').innerHTML = renderTable(content, [
     { key: 'user_id', label: 'User' },
     { key: 'day_number', label: 'Day' },
-    { key: 'cycle_id', label: 'Cycle' },
     { key: 'quote', label: 'Quote', wrap: true },
     { key: 'quote_author', label: 'Author' },
     { key: 'song_title', label: 'Song' },
     { key: 'song_artist', label: 'Artist' },
     { key: 'affirmation', label: 'Affirmation', wrap: true },
-    { key: 'journal_prompt', label: 'Journal Prompt', wrap: true },
-    { key: 'generated_at', label: 'Generated' },
+    { key: 'generated_at', label: 'Generated', render: timeAgo },
   ])
 
   document.getElementById('journals').innerHTML = renderTable(journals, [
     { key: 'user_id', label: 'User' },
     { key: 'day_number', label: 'Day' },
     { key: 'content', label: 'Entry', wrap: true },
-    { key: 'created_at', label: 'Created' },
+    { key: 'created_at', label: 'Created', render: timeAgo },
+  ])
+
+  document.getElementById('events').innerHTML = renderTable(events, [
+    { key: 'user_id', label: 'User' },
+    { key: 'event', label: 'Event', render: v => badge(v, 'badge-event') },
+    { key: 'data', label: 'Data', wrap: true, render: v => { try { const d = JSON.parse(v); return esc(JSON.stringify(d)) } catch { return esc(v) } } },
+    { key: 'created_at', label: 'Time', render: timeAgo },
   ])
 }
 

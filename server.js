@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const bcrypt = require('bcryptjs')
-const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan } = require('./db')
+const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan, saveMood, saveFavorite, saveDayCompletion, logEvent } = require('./db')
 
 const app = express()
 app.use(cors({ origin: '*' }))
@@ -756,11 +756,79 @@ app.get('/api/admin/journals', (_, res) => {
   res.json(rows)
 })
 
+app.post('/api/mood', (req, res) => {
+  const { userId, dayNumber, mood } = req.body
+  if (!userId || !dayNumber) return res.status(400).json({ error: 'Missing userId or dayNumber' })
+  try {
+    saveMood(userId, dayNumber, mood || null)
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.post('/api/favorite', (req, res) => {
+  const { userId, dayNumber, type, content, author } = req.body
+  if (!userId || !dayNumber || !type) return res.status(400).json({ error: 'Missing fields' })
+  try {
+    saveFavorite(userId, dayNumber, type, content || null, author)
+    res.json({ ok: true })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+app.post('/api/day-complete', (req, res) => {
+  const { userId, dayNumber, completed } = req.body
+  if (!userId || !dayNumber) return res.status(400).json({ error: 'Missing fields' })
+  try {
+    saveDayCompletion(userId, dayNumber, completed !== false)
+    res.json({ ok: true })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+app.post('/api/event', (req, res) => {
+  const { userId, event, data } = req.body
+  if (!userId || !event) return res.status(400).json({ error: 'Missing fields' })
+  try {
+    logEvent(userId, event, data)
+    res.json({ ok: true })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+app.get('/api/admin/favorites', (_, res) => {
+  const rows = db.prepare('SELECT * FROM favorites ORDER BY saved_at DESC').all()
+  res.json(rows)
+})
+
+app.get('/api/admin/completions', (_, res) => {
+  const rows = db.prepare('SELECT * FROM day_completions ORDER BY user_id, day_number').all()
+  res.json(rows)
+})
+
+app.get('/api/admin/events', (_, res) => {
+  const rows = db.prepare('SELECT * FROM events ORDER BY created_at DESC LIMIT 200').all()
+  res.json(rows)
+})
+
+app.get('/api/admin/accounts', (_, res) => {
+  const rows = db.prepare('SELECT id, email, profile_id, plan, created_at FROM accounts ORDER BY created_at DESC').all()
+  res.json(rows)
+})
+
+app.get('/api/admin/moods', (_, res) => {
+  const rows = db.prepare('SELECT * FROM moods ORDER BY user_id, day_number').all()
+  res.json(rows)
+})
+
 app.get('/api/admin/stats', (_, res) => {
   const profiles = db.prepare('SELECT COUNT(*) as count FROM profiles').get().count
+  const accounts = db.prepare('SELECT COUNT(*) as count FROM accounts').get().count
   const content = db.prepare('SELECT COUNT(*) as count FROM daily_content').get().count
   const journals = db.prepare('SELECT COUNT(*) as count FROM journal_entries').get().count
-  res.json({ profiles, content, journals })
+  const moods = db.prepare('SELECT COUNT(*) as count FROM moods').get().count
+  const favorites = db.prepare('SELECT COUNT(*) as count FROM favorites').get().count
+  const completions = db.prepare('SELECT COUNT(*) as count FROM day_completions').get().count
+  const events = db.prepare('SELECT COUNT(*) as count FROM events').get().count
+  res.json({ profiles, accounts, content, journals, moods, favorites, completions, events })
 })
 
 // --- Spotify integration ---

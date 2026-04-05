@@ -105,11 +105,11 @@ function createAmbientPad(): { start: () => void; swell: () => void; fadeOut: ()
     feedback.gain.value = 0.3
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 800
+    lp.frequency.value = 600 // lower cutoff for warmer tone
 
     // Drone: layered detuned oscillators for warmth
     const oscs: OscillatorNode[] = []
-    const notes = [132, 198, 264] // C3, G3, C4
+    const notes = [66, 99, 132, 198] // C2, G2, C3, G3 — deeper, warmer
     notes.forEach(freq => {
       const osc = ctx.createOscillator()
       osc.type = 'sine'
@@ -118,8 +118,8 @@ function createAmbientPad(): { start: () => void; swell: () => void; fadeOut: ()
       oscs.push(osc)
       // Slight detune for richness
       const osc2 = ctx.createOscillator()
-      osc2.type = 'sine'
-      osc2.frequency.value = freq * 1.003
+      osc2.type = 'triangle' // triangle wave adds gentle overtones
+      osc2.frequency.value = freq * 1.002
       osc2.connect(lp)
       oscs.push(osc2)
     })
@@ -137,11 +137,11 @@ function createAmbientPad(): { start: () => void; swell: () => void; fadeOut: ()
         if (started) return
         started = true
         oscs.forEach(o => o.start())
-        master.gain.setTargetAtTime(0.08, ctx.currentTime, 2.0) // gentle fade in over ~6s
+        master.gain.setTargetAtTime(0.12, ctx.currentTime, 2.5) // gentle fade in, warmer volume
       },
       swell() {
         // Brief volume swell during inhale
-        master.gain.setTargetAtTime(0.14, ctx.currentTime, 1.5)
+        master.gain.setTargetAtTime(0.18, ctx.currentTime, 1.5)
         setTimeout(() => {
           master.gain.setTargetAtTime(0.08, ctx.currentTime, 2.0)
         }, 7000)
@@ -307,8 +307,8 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 18, color: vibe.accent, textAlign: 'center', lineHeight: 1.6, maxWidth: 260, whiteSpace: 'pre-line' }}>
           {displayOpening}
         </div>
-        <button onClick={stopMoment} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: vibe.muted, marginTop: 4 }}>
-          &#10005; end
+        <button onClick={stopMoment} style={{ background: `${vibe.accent}15`, border: `1.5px solid ${vibe.accent}30`, borderRadius: 24, padding: '10px 28px', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 600, color: vibe.accent, marginTop: 8 }}>
+          End
         </button>
       </div>
     )
@@ -540,11 +540,13 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     setShowCelebration(true)
     track('day_marked_done', { day_number: dayNumber })
     setTimeout(() => setShowCelebration(false), 3000)
+    fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, completed: true }) }).catch(() => {})
     onDayComplete()
   }
 
   const unmarkDone = () => {
     localStorage.removeItem(`cycle_day_${dayNumber}_done`)
+    fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, completed: false }) }).catch(() => {})
     setDayDone(false)
   }
 
@@ -555,6 +557,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
       : [...favorites, { type, text, author, day: dayNumber }]
     setFavorites(next)
     localStorage.setItem('cycle_favorites', JSON.stringify(next))
+    fetch('/api/favorite', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, type, content: exists ? null : text, author }) }).catch(() => {})
   }
 
   const isFavorited = (type: string) => favorites.some(f => f.type === type && f.day === dayNumber)
@@ -800,33 +803,6 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
         </Card>
       </div>
 
-      {/* Mood check-in */}
-      <div style={{ padding: '0 18px 8px', display: 'flex', justifyContent: 'center', gap: 6 }}>
-        {[
-          { key: 'great', emoji: '&#128525;', label: 'Great' },
-          { key: 'good', emoji: '&#128522;', label: 'Good' },
-          { key: 'okay', emoji: '&#128528;', label: 'Okay' },
-          { key: 'tough', emoji: '&#128532;', label: 'Tough' },
-          { key: 'hard', emoji: '&#128557;', label: 'Hard' },
-        ].map(m => (
-          <button key={m.key} onClick={() => {
-            const val = mood === m.key ? null : m.key
-            setMood(val)
-            if (val) { localStorage.setItem(`cycle_mood_day${dayNumber}`, val); track('mood_logged', { day_number: dayNumber, mood: val }) }
-            else localStorage.removeItem(`cycle_mood_day${dayNumber}`)
-          }} style={{
-            background: mood === m.key ? `${vibe.accent}20` : 'transparent',
-            border: mood === m.key ? `1.5px solid ${vibe.accent}40` : '1.5px solid transparent',
-            borderRadius: 10, padding: '6px 10px', cursor: 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            transition: 'all 0.2s', opacity: mood && mood !== m.key ? 0.4 : 1,
-          }}>
-            <span style={{ fontSize: 20 }} dangerouslySetInnerHTML={{ __html: m.emoji }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, letterSpacing: '0.05em' }}>{m.label}</span>
-          </button>
-        ))}
-      </div>
-
       {loading ? (
         <div className="flex-center" style={{ flex: 1, flexDirection: 'column', gap: 14 }}>
           <div className="spinner" style={{ width: 40, height: 40, border: `2px solid ${vibe.accent}40`, borderTop: `2px solid ${vibe.accent}` }} />
@@ -931,34 +907,32 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
           transition: 'all 0.2s', flexShrink: 0,
         }}
       >‹</button>
-      {/* Mark Day done / celebration / undo */}
+      {/* Mark Day done / sparkle celebration / toggle undo */}
       {showCelebration ? (
         <div style={{
           flex: 1, height: 48, borderRadius: 14,
           background: `${vibe.accent}20`,
           border: `1.5px solid ${vibe.accent}40`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 14,
-          color: vibe.accent, animation: 'fadeIn 0.5s ease',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          fontSize: 18, color: vibe.accent, animation: 'fadeIn 0.5s ease',
         }}>
-          &#10024; Day {dayNumber} — you showed up &#10024;
+          &#10024; &#10003; &#10024;
         </div>
       ) : dayDone ? (
         <button
           onClick={unmarkDone}
           style={{
             flex: 1, height: 48, borderRadius: 14,
-            background: 'transparent',
+            background: `${vibe.accent}15`,
             color: vibe.accent,
-            border: `1.5px solid ${vibe.accent}40`,
-            fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13,
+            border: `1.5px solid ${vibe.accent}30`,
+            fontFamily: typo.bodyFont, fontWeight: 700, fontSize: 14,
             cursor: 'pointer',
             transition: 'all 0.3s',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          <span>&#10003; Day {dayNumber} done</span>
-          <span style={{ fontSize: 11, opacity: 0.5 }}>undo</span>
+          Done &#10003;
         </button>
       ) : (
         <button
@@ -973,7 +947,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
             transition: 'all 0.3s',
           }}
         >
-          I showed up today &#10003;
+          Done &#10003;
         </button>
       )}
       {/* Right arrow */}

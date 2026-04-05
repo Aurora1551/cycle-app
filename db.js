@@ -88,6 +88,39 @@ db.exec(`
     updated_at TEXT DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS moods (
+    user_id TEXT NOT NULL,
+    day_number INTEGER NOT NULL,
+    mood TEXT NOT NULL,
+    logged_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, day_number)
+  );
+
+  CREATE TABLE IF NOT EXISTS favorites (
+    user_id TEXT NOT NULL,
+    day_number INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    content TEXT NOT NULL,
+    author TEXT,
+    saved_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, day_number, type)
+  );
+
+  CREATE TABLE IF NOT EXISTS day_completions (
+    user_id TEXT NOT NULL,
+    day_number INTEGER NOT NULL,
+    completed_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, day_number)
+  );
+
+  CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    event TEXT NOT NULL,
+    data TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS purchases (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     user_id TEXT NOT NULL,
@@ -152,6 +185,29 @@ const stmts = {
   `),
   getSpotifyTokens: db.prepare('SELECT * FROM spotify_tokens WHERE user_id = ?'),
   deleteSpotifyTokens: db.prepare('DELETE FROM spotify_tokens WHERE user_id = ?'),
+
+  upsertFavorite: db.prepare(`
+    INSERT INTO favorites (user_id, day_number, type, content, author)
+    VALUES (@userId, @dayNumber, @type, @content, @author)
+    ON CONFLICT(user_id, day_number, type) DO UPDATE SET content=@content, author=@author, saved_at=datetime('now')
+  `),
+  deleteFavorite: db.prepare('DELETE FROM favorites WHERE user_id = ? AND day_number = ? AND type = ?'),
+
+  upsertDayCompletion: db.prepare(`
+    INSERT OR IGNORE INTO day_completions (user_id, day_number) VALUES (@userId, @dayNumber)
+  `),
+  deleteDayCompletion: db.prepare('DELETE FROM day_completions WHERE user_id = ? AND day_number = ?'),
+
+  insertEvent: db.prepare(`
+    INSERT INTO events (user_id, event, data) VALUES (@userId, @event, @data)
+  `),
+
+  upsertMood: db.prepare(`
+    INSERT INTO moods (user_id, day_number, mood)
+    VALUES (@userId, @dayNumber, @mood)
+    ON CONFLICT(user_id, day_number) DO UPDATE SET mood=@mood, logged_at=datetime('now')
+  `),
+  deleteMood: db.prepare('DELETE FROM moods WHERE user_id = ? AND day_number = ?'),
 
   insertPurchase: db.prepare(`
     INSERT INTO purchases (user_id, plan, stripe_payment_id, amount, currency, status)
@@ -298,6 +354,34 @@ function updateAccountPlan(email, plan) {
   stmts.updateAccountPlan.run({ email, plan })
 }
 
+function saveFavorite(userId, dayNumber, type, content, author) {
+  if (content) {
+    stmts.upsertFavorite.run({ userId, dayNumber, type, content, author: author || null })
+  } else {
+    stmts.deleteFavorite.run(userId, dayNumber, type)
+  }
+}
+
+function saveDayCompletion(userId, dayNumber, completed) {
+  if (completed) {
+    stmts.upsertDayCompletion.run({ userId, dayNumber })
+  } else {
+    stmts.deleteDayCompletion.run(userId, dayNumber)
+  }
+}
+
+function logEvent(userId, event, data) {
+  stmts.insertEvent.run({ userId, event, data: data ? JSON.stringify(data) : null })
+}
+
+function saveMood(userId, dayNumber, mood) {
+  if (mood) {
+    stmts.upsertMood.run({ userId, dayNumber, mood })
+  } else {
+    stmts.deleteMood.run(userId, dayNumber)
+  }
+}
+
 module.exports = {
   db,
   saveProfile,
@@ -315,4 +399,8 @@ module.exports = {
   savePurchase,
   getPurchaseByStripeId,
   updateAccountPlan,
+  saveMood,
+  saveFavorite,
+  saveDayCompletion,
+  logEvent,
 }

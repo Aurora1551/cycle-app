@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress Tab — Full Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Karla:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #FDF6F0; font-family: 'Karla', sans-serif; display: flex; justify-content: center; padding: 40px 20px; gap: 40px; flex-wrap: wrap; }
+  .phone { width: 340px; border-radius: 32px; overflow: hidden; border: 2px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+  .phone-inner { display: flex; flex-direction: column; }
+  .card { border-radius: 14px; padding: 14px 16px; margin: 0 18px 12px; }
+  .label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .heading { font-family: 'Cormorant Garamond', serif; }
+  .nav { display: flex; justify-content: space-around; padding: 14px 0 10px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto; font-size: 11px; background: inherit; }
+  .nav-item { text-align: center; font-size: 10px; color: rgba(253,246,240,0.3); }
+  .nav-active { color: #C4614A; }
+  .desc { max-width: 340px; padding-top: 12px; }
+  .desc-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .desc p { font-size: 13px; color: rgba(253,246,240,0.5); line-height: 1.6; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<!-- Fierce vibe -->
+<div>
+  <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.25); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px;">Fierce vibe &middot; Day 8 of 28 &middot; 2 saved items</div>
+  <div class="phone" style="background: #1C0F0C;">
+    <div class="phone-inner">
+      <!-- Header -->
+      <div style="padding: 20px 22px 10px;">
+        <div class="mono" style="font-size: 10px; color: rgba(253,246,240,0.4); letter-spacing: 0.18em; margin-bottom: 4px;">YOUR PROGRESS</div>
+        <div class="heading" style="font-size: 24px; font-weight: 700; font-style: italic; color: #FDF6F0;">Your Journey</div>
+      </div>
+
+      <!-- Day by day grid -->
+      <div class="card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="label" style="color: #C4614A;">DAY BY DAY</div>
+        <!-- Week 1 -->
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <div class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4); width: 18px;">WK 1</div>
+          <div style="flex: 1; display: flex; gap: 4px;">
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">1</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">2</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">3</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">4</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">5</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">6</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: white;">7</span></div>
+          </div>
+        </div>
+        <!-- Week 2 -->
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <div class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4); width: 18px;">WK 2</div>
+          <div style="flex: 1; display: flex; gap: 4px;">
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(196,97,74,0.4); border: 2px solid #C4614A; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: #C4614A;">8</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">9</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">10</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">11</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">12</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">13</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">14</span></div>
+          </div>
+        </div>
+        <!-- Week 3 -->
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <div class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4); width: 18px;">WK 3</div>
+          <div style="flex: 1; display: flex; gap: 4px;">
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">15</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">16</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">17</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">18</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">19</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">20</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">21</span></div>
+          </div>
+        </div>
+        <!-- Week 4 -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4); width: 18px;">WK 4</div>
+          <div style="flex: 1; display: flex; gap: 4px;">
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">22</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">23</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">24</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">25</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">26</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">27</span></div>
+            <div style="flex: 1; aspect-ratio: 1; max-width: 34px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 7px; color: rgba(253,246,240,0.4);">28</span></div>
+          </div>
+        </div>
+        <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.3); margin-top: 10px;">Tap a day to revisit</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="label" style="color: #C4614A;">YOUR STATS</div>
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+          <div>
+            <div class="heading" style="font-size: 30px; font-weight: 700; font-style: italic; color: #C4614A;">7</div>
+            <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4); letter-spacing: 0.1em;">DAYS DONE</div>
+          </div>
+          <div>
+            <div class="heading" style="font-size: 30px; font-weight: 700; font-style: italic; color: #C4614A;">28</div>
+            <div class="mono" style="font-size: 8px; color: rgba(253,246,240,0.4); letter-spacing: 0.1em;">TOTAL DAYS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved favorites -->
+      <div class="card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="label" style="color: #C4614A;">&#9829; SAVED</div>
+
+        <!-- Saved quote -->
+        <div style="padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+          <div class="heading" style="font-size: 15px; font-style: italic; color: #FDF6F0; line-height: 1.4;">
+            "She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."
+          </div>
+          <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.4); margin-top: 4px; letter-spacing: 0.1em;">
+            — Atticus &middot; QUOTE &middot; DAY 2
+          </div>
+        </div>
+
+        <!-- Saved affirmation -->
+        <div style="padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+          <div class="heading" style="font-size: 15px; font-style: italic; color: #FDF6F0; line-height: 1.4;">
+            I am stronger than the uncertainty I feel today.
+          </div>
+          <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.4); margin-top: 4px; letter-spacing: 0.1em;">
+            AFFIRMATION &middot; DAY 5
+          </div>
+        </div>
+
+        <!-- Saved quote 2 -->
+        <div>
+          <div class="heading" style="font-size: 15px; font-style: italic; color: #FDF6F0; line-height: 1.4;">
+            "You are allowed to be both a masterpiece and a work in progress simultaneously."
+          </div>
+          <div class="mono" style="font-size: 9px; color: rgba(253,246,240,0.4); margin-top: 4px; letter-spacing: 0.1em;">
+            — Sophia Bush &middot; QUOTE &middot; DAY 7
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom nav -->
+      <div class="nav" style="background: #1C0F0C;">
+        <div class="nav-item" style="color: rgba(253,246,240,0.3);">Today</div>
+        <div class="nav-item nav-active">Progress</div>
+        <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Description -->
+<div class="desc">
+  <div class="desc-title">How it works</div>
+  <p><strong style="color: #FDF6F0;">Day grid:</strong> Filled circles = completed days. Bordered circle = current day. Faded = future. Tap any day to revisit it.</p>
+  <p><strong style="color: #FDF6F0;">Stats:</strong> Days done vs total days in the cycle.</p>
+  <p><strong style="color: #FDF6F0;">Saved:</strong> Only appears if you've hearted at least one quote or affirmation. Shows the text, author (for quotes), content type, and which day it was from. Most recent saves at the bottom.</p>
+  <p style="color: rgba(253,246,240,0.3); font-style: italic; font-size: 12px; margin-top: 16px;">If nothing is saved, the Saved card doesn't show at all — the page just has the grid and stats.</p>
+
+  <div class="desc-title" style="margin-top: 24px;">Without saved items</div>
+  <p>The page would just show the day grid card and the stats card. Clean and simple — the Saved section only appears when you have favorites.</p>
+</div>
+
+</body>
+</html>

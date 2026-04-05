@@ -281,7 +281,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
                 {isPaused ? 'JOURNEY PAUSED' : 'TAKE A BREAK'}
               </div>
               <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>
-                {isPaused ? 'Your journey is on hold. Tap to continue.' : 'Pause your cycle — no pressure, no guilt.'}
+                {isPaused ? 'Your journey is on hold. Tap to continue.' : 'Pause your cycle. Rest is part of the journey too.'}
               </div>
             </div>
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>

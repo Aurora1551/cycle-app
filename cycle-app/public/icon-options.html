@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Icon Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Karla:wght@300;400;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 700px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 48px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .option-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .option { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px 20px; cursor: pointer; text-align: center; transition: all 0.2s; min-width: 120px; }
+  .option:hover { border-color: rgba(196,97,74,0.3); }
+  .option.selected { border-color: #C4614A; background: rgba(196,97,74,0.08); }
+  .option-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.35); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 8px; }
+  .preview { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-top: 12px; }
+  .preview-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.25); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .mood-preview { display: flex; gap: 8px; justify-content: center; }
+  .mood-item { border-radius: 10px; padding: 8px 12px; text-align: center; border: 1.5px solid transparent; }
+  .mood-item.active { background: rgba(196,97,74,0.2); border-color: rgba(196,97,74,0.4); }
+  .mood-item.dim { opacity: 0.4; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .card-preview { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 16px; }
+  .note { font-size: 12px; color: rgba(253,246,240,0.3); font-style: italic; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Choose Your Icons</h1>
+<p class="subtitle">Click to select. Your choices are saved locally.</p>
+
+<!-- ======================== MOOD EMOJIS ======================== -->
+<div class="section">
+  <div class="section-title">Mood Emojis (pick a set)</div>
+
+  <div class="option-row">
+    <div class="option" data-choice="mood" data-value="face" onclick="select(this)">
+      <div style="font-size: 24px; display: flex; gap: 8px; justify-content: center;">
+        <span>&#128525;</span><span>&#128522;</span><span>&#128528;</span><span>&#128532;</span>
+      </div>
+      <div class="option-label">Face emojis (current)</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="circle" onclick="select(this)">
+      <div style="font-size: 24px; display: flex; gap: 8px; justify-content: center;">
+        <span>&#9679;</span><span>&#9679;</span><span>&#9679;</span><span>&#9679;</span>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 4px;">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: #7BD4A0; display: inline-block;"></span>
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: #E8A598; display: inline-block;"></span>
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: #F5C842; display: inline-block;"></span>
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: #C4614A; display: inline-block;"></span>
+      </div>
+      <div class="option-label">Colored dots</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="minimal" onclick="select(this)">
+      <div style="font-size: 20px; display: flex; gap: 12px; justify-content: center; font-family: 'Karla', sans-serif; font-weight: 300; color: rgba(253,246,240,0.7);">
+        <span>:)</span><span>:|</span><span>:/</span><span>:(</span>
+      </div>
+      <div class="option-label">Text faces</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="nature" onclick="select(this)">
+      <div style="font-size: 24px; display: flex; gap: 8px; justify-content: center;">
+        <span>&#9728;&#65039;</span><span>&#127780;&#65039;</span><span>&#9729;&#65039;</span><span>&#127783;&#65039;</span>
+      </div>
+      <div class="option-label">Weather</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="flower" onclick="select(this)">
+      <div style="font-size: 24px; display: flex; gap: 8px; justify-content: center;">
+        <span>&#127800;</span><span>&#127793;</span><span>&#127811;</span><span>&#127810;</span>
+      </div>
+      <div class="option-label">Plants</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="abstract" onclick="select(this)">
+      <div style="font-size: 24px; display: flex; gap: 8px; justify-content: center;">
+        <span>&#10024;</span><span>&#9734;</span><span>&#9675;</span><span>&#8226;</span>
+      </div>
+      <div class="option-label">Abstract</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="gradient" onclick="select(this)">
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #7BD4A0, #4CA070);"></div>
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #A8D8B0, #7CB890);"></div>
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #F5C842, #D4A020);"></div>
+        <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #C4614A, #A04030);"></div>
+      </div>
+      <div class="option-label">Gradient orbs (Headspace style)</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="words" onclick="select(this)">
+      <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+        <span style="font-size: 11px; font-family: 'DM Mono', monospace; color: #7BD4A0; border: 1px solid rgba(123,212,160,0.3); border-radius: 16px; padding: 4px 10px;">great</span>
+        <span style="font-size: 11px; font-family: 'DM Mono', monospace; color: #E8A598; border: 1px solid rgba(232,165,152,0.3); border-radius: 16px; padding: 4px 10px;">good</span>
+        <span style="font-size: 11px; font-family: 'DM Mono', monospace; color: #F5C842; border: 1px solid rgba(245,200,66,0.3); border-radius: 16px; padding: 4px 10px;">okay</span>
+        <span style="font-size: 11px; font-family: 'DM Mono', monospace; color: #C4614A; border: 1px solid rgba(196,97,74,0.3); border-radius: 16px; padding: 4px 10px;">tough</span>
+      </div>
+      <div class="option-label">Word pills (How We Feel style)</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="slider" onclick="select(this)">
+      <div style="display: flex; align-items: center; gap: 4px; justify-content: center;">
+        <span style="font-size: 10px; color: #7BD4A0;">&#9679;</span>
+        <div style="width: 100px; height: 4px; border-radius: 2px; background: linear-gradient(to right, #7BD4A0, #A8D8B0, #F5C842, #C4614A); position: relative;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: white; border: 2px solid #A8D8B0; position: absolute; top: -4px; left: 25%;"></div>
+        </div>
+        <span style="font-size: 10px; color: #C4614A;">&#9679;</span>
+      </div>
+      <div class="option-label">Slider (Bearable style)</div>
+    </div>
+
+    <div class="option" data-choice="mood" data-value="moon" onclick="select(this)">
+      <div style="font-size: 24px; display: flex; gap: 8px; justify-content: center;">
+        <span>&#127773;</span><span>&#127764;</span><span>&#127763;</span><span>&#127762;</span>
+      </div>
+      <div class="option-label">Moon phases</div>
+    </div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-label">Preview (selected state = "Good")</div>
+    <div id="mood-preview" class="mood-preview"></div>
+  </div>
+</div>
+
+<!-- ======================== SAVE/HEART ICON ======================== -->
+<div class="section">
+  <div class="section-title">Save / Favorite Icon</div>
+  <p class="note" style="margin-bottom: 16px;">All options show as outline when not saved, filled when saved.</p>
+
+  <div class="option-row">
+    <div class="option" data-choice="heart" data-value="heart" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
+        <span style="opacity: 0.35;">&#9825;</span>
+        <span style="color: #E8707A;">&#9829;</span>
+      </div>
+      <div class="option-label">Heart (current)</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="bookmark" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
+        <span style="opacity: 0.35;">&#9744;</span>
+        <span style="color: #C4614A;">&#9745;</span>
+      </div>
+      <div class="option-label">Bookmark</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="star" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
+        <span style="opacity: 0.35;">&#9734;</span>
+        <span style="color: #F5C842;">&#9733;</span>
+      </div>
+      <div class="option-label">Star</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="ribbon" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
+        <span style="opacity: 0.35;">&#127895;</span>
+        <span style="color: #C4614A;">&#127895;</span>
+      </div>
+      <div class="option-label">Ribbon</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="sparkle" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
+        <span style="opacity: 0.35;">&#10023;</span>
+        <span style="color: #C4614A;">&#10024;</span>
+      </div>
+      <div class="option-label">Sparkle</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="plus" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
+        <span style="opacity: 0.35;">+</span>
+        <span style="color: #C4614A;">&#10003;</span>
+      </div>
+      <div class="option-label">Plus / Check</div>
+    </div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-label">Preview on quote card</div>
+    <div class="card-preview">
+      <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 10px;">&#128293; TODAY'S FIRE</div>
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"You are allowed to be both a masterpiece and a work in progress."</div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="mono" style="font-size: 11px; color: #C4614A;">— Sophia Bush</div>
+        <div style="display: flex; gap: 10px;">
+          <span id="heart-preview-unsaved" style="font-size: 18px; opacity: 0.35; cursor: pointer;"></span>
+          <span id="share-preview" style="font-size: 18px; opacity: 0.5; cursor: pointer;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== SHARE ICON ======================== -->
+<div class="section">
+  <div class="section-title">Share Icon</div>
+
+  <div class="option-row">
+    <div class="option" data-choice="share" data-value="arrow" onclick="select(this)">
+      <div style="font-size: 22px; opacity: 0.6;">&#8599;</div>
+      <div class="option-label">Arrow (current)</div>
+    </div>
+
+    <div class="option" data-choice="share" data-value="share-ios" onclick="select(this)">
+      <div style="font-size: 22px; opacity: 0.6;">&#9741;</div>
+      <div class="option-label">iOS share</div>
+    </div>
+
+    <div class="option" data-choice="share" data-value="send" onclick="select(this)">
+      <div style="font-size: 22px; opacity: 0.6;">&#10148;</div>
+      <div class="option-label">Send arrow</div>
+    </div>
+
+    <div class="option" data-choice="share" data-value="link" onclick="select(this)">
+      <div style="font-size: 22px; opacity: 0.6;">&#128279;</div>
+      <div class="option-label">Link</div>
+    </div>
+
+    <div class="option" data-choice="share" data-value="dots" onclick="select(this)">
+      <div style="font-size: 22px; opacity: 0.6;">&#8943;</div>
+      <div class="option-label">Three dots</div>
+    </div>
+
+    <div class="option" data-choice="share" data-value="paper" onclick="select(this)">
+      <div style="font-size: 22px; opacity: 0.6;">&#9993;</div>
+      <div class="option-label">Envelope</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== DAY COMPLETION BUTTON ======================== -->
+<div class="section">
+  <div class="section-title">Day Completion Button (pick wording)</div>
+
+  <div class="option-row">
+    <div class="option" data-choice="complete" data-value="showed" onclick="select(this)">
+      <div style="background: #C4614A; color: white; border-radius: 12px; padding: 12px 16px; font-weight: 700; font-size: 13px;">I showed up today &#10003;</div>
+      <div class="option-label">Current</div>
+    </div>
+    <div class="option" data-choice="complete" data-value="done" onclick="select(this)">
+      <div style="background: #C4614A; color: white; border-radius: 12px; padding: 12px 16px; font-weight: 700; font-size: 13px;">Done &#10003;</div>
+      <div class="option-label">Simple</div>
+    </div>
+    <div class="option" data-choice="complete" data-value="complete" onclick="select(this)">
+      <div style="background: #C4614A; color: white; border-radius: 12px; padding: 12px 16px; font-weight: 700; font-size: 13px;">Complete day</div>
+      <div class="option-label">Functional</div>
+    </div>
+    <div class="option" data-choice="complete" data-value="daynum" onclick="select(this)">
+      <div style="background: #C4614A; color: white; border-radius: 12px; padding: 12px 16px; font-weight: 700; font-size: 13px;">Day 5 &#10003;</div>
+      <div class="option-label">Just day number</div>
+    </div>
+    <div class="option" data-choice="complete" data-value="check" onclick="select(this)">
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+        <span style="color: white; font-size: 20px;">&#10003;</span>
+      </div>
+      <div class="option-label">Just a checkmark</div>
+    </div>
+    <div class="option" data-choice="complete" data-value="here" onclick="select(this)">
+      <div style="background: #C4614A; color: white; border-radius: 12px; padding: 12px 16px; font-weight: 700; font-size: 13px;">I'm here &#10003;</div>
+      <div class="option-label">Short & warm</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top: 24px;">Celebration (after tapping)</div>
+  <div class="option-row">
+    <div class="option" data-choice="celebration" data-value="text" onclick="select(this)">
+      <div style="background: rgba(196,97,74,0.2); border: 1.5px solid rgba(196,97,74,0.4); border-radius: 12px; padding: 12px 16px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #C4614A; text-align: center;">&#10024; Day 5 &mdash; you showed up &#10024;</div>
+      <div class="option-label">Text celebration (current)</div>
+    </div>
+    <div class="option" data-choice="celebration" data-value="fill" onclick="select(this)">
+      <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.4); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.4); font-size: 18px;">&#10003;</div>
+        <span style="color: rgba(253,246,240,0.3);">&rarr;</span>
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">&#10003;</div>
+      </div>
+      <div class="option-label">Silent fill animation</div>
+    </div>
+    <div class="option" data-choice="celebration" data-value="pulse" onclick="select(this)">
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 0 20px rgba(196,97,74,0.5);">
+        <span style="color: white; font-size: 20px;">&#10024;</span>
+      </div>
+      <div class="option-label">Sparkle pulse then settles to &#10003;</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top: 24px;">Undo behavior</div>
+  <div class="option-row">
+    <div class="option" data-choice="undo" data-value="toggle" onclick="select(this)">
+      <div style="font-size: 13px; color: rgba(253,246,240,0.6);">Tap the &#10003; again to toggle off</div>
+      <div class="option-label">Toggle (like Instagram heart)</div>
+    </div>
+    <div class="option" data-choice="undo" data-value="text" onclick="select(this)">
+      <div style="display: flex; gap: 6px; align-items: center; justify-content: center; font-size: 13px; color: #C4614A;">&#10003; Day 5 done <span style="font-size: 11px; opacity: 0.5;">undo</span></div>
+      <div class="option-label">Small "undo" text (current)</div>
+    </div>
+    <div class="option" data-choice="undo" data-value="longpress" onclick="select(this)">
+      <div style="font-size: 13px; color: rgba(253,246,240,0.6);">Long-press to undo</div>
+      <div class="option-label">Hidden long-press</div>
+    </div>
+    <div class="option" data-choice="undo" data-value="fade" onclick="select(this)">
+      <div style="font-size: 13px; color: rgba(253,246,240,0.6);">Small &times; appears for 3s then fades</div>
+      <div class="option-label">Temporary close button</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== TAKE A BREAK SUBTITLE ======================== -->
+<div class="section">
+  <div class="section-title">"Take a Break" subtitle (pick wording)</div>
+
+  <div class="option-row">
+    <div class="option" data-choice="break" data-value="noguillt" onclick="select(this)">
+      <div style="font-size: 13px; color: #FDF6F0;">Pause your cycle &mdash; no pressure, no guilt.</div>
+      <div class="option-label">Current</div>
+    </div>
+    <div class="option" data-choice="break" data-value="ready" onclick="select(this)">
+      <div style="font-size: 13px; color: #FDF6F0;">Pause your cycle. We'll be here when you're ready.</div>
+      <div class="option-label">"We'll be here"</div>
+    </div>
+    <div class="option" data-choice="break" data-value="space" onclick="select(this)">
+      <div style="font-size: 13px; color: #FDF6F0;">Take some space. Your journey waits for you.</div>
+      <div class="option-label">"Your journey waits"</div>
+    </div>
+    <div class="option" data-choice="break" data-value="rest" onclick="select(this)">
+      <div style="font-size: 13px; color: #FDF6F0;">Rest is part of the journey too.</div>
+      <div class="option-label">"Rest is part of it"</div>
+    </div>
+    <div class="option" data-choice="break" data-value="simple" onclick="select(this)">
+      <div style="font-size: 13px; color: #FDF6F0;">Pause your cycle. Nothing is lost.</div>
+      <div class="option-label">"Nothing is lost"</div>
+    </div>
+    <div class="option" data-choice="break" data-value="gentle" onclick="select(this)">
+      <div style="font-size: 13px; color: #FDF6F0;">Step away for a while. Everything stays.</div>
+      <div class="option-label">"Everything stays"</div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center; padding: 20px 0; color: rgba(253,246,240,0.12); font-family: 'DM Mono', monospace; font-size: 10px;">
+  Click options to select &middot; Your choices save locally
+</div>
+
+<script>
+const choices = JSON.parse(localStorage.getItem('cycle_icon_choices') || '{}')
+
+const MOOD_SETS = {
+  face: [
+    { emoji: '&#128525;', label: 'Great' },
+    { emoji: '&#128522;', label: 'Good' },
+    { emoji: '&#128528;', label: 'Okay' },
+    { emoji: '&#128532;', label: 'Tough' },
+  ],
+  circle: [
+    { emoji: '<span style="color:#7BD4A0;font-size:24px;">&#9679;</span>', label: 'Great' },
+    { emoji: '<span style="color:#E8A598;font-size:24px;">&#9679;</span>', label: 'Good' },
+    { emoji: '<span style="color:#F5C842;font-size:24px;">&#9679;</span>', label: 'Okay' },
+    { emoji: '<span style="color:#C4614A;font-size:24px;">&#9679;</span>', label: 'Tough' },
+  ],
+  minimal: [
+    { emoji: ':)', label: 'Great' },
+    { emoji: ':|', label: 'Good' },
+    { emoji: ':/', label: 'Okay' },
+    { emoji: ':(', label: 'Tough' },
+  ],
+  nature: [
+    { emoji: '&#9728;&#65039;', label: 'Great' },
+    { emoji: '&#127780;&#65039;', label: 'Good' },
+    { emoji: '&#9729;&#65039;', label: 'Okay' },
+    { emoji: '&#127783;&#65039;', label: 'Tough' },
+  ],
+  flower: [
+    { emoji: '&#127800;', label: 'Great' },
+    { emoji: '&#127793;', label: 'Good' },
+    { emoji: '&#127811;', label: 'Okay' },
+    { emoji: '&#127810;', label: 'Tough' },
+  ],
+  abstract: [
+    { emoji: '&#10024;', label: 'Great' },
+    { emoji: '&#9734;', label: 'Good' },
+    { emoji: '&#9675;', label: 'Okay' },
+    { emoji: '&#8226;', label: 'Tough' },
+  ],
+  gradient: [
+    { emoji: '<div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#7BD4A0,#4CA070);display:inline-block;"></div>', label: 'Great' },
+    { emoji: '<div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#A8D8B0,#7CB890);display:inline-block;"></div>', label: 'Good' },
+    { emoji: '<div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#F5C842,#D4A020);display:inline-block;"></div>', label: 'Okay' },
+    { emoji: '<div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#C4614A,#A04030);display:inline-block;"></div>', label: 'Tough' },
+  ],
+  words: [
+    { emoji: '<span style="font-size:11px;font-family:DM Mono,monospace;color:#7BD4A0;border:1px solid rgba(123,212,160,0.3);border-radius:16px;padding:3px 10px;">great</span>', label: '' },
+    { emoji: '<span style="font-size:11px;font-family:DM Mono,monospace;color:#E8A598;border:1px solid rgba(232,165,152,0.3);border-radius:16px;padding:3px 10px;">good</span>', label: '' },
+    { emoji: '<span style="font-size:11px;font-family:DM Mono,monospace;color:#F5C842;border:1px solid rgba(245,200,66,0.3);border-radius:16px;padding:3px 10px;">okay</span>', label: '' },
+    { emoji: '<span style="font-size:11px;font-family:DM Mono,monospace;color:#C4614A;border:1px solid rgba(196,97,74,0.3);border-radius:16px;padding:3px 10px;">tough</span>', label: '' },
+  ],
+  slider: [
+    { emoji: '&larr; drag &rarr;', label: '' },
+  ],
+  moon: [
+    { emoji: '&#127773;', label: 'Great' },
+    { emoji: '&#127764;', label: 'Good' },
+    { emoji: '&#127763;', label: 'Okay' },
+    { emoji: '&#127762;', label: 'Tough' },
+  ],
+}
+
+const HEART_MAP = {
+  heart: { unsaved: '&#9825;', saved: '&#9829;' },
+  bookmark: { unsaved: '&#9744;', saved: '&#9745;' },
+  star: { unsaved: '&#9734;', saved: '&#9733;' },
+  ribbon: { unsaved: '&#127895;', saved: '&#127895;' },
+  sparkle: { unsaved: '&#10023;', saved: '&#10024;' },
+  plus: { unsaved: '+', saved: '&#10003;' },
+}
+
+const SHARE_MAP = {
+  arrow: '&#8599;',
+  'share-ios': '&#9741;',
+  send: '&#10148;',
+  link: '&#128279;',
+  dots: '&#8943;',
+  paper: '&#9993;',
+}
+
+function select(el) {
+  const key = el.dataset.choice
+  const val = el.dataset.value
+  choices[key] = val
+  localStorage.setItem('cycle_icon_choices', JSON.stringify(choices))
+  document.querySelectorAll(`.option[data-choice="${key}"]`).forEach(o => o.classList.remove('selected'))
+  el.classList.add('selected')
+  updatePreviews()
+}
+
+function updatePreviews() {
+  // Mood preview
+  const moodSet = MOOD_SETS[choices.mood || 'face']
+  const mp = document.getElementById('mood-preview')
+  mp.innerHTML = moodSet.map((m, i) => {
+    const cls = i === 1 ? 'mood-item active' : 'mood-item dim'
+    return `<div class="${cls}"><div style="font-size:22px;">${m.emoji}</div><div class="mono" style="font-size:8px;color:rgba(253,246,240,0.4);margin-top:2px;">${m.label}</div></div>`
+  }).join('')
+
+  // Heart preview
+  const h = HEART_MAP[choices.heart || 'heart']
+  document.getElementById('heart-preview-unsaved').innerHTML = h.unsaved
+
+  // Share preview
+  document.getElementById('share-preview').innerHTML = SHARE_MAP[choices.share || 'arrow']
+}
+
+// Init selections
+document.querySelectorAll('.option').forEach(o => {
+  if (choices[o.dataset.choice] === o.dataset.value) o.classList.add('selected')
+})
+updatePreviews()
+</script>
+</body>
+</html>
