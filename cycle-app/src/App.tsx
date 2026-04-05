@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { isDarkBg } from './lib/theme'
 import SplashScreen from './screens/SplashScreen'
 import OnboardingName from './screens/OnboardingName'
 import OnboardingTreatment from './screens/OnboardingTreatment'
@@ -20,6 +21,7 @@ import LoginScreen from './screens/LoginScreen'
 import RegisterGate from './screens/RegisterGate'
 import PaymentScreen from './screens/PaymentScreen'
 import PaymentSuccess from './screens/PaymentSuccess'
+import GiftRedeem from './screens/GiftRedeem'
 import type { OnboardingData, VibeKey } from './types'
 import { VIBES } from './types'
 import { track } from './lib/posthog'
@@ -33,12 +35,13 @@ type Screen =
   | 'paywall' | 'create-account' | 'notification-settings'
   | 'day' | 'progress' | 'settings' | 'end-of-cycle' | 'gift-flow'
   | 'register-gate' | 'payment' | 'payment-success'
+  | 'gift-redeem'
 
 const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow', 'payment', 'payment-success']
 const NAV_SCREENS: Screen[] = ['day', 'progress']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
-  if (screen === 'splash' || screen === 'login' || screen === 'register-gate') return '#0E0E0E'
+  if (screen === 'splash' || screen === 'login' || screen === 'register-gate' || screen === 'gift-redeem') return '#0E0E0E'
   const activeVibe = preview || vibe
   if (ONBOARDING_VIBE_SCREENS.includes(screen) && activeVibe) {
     return VIBES.find(v => v.key === activeVibe)?.bg || '#FDF6F0'
@@ -58,6 +61,15 @@ function App() {
   const [vibePreview, setVibePreview] = useState<VibeKey | null>(null)
   const [dayNumber, setDayNumber] = useState(() => parseInt(localStorage.getItem(DAY_KEY) || '1', 10))
   const [isPremium, setIsPremium] = useState(() => localStorage.getItem('cycle_premium') === '1')
+  const [isPaused, setIsPaused] = useState(() => localStorage.getItem('cycle_paused') === '1')
+  const [showWelcomeBack, setShowWelcomeBack] = useState(() => {
+    // Show welcome back if user was paused and just returned
+    if (localStorage.getItem('cycle_paused') === '1' && localStorage.getItem('cycle_pause_returning') === '1') {
+      localStorage.removeItem('cycle_pause_returning')
+      return true
+    }
+    return false
+  })
   const [selectedPlan, setSelectedPlan] = useState<'one_cycle' | 'gift'>('one_cycle')
 
   const update = (patch: Partial<OnboardingData>) => {
@@ -83,7 +95,13 @@ function App() {
     // Handle Stripe payment success redirect
     if (window.location.pathname === '/payment/success') {
       setScreen('payment-success')
-      return // Don't process Spotify callback on payment redirect
+      return
+    }
+
+    // Handle gift redeem link
+    if (window.location.pathname.startsWith('/gift/redeem')) {
+      setScreen('gift-redeem')
+      return
     }
 
     // Handle Spotify OAuth callback
@@ -133,15 +151,24 @@ function App() {
       try {
         const d = JSON.parse(saved) as Partial<OnboardingData>
         if (d.name && d.treatment && d.cycleDays && d.components && d.vibe && d.genres) {
+          // Full profile — go to day screen
           setData(d)
           const day = parseInt(localStorage.getItem(DAY_KEY) || '1', 10)
           setDayNumber(day)
-          // If returning from Spotify callback, go to settings; otherwise normal flow
           if (isSpotifyCallback && (spotifyCode || spotifyError)) {
             setScreen('settings')
           } else {
             setScreen(day > (d.cycleDays || 28) ? 'end-of-cycle' : 'day')
           }
+        } else if (d.name) {
+          // Partial profile — resume onboarding from where they left off
+          setData(d)
+          if (!d.treatment) setScreen('onboarding-treatment')
+          else if (!d.cycleDays) setScreen('onboarding-cycle-length')
+          else if (!d.components) setScreen('onboarding-components')
+          else if (!d.vibe) setScreen('onboarding-vibe')
+          else if (!d.genres) setScreen('onboarding-music')
+          else setScreen('summary')
         }
       } catch {}
     }
@@ -155,6 +182,21 @@ function App() {
     document.documentElement.style.background = appBg
     document.body.style.background = appBg
   }, [appBg])
+
+  const pauseJourney = () => {
+    localStorage.setItem('cycle_paused', '1')
+    localStorage.setItem('cycle_pause_date', new Date().toISOString())
+    setIsPaused(true)
+    track('journey_paused')
+  }
+
+  const resumeJourney = () => {
+    localStorage.removeItem('cycle_paused')
+    localStorage.removeItem('cycle_pause_date')
+    setIsPaused(false)
+    setShowWelcomeBack(false)
+    track('journey_resumed')
+  }
 
   const advanceDay = () => {
     const next = dayNumber + 1
@@ -195,7 +237,7 @@ function App() {
 
   return (
     <div style={{ width: '100%', minHeight: '100svh', display: 'flex', justifyContent: 'center', background: appBg, transition: 'background 0.5s ease' }}>
-      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-name') }} onHaveAccount={() => setScreen('login')} />}
+      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-name') }} onHaveAccount={() => setScreen('login')} onGift={() => setScreen('gift-flow')} />}
       {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('onboarding-name')} />}
       {screen === 'onboarding-name' && <OnboardingName onBack={() => setScreen('splash')} onContinue={name => { update({ name }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-treatment') }} initialValue={data.name} />}
       {screen === 'onboarding-treatment' && <OnboardingTreatment onBack={() => setScreen('onboarding-name')} onContinue={treatment => { update({ treatment }); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-cycle-length') }} initialValue={data.treatment} />}
@@ -204,37 +246,77 @@ function App() {
       {screen === 'onboarding-vibe' && <OnboardingVibe onBack={() => { setVibePreview(null); setScreen('onboarding-components') }} onContinue={vibeKey => { update({ vibe: vibeKey }); setVibePreview(null); track('onboarding_step_completed', { step: 5 }); setScreen('onboarding-music') }} initialValue={data.vibe || null} onPreview={setVibePreview} />}
       {screen === 'onboarding-music' && data.vibe && <OnboardingMusic onBack={() => setScreen('onboarding-vibe')} onContinue={genres => { update({ genres }); track('onboarding_step_completed', { step: 6 }); setScreen('summary') }} vibe={data.vibe} initialValue={data.genres} />}
       {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
-      {screen === 'paywall' && <Paywall name={data.name} onBack={() => setScreen('day')} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onSelectPlan={plan => {
+      {screen === 'paywall' && <Paywall name={data.name} onBack={() => setScreen('day')} onStartFree={() => { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') }} onSelectPlan={plan => {
         track('plan_selected', { plan })
-        if (plan === 'free') { setScreen('day'); return }
-        setSelectedPlan(plan === 'gift' ? 'gift' : 'one_cycle')
-        // Check if logged in — if not, create account first
-        const hasAccount = localStorage.getItem('cycle_account_email')
-        if (hasAccount) { setScreen('payment') } else { setScreen('create-account') }
+        if (plan === 'free') { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day'); return }
+        if (plan === 'gift') { setScreen('gift-flow'); return }
+        // MOCK PAYMENT: skip Stripe, grant premium immediately (one_cycle only)
+        localStorage.setItem('cycle_premium', '1')
+        setIsPremium(true)
+        track('payment_completed', { plan })
+        setDayNumber(4); localStorage.setItem(DAY_KEY, '4'); setScreen('day')
       }} />}
       {screen === 'create-account' && <CreateAccount onBack={() => setScreen('paywall')} onSuccess={() => {
         localStorage.setItem('cycle_is_guest', '0')
-        // If a paid plan was selected, go to payment; otherwise notification settings
-        if (selectedPlan === 'one_cycle' || selectedPlan === 'gift') {
-          setScreen('payment')
+        // MOCK PAYMENT: skip Stripe after registration, grant premium immediately
+        if (selectedPlan === 'gift') {
+          setScreen('gift-flow')
+        } else if (selectedPlan === 'one_cycle') {
+          localStorage.setItem('cycle_premium', '1')
+          setIsPremium(true)
+          track('payment_completed', { plan: selectedPlan })
+          setDayNumber(4); localStorage.setItem(DAY_KEY, '4'); setScreen('day')
         } else {
-          setScreen('notification-settings')
+          // Came from register gate (no plan selected) — send to paywall to choose a plan
+          advanceDay()
+          track('paywall_viewed')
+          setScreen('paywall')
         }
       }} onLogin={() => setScreen('login')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} profileData={data as OnboardingData} dayNumber={dayNumber} />}
       {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onDone={() => setScreen('day')} />}
-      {screen === 'register-gate' && <RegisterGate onCreateAccount={() => setScreen('create-account')} onContinueGuest={() => setScreen('day')} />}
-      {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3 && localStorage.getItem('cycle_register_dismissed') !== '1') { advanceDay(); setScreen('register-gate'); return } advanceDay() }} onSettings={() => setScreen('settings')} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)) }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} onEndOfCycle={() => setScreen('end-of-cycle')} />}
+      {screen === 'register-gate' && <RegisterGate onCreateAccount={() => setScreen('create-account')} onContinueGuest={() => { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') }} />}
+      {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3) { setScreen('register-gate'); return } if (!isPremium && nextDay > 3) { track('paywall_viewed'); setScreen('paywall'); return } advanceDay() }} onSettings={() => setScreen('settings')} onGoToDay={day => { if (!isPremium && day > 3) { track('paywall_viewed'); setScreen('paywall'); return } setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)) }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} onEndOfCycle={() => setScreen('end-of-cycle')} />}
       {screen === 'progress' && data.name && data.vibe && data.components && <Progress data={data as OnboardingData} dayNumber={dayNumber} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen('day') }} />}
-      {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onBack={() => setScreen('day')} />}
+      {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onBack={() => setScreen('day')} isPaused={isPaused} onPause={pauseJourney} onResume={resumeJourney} />}
+      {/* Welcome back overlay after pause */}
+      {showWelcomeBack && screen === 'day' && vibe && (
+        <div style={{ position: 'fixed', inset: 0, background: vibe.bg, zIndex: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32, textAlign: 'center' }}>
+          <div style={{ fontSize: 48 }}>&#127800;</div>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: isDarkBg(vibe.bg) ? '#FDF6F0' : '#1C0F0C', lineHeight: 1.2 }}>
+            Welcome back{data.name ? `, ${data.name}` : ''}
+          </div>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, color: isDarkBg(vibe.bg) ? 'rgba(253,246,240,0.5)' : '#9B7B74', lineHeight: 1.6, maxWidth: 280 }}>
+            You took a break, and that's okay. You're here now, and that's what matters.
+          </div>
+          <button onClick={resumeJourney} className="btn-primary" style={{ background: vibe.accent, marginTop: 12 }}>
+            Continue my journey
+          </button>
+        </div>
+      )}
       {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={restartJourney} onGift={() => setScreen('gift-flow')} />}
-      {screen === 'gift-flow' && <GiftFlow onBack={() => setScreen('paywall')} vibeAccent={vibe?.accent} vibeBg={vibe?.bg} />}
+      {screen === 'gift-flow' && <GiftFlow onBack={() => setScreen('splash')} onDone={() => { const hasProfile = data.name && data.vibe; if (hasProfile) { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') } else { setScreen('splash') } }} vibeAccent={vibe?.accent} vibeBg={vibe?.bg} />}
+      {screen === 'gift-redeem' && <GiftRedeem
+        giftCode={new URLSearchParams(window.location.search).get('code') || ''}
+        senderName={new URLSearchParams(window.location.search).get('from') || undefined}
+        message={new URLSearchParams(window.location.search).get('msg') || undefined}
+        onCreateAccount={() => {
+          // Recipient registered — they have premium, start onboarding
+          window.history.replaceState({}, '', '/')
+          setScreen('onboarding-name')
+        }}
+        onLogin={() => {
+          window.history.replaceState({}, '', '/')
+          setScreen('login')
+        }}
+      />}
       {screen === 'payment' && <PaymentScreen
         plan={selectedPlan}
         onSuccess={plan => {
+          if (plan === 'gift') { setScreen('gift-flow'); return }
           localStorage.setItem('cycle_premium', '1')
           setIsPremium(true)
           track('payment_completed', { plan })
-          if (plan === 'gift') { setScreen('gift-flow') } else { setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }
+          setDayNumber(4); localStorage.setItem(DAY_KEY, '4'); setScreen('day')
         }}
         onBack={() => setScreen('paywall')}
         vibeBg={vibe?.bg}
@@ -244,8 +326,9 @@ function App() {
       />}
       {screen === 'payment-success' && <PaymentSuccess
         onComplete={plan => {
+          if (plan === 'gift') { setScreen('gift-flow'); return }
           setIsPremium(true)
-          if (plan === 'gift') { setScreen('gift-flow') } else { setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }
+          setDayNumber(4); localStorage.setItem(DAY_KEY, '4'); setScreen('day')
         }}
         vibeBg={vibe?.bg}
         vibeAccent={vibe?.accent}

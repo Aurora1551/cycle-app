@@ -87,6 +87,9 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
           className="btn-primary" style={{ background: canContinue ? A : 'rgba(196,97,74,0.3)' }}>
           {t('continue')}
         </button>
+        <button onClick={() => onContinue('ivf')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '10px 0 0', width: '100%', textAlign: 'center' }}>
+          Skip for now
+        </button>
       </OnboardingLayout>
     </div>
   )

@@ -31,44 +31,31 @@ const LoginScreen: React.FC<Props> = ({ onBack, onSuccess, onSignUp }) => {
     if (!email || !password) return
     setLoading(true)
     setError('')
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      const body = await res.json()
-      if (!res.ok) {
-        setError(body.error === 'Invalid email or password' ? t('login.error') : body.error || t('login.error'))
-        setLoading(false)
-        return
-      }
-
-      // Store session
-      localStorage.setItem('cycle_account_email', body.email)
+    // MOCK LOGIN: skip API, restore profile from localStorage
+    setTimeout(() => {
+      localStorage.setItem('cycle_account_email', email)
       localStorage.setItem('cycle_is_guest', '0')
       track('login_success')
 
-      if (body.profile) {
-        // Restore profile data and navigate to day screen
+      const saved = localStorage.getItem('cycle_onboarding_data')
+      if (saved) {
+        const parsed = JSON.parse(saved)
         const profile: OnboardingData = {
-          name: body.profile.name,
-          treatment: body.profile.treatment,
-          cycleDays: body.profile.cycleDays,
-          components: body.profile.components,
-          vibe: body.profile.vibe,
-          genres: body.profile.genres,
+          name: parsed.name,
+          treatment: parsed.treatment,
+          cycleDays: parsed.cycleDays,
+          components: parsed.components,
+          vibe: parsed.vibe,
+          genres: parsed.genres,
         }
-        onSuccess(profile, body.profile.currentDay || 1)
+        const currentDay = parseInt(localStorage.getItem('cycle_current_day') || '1', 10)
+        onSuccess(profile, currentDay)
       } else {
-        // Account exists but no profile linked — go to onboarding
+        // No profile found — go to onboarding
         onSignUp()
       }
-    } catch {
-      setError(t('login.networkError'))
-    } finally {
       setLoading(false)
-    }
+    }, 600)
   }
 
   const fieldStyle: React.CSSProperties = { background: fieldBg, border: `1.5px solid ${fieldBorder}`, borderRadius: 12, padding: '12px 14px' }

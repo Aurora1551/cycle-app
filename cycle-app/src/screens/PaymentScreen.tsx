@@ -18,8 +18,8 @@ interface Props {
 }
 
 const PLAN_DISPLAY = {
-  one_cycle: { name: 'One Cycle', price: '£5.99' },
-  gift: { name: 'Gift a Cycle', price: '£12.99' },
+  one_cycle: { name: 'One Cycle', price: '£9.99' },
+  gift: { name: 'Gift a Cycle', price: '£9.99' },
 }
 
 let stripePromise: ReturnType<typeof loadStripe> | null = null

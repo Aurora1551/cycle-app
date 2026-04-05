@@ -22,7 +22,7 @@ interface Props {
   onEndOfCycle?: () => void
 }
 
-// --- Speech helpers ---
+// --- Speech: Warm voice for opening/closing phrases only ---
 let voicesLoaded = false
 if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = () => { voicesLoaded = true }
@@ -44,9 +44,9 @@ function speak(text: string): Promise<void> {
     if (!('speechSynthesis' in window)) { resolve(); return }
     const doSpeak = () => {
       const u = new SpeechSynthesisUtterance(text)
-      u.rate = 0.75
-      u.pitch = 0.9
-      u.volume = 1.0
+      u.rate = 0.72
+      u.pitch = 0.85
+      u.volume = 0.85
       const voice = getBestVoice()
       if (voice) u.voice = voice
       u.onend = () => resolve()
@@ -62,61 +62,124 @@ function speak(text: string): Promise<void> {
   })
 }
 
-// --- Brown noise generator (warm, calming — not harsh white noise) ---
-function createBrownNoise(): { start: () => void; fadeOut: () => Promise<void>; kill: () => void } | null {
+// --- Audio: Singing bowl chime (Web Audio synthesis) ---
+function createChime(): { play: () => void; ctx: AudioContext } | null {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    const bufferSize = 4096
-    const brownNode = ctx.createScriptProcessor(bufferSize, 1, 1)
-    let lastOut = 0.0
-    brownNode.onaudioprocess = (e) => {
-      const output = e.outputBuffer.getChannelData(0)
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1
-        lastOut = (lastOut + 0.02 * white) / 1.02
-        output[i] = lastOut * 3.5
-      }
-    }
-    // Low-pass filter to soften further
-    const lp = ctx.createBiquadFilter()
-    lp.type = 'lowpass'
-    lp.frequency.value = 500
-    const gain = ctx.createGain()
-    gain.gain.value = 0
-    brownNode.connect(lp)
-    lp.connect(gain)
-    gain.connect(ctx.destination)
-
     return {
-      start() {
-        // Gentle 3s fade in to target volume
-        gain.gain.setTargetAtTime(0.25, ctx.currentTime, 1.0)
-      },
-      fadeOut() {
-        return new Promise<void>(resolve => {
-          gain.gain.setTargetAtTime(0, ctx.currentTime, 0.5) // ~2s fade
-          setTimeout(() => {
-            try { brownNode.disconnect(); lp.disconnect(); gain.disconnect(); ctx.close() } catch {}
-            resolve()
-          }, 2000)
+      ctx,
+      play() {
+        // Layered sine waves for a singing bowl sound
+        const freqs = [528, 396, 264] // C major chord, solfeggio-inspired
+        const master = ctx.createGain()
+        master.gain.value = 0.3
+        master.connect(ctx.destination)
+
+        freqs.forEach((freq, i) => {
+          const osc = ctx.createOscillator()
+          osc.type = 'sine'
+          osc.frequency.value = freq
+          const gain = ctx.createGain()
+          gain.gain.setValueAtTime(0.25 - i * 0.06, ctx.currentTime)
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.5)
+          osc.connect(gain)
+          gain.connect(master)
+          osc.start(ctx.currentTime)
+          osc.stop(ctx.currentTime + 3.5)
         })
-      },
-      kill() {
-        try { gain.gain.value = 0; brownNode.disconnect(); lp.disconnect(); gain.disconnect(); ctx.close() } catch {}
       },
     }
   } catch { return null }
 }
 
-// --- Breathing phases ---
-const PHASES: { label: string; spokenLabel: string; duration: number; scale: number }[] = [
-  { label: 'Breathe in...', spokenLabel: 'Breathe in', duration: 4, scale: 1.35 },
-  { label: 'Hold...', spokenLabel: 'Hold', duration: 4, scale: 1.35 },
-  { label: 'Breathe out...', spokenLabel: 'Breathe out', duration: 6, scale: 1.0 },
-]
-const TOTAL_CYCLES = 3
+// --- Audio: Warm ambient pad ---
+function createAmbientPad(): { start: () => void; swell: () => void; fadeOut: () => Promise<void>; kill: () => void } | null {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const master = ctx.createGain()
+    master.gain.value = 0
+    // Warm reverb-like effect via delay
+    const delay = ctx.createDelay()
+    delay.delayTime.value = 0.15
+    const feedback = ctx.createGain()
+    feedback.gain.value = 0.3
+    const lp = ctx.createBiquadFilter()
+    lp.type = 'lowpass'
+    lp.frequency.value = 800
 
-interface GuidedBreathingProps {
+    // Drone: layered detuned oscillators for warmth
+    const oscs: OscillatorNode[] = []
+    const notes = [132, 198, 264] // C3, G3, C4
+    notes.forEach(freq => {
+      const osc = ctx.createOscillator()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      osc.connect(lp)
+      oscs.push(osc)
+      // Slight detune for richness
+      const osc2 = ctx.createOscillator()
+      osc2.type = 'sine'
+      osc2.frequency.value = freq * 1.003
+      osc2.connect(lp)
+      oscs.push(osc2)
+    })
+
+    lp.connect(master)
+    lp.connect(delay)
+    delay.connect(feedback)
+    feedback.connect(lp)
+    master.connect(ctx.destination)
+
+    let started = false
+
+    return {
+      start() {
+        if (started) return
+        started = true
+        oscs.forEach(o => o.start())
+        master.gain.setTargetAtTime(0.08, ctx.currentTime, 2.0) // gentle fade in over ~6s
+      },
+      swell() {
+        // Brief volume swell during inhale
+        master.gain.setTargetAtTime(0.14, ctx.currentTime, 1.5)
+        setTimeout(() => {
+          master.gain.setTargetAtTime(0.08, ctx.currentTime, 2.0)
+        }, 7000)
+      },
+      fadeOut() {
+        return new Promise<void>(resolve => {
+          master.gain.setTargetAtTime(0, ctx.currentTime, 1.0)
+          setTimeout(() => {
+            try { oscs.forEach(o => o.stop()); delay.disconnect(); feedback.disconnect(); lp.disconnect(); master.disconnect(); ctx.close() } catch {}
+            resolve()
+          }, 3000)
+        })
+      },
+      kill() {
+        try { master.gain.value = 0; oscs.forEach(o => o.stop()); ctx.close() } catch {}
+      },
+    }
+  } catch { return null }
+}
+
+// --- "Your Moment" breathing: 1 breath cycle, ~35 seconds ---
+// Timeline: chime (0-3s) → inhale (3-10s, 7s) → hold (10-13s, 3s) → exhale (13-21s, 8s) → closing text (21-30s) → chime (30-33s) → done (35s)
+const MOMENT_PHASES = [
+  { key: 'inhale', label: 'Breathe in slowly', duration: 7, scale: 1.4 },
+  { key: 'hold', label: 'Hold gently', duration: 3, scale: 1.4 },
+  { key: 'exhale', label: 'And release', duration: 8, scale: 1.0 },
+] as const
+
+// Vibe-specific moment phrases
+const MOMENT_PHRASES: Record<string, { opening: string; closing: string }> = {
+  fierce: { opening: 'Place your hand on your belly.\nYou are powerful.', closing: 'That strength lives in you.' },
+  nurturing: { opening: 'Rest your hand gently\nbelow your navel.', closing: 'You are held, always.' },
+  calm: { opening: 'Feel the stillness\nin your body.', closing: 'You are exactly where\nyou need to be.' },
+  lighthearted: { opening: 'Smile.\nTake one big breath with me.', closing: 'See? You\'ve got this.' },
+  spiritual: { opening: 'Place your hand on your heart.\nBe still.', closing: 'You are guided.\nTrust this.' },
+}
+
+interface YourMomentProps {
   vibe: typeof VIBES[0]
   typo: ReturnType<typeof resolveTypo>
   openingLine: string
@@ -126,104 +189,127 @@ interface GuidedBreathingProps {
   onStop: () => void
 }
 
-function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onComplete, onStop }: GuidedBreathingProps) {
+function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, onStop }: YourMomentProps) {
   const { t } = useTranslation()
-  const [stage, setStage] = useState<'opening' | 'breathing' | 'done'>('opening')
-  const [cycle, setCycle] = useState(0)
+  const [stage, setStage] = useState<'opening' | 'breathing' | 'closing' | 'done'>('opening')
   const [phaseIdx, setPhaseIdx] = useState(0)
-  const [countdown, setCountdown] = useState(4) // counts DOWN
+  const [elapsed, setElapsed] = useState(0) // elapsed within current phase
   const [openingFade, setOpeningFade] = useState(0)
-  const noiseRef = React.useRef<ReturnType<typeof createBrownNoise>>(null)
+  const padRef = React.useRef<ReturnType<typeof createAmbientPad>>(null)
+  const chimeRef = React.useRef<ReturnType<typeof createChime>>(null)
   const stoppedRef = React.useRef(false)
-  const phase = PHASES[phaseIdx]
 
-  // Compute circle scale based on current phase for smooth CSS transition
-  const circleScale = stage === 'breathing' ? phase.scale : 1.0
+  const phase = MOMENT_PHASES[phaseIdx]
+  const progress = stage === 'breathing' ? elapsed / phase.duration : 0
+  const circleScale = stage === 'breathing' ? phase.scale : stage === 'closing' || stage === 'done' ? 1.0 : 1.0
 
-  const stopMeditation = async () => {
+  // Vibe phrases (use AI-generated if available, fallback to vibe defaults)
+  const vibeKey = vibe.key || 'calm'
+  const phrases = MOMENT_PHRASES[vibeKey] || MOMENT_PHRASES.calm
+  const displayOpening = openingLine || phrases.opening
+  const displayClosing = closingLine || phrases.closing
+
+  const stopMoment = () => {
     stoppedRef.current = true
     try { window.speechSynthesis?.cancel() } catch {}
-    if (noiseRef.current) {
-      await noiseRef.current.fadeOut()
-      noiseRef.current = null
-    }
+    padRef.current?.kill()
+    padRef.current = null
     onStop()
   }
 
-  // Start brown noise + speak opening line
+  // Init audio + opening sequence
   useEffect(() => {
-    noiseRef.current = createBrownNoise()
-    noiseRef.current?.start()
+    padRef.current = createAmbientPad()
+    chimeRef.current = createChime()
+
+    // Opening chime + pad + voice
+    chimeRef.current?.play()
+    padRef.current?.start()
     setOpeningFade(1)
 
+    // Speak opening phrase after chime settles, then transition to breathing
     const run = async () => {
-      await speak(openingLine)
+      await new Promise(r => setTimeout(r, 2000))
       if (stoppedRef.current) return
-      await new Promise(r => setTimeout(r, 1200))
+      await speak(displayOpening.replace(/\n/g, '. '))
       if (stoppedRef.current) return
+      await new Promise(r => setTimeout(r, 800))
+      if (stoppedRef.current) return
+      padRef.current?.swell()
       setStage('breathing')
     }
     run()
+    const timer = setTimeout(() => {}, 0) // keep cleanup shape
 
     return () => {
+      clearTimeout(timer)
       stoppedRef.current = true
       try { window.speechSynthesis?.cancel() } catch {}
-      noiseRef.current?.kill()
+      padRef.current?.kill()
     }
   }, [])
 
-  // Breathing timer — 1 tick per second
+  // Breathing timer — ticks every 100ms for smooth progress bar
   useEffect(() => {
     if (stage !== 'breathing' || stoppedRef.current) return
 
-    // Speak phase name ONLY at the start of each phase (when countdown equals duration)
-    if (countdown === phase.duration) {
-      speak(phase.spokenLabel)
-    }
-
-    const timer = setTimeout(() => {
+    const interval = setInterval(() => {
       if (stoppedRef.current) return
-
-      if (countdown <= 1) {
-        // Phase complete — move to next
-        const nextPhase = phaseIdx + 1
-        if (nextPhase >= PHASES.length) {
-          // Cycle complete
-          const nextCycle = cycle + 1
-          if (nextCycle >= TOTAL_CYCLES) {
-            // All cycles done — closing
-            try { window.speechSynthesis?.cancel() } catch {}
-            speak(closingLine)
-            if (noiseRef.current) {
-              noiseRef.current.fadeOut().then(() => { noiseRef.current = null })
+      setElapsed(prev => {
+        const next = prev + 0.1
+        if (next >= phase.duration) {
+          // Move to next phase
+          const nextPhaseIdx = phaseIdx + 1
+          if (nextPhaseIdx >= MOMENT_PHASES.length) {
+            // All phases done — go to closing with voice
+            clearInterval(interval)
+            setStage('closing')
+            const closingSequence = async () => {
+              await new Promise(r => setTimeout(r, 1000))
+              if (stoppedRef.current) return
+              await speak(displayClosing.replace(/\n/g, '. '))
+              if (stoppedRef.current) return
+              await new Promise(r => setTimeout(r, 800))
+              if (stoppedRef.current) return
+              chimeRef.current?.play()
+              padRef.current?.fadeOut().then(() => { padRef.current = null })
+              await new Promise(r => setTimeout(r, 3000))
+              if (stoppedRef.current) return
+              setStage('done')
+              onComplete()
             }
-            setStage('done')
-            onComplete()
-            return
+            closingSequence()
+            return 0
           }
-          setCycle(nextCycle)
-          setPhaseIdx(0)
-          setCountdown(PHASES[0].duration)
-        } else {
-          setPhaseIdx(nextPhase)
-          setCountdown(PHASES[nextPhase].duration)
+          setPhaseIdx(nextPhaseIdx)
+          return 0
         }
-      } else {
-        setCountdown(c => c - 1)
-      }
-    }, 1000)
+        return next
+      })
+    }, 100)
 
-    return () => clearTimeout(timer)
-  }, [stage, cycle, phaseIdx, countdown])
+    return () => clearInterval(interval)
+  }, [stage, phaseIdx])
 
   // --- Opening stage ---
   if (stage === 'opening') {
     return (
-      <div className="flex-col" style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: '32px 12px', minHeight: 200, opacity: openingFade, transition: 'opacity 1.2s ease' }}>
-        <div style={{ width: 64, height: 64, borderRadius: '50%', background: `${vibe.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🌿</div>
-        <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 20, color: vibe.accent, textAlign: 'center', lineHeight: 1.5, maxWidth: 280 }}>{openingLine}</div>
-        <div className="mono-hint" style={{ color: vibe.muted, fontSize: 11 }}>{t('day.preparingBreath')}</div>
-        <button onClick={stopMeditation} style={{ background: `${vibe.accent}15`, border: `1.5px solid ${vibe.accent}35`, borderRadius: 24, padding: '10px 28px', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 14, fontWeight: 600, color: vibe.accent, marginTop: 8 }}>{t('day.stop')}</button>
+      <div className="flex-col" style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: '32px 12px', minHeight: 240, opacity: openingFade, transition: 'opacity 1.5s ease' }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%',
+          background: `radial-gradient(circle at 40% 40%, ${vibe.accent}60, ${vibe.accent}20)`,
+          boxShadow: `0 0 40px ${vibe.accent}30, 0 0 80px ${vibe.accent}15`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          animation: 'float 3s ease-in-out infinite',
+        }}>
+          <div style={{ fontSize: 28, opacity: 0.8 }}>&#10024;</div>
+        </div>
+        <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 18, color: vibe.accent, textAlign: 'center', lineHeight: 1.6, maxWidth: 260, whiteSpace: 'pre-line' }}>
+          {displayOpening}
+        </div>
+        <button onClick={stopMoment} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: vibe.muted, marginTop: 4 }}>
+          &#10005; end
+        </button>
       </div>
     )
   }
@@ -234,20 +320,20 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
     const spotifyUrl = `https://open.spotify.com/search/${encodeURIComponent(genres.join(' ') + ' meditation calm')}`
     return (
       <div className="flex-col" style={{ alignItems: 'center', gap: 20, padding: '16px 0' }}>
-        <div style={{ fontSize: 28, marginBottom: 4 }}>✨</div>
-        <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 20, color: vibe.accent, textAlign: 'center', lineHeight: 1.5, maxWidth: 280 }}>{closingLine}</div>
+        <div style={{ fontSize: 28, marginBottom: 4 }}>&#10024;</div>
+        <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 20, color: vibe.accent, textAlign: 'center', lineHeight: 1.5, maxWidth: 280, whiteSpace: 'pre-line' }}>{displayClosing}</div>
         <div className="mono-hint" style={{ color: vibe.muted, fontSize: 11 }}>{t('day.breathingComplete')}</div>
         <div style={{ width: '100%', marginTop: 8 }}>
           <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 10 }}>{t('day.goDeeper')}</div>
           <div className="flex-col" style={{ gap: 8 }}>
             <a href={insightTimerUrl} target="_blank" rel="noopener noreferrer" onClick={() => track('insight_timer_tapped', {})}
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 12, border: `1.5px solid ${vibe.accent}33`, background: `${vibe.accent}08`, textDecoration: 'none', cursor: 'pointer' }}>
-              <span style={{ fontSize: 18 }}>🎧</span>
+              <span style={{ fontSize: 18 }}>&#127911;</span>
               <span style={{ fontSize: 13, fontWeight: 600, fontFamily: typo.bodyFont, color: vibe.accent }}>{t('day.insightTimer')}</span>
             </a>
             <a href={spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={() => track('spotify_playlist_tapped', {})}
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 12, border: `1.5px solid ${vibe.accent}33`, background: `${vibe.accent}08`, textDecoration: 'none', cursor: 'pointer' }}>
-              <span style={{ fontSize: 18 }}>🎵</span>
+              <span style={{ fontSize: 18 }}>&#127925;</span>
               <span style={{ fontSize: 13, fontWeight: 600, fontFamily: typo.bodyFont, color: vibe.accent }}>{t('day.spotifyCalm')}</span>
             </a>
           </div>
@@ -256,35 +342,70 @@ function GuidedBreathing({ vibe, typo, openingLine, closingLine, genres, onCompl
     )
   }
 
+  // --- Closing stage ---
+  if (stage === 'closing') {
+    return (
+      <div className="flex-col" style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: '32px 12px', minHeight: 240 }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%',
+          background: `radial-gradient(circle at 40% 40%, ${vibe.accent}60, ${vibe.accent}20)`,
+          boxShadow: `0 0 40px ${vibe.accent}30`,
+        }}>
+        </div>
+        <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 20, color: vibe.accent, textAlign: 'center', lineHeight: 1.5, maxWidth: 280, whiteSpace: 'pre-line', opacity: 0.9, transition: 'opacity 1s ease' }}>
+          {displayClosing}
+        </div>
+      </div>
+    )
+  }
+
   // --- Breathing stage ---
-  // The circle scale is driven by CSS transition on .breath-ring (transition: transform 1s ease-in-out)
+  const totalDuration = MOMENT_PHASES.reduce((sum, p) => sum + p.duration, 0)
+  const elapsedTotal = MOMENT_PHASES.slice(0, phaseIdx).reduce((sum, p) => sum + p.duration, 0) + elapsed
+  const overallProgress = elapsedTotal / totalDuration
+
   return (
-    <div className="flex-col" style={{ alignItems: 'center', gap: 12, padding: '16px 0' }}>
-      {/* Breathing circle */}
-      <div style={{ position: 'relative', width: 200, height: 200 }}>
-        <div className="breath-ring" style={{ inset: 0, background: `${vibe.accent}15`, transform: `scale(${circleScale})` }} />
-        <div className="breath-ring" style={{ inset: 18, background: `${vibe.accent}22`, transform: `scale(${circleScale * 0.95})` }} />
-        <div className="breath-ring flex-center" style={{ inset: 36, background: `${vibe.accent}38`, transform: `scale(${circleScale * 0.9})` }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 14, color: vibe.accent, opacity: 0.85 }}>
-              {phase.label}
-            </div>
-            <div style={{ fontFamily: typo.headingFont, fontWeight: 700, fontSize: 40, color: vibe.accent, lineHeight: 1 }}>
-              {countdown}
-            </div>
-          </div>
+    <div className="flex-col" style={{ alignItems: 'center', gap: 16, padding: '24px 0' }}>
+      {/* Breathing orb — single, clean */}
+      <div style={{ position: 'relative', width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Outer glow */}
+        <div style={{
+          position: 'absolute', inset: -20, borderRadius: '50%',
+          background: `radial-gradient(circle, ${vibe.accent}18 0%, transparent 70%)`,
+          transform: `scale(${circleScale})`,
+          transition: `transform ${phase.duration}s ease-in-out`,
+        }} />
+        {/* Main orb */}
+        <div style={{
+          width: 120, height: 120, borderRadius: '50%',
+          background: `radial-gradient(circle at 40% 40%, ${vibe.accent}80, ${vibe.accent}30)`,
+          boxShadow: `0 0 ${circleScale > 1.2 ? 50 : 25}px ${vibe.accent}40`,
+          transform: `scale(${circleScale})`,
+          transition: `transform ${phase.duration}s ease-in-out, box-shadow ${phase.duration}s ease-in-out`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{ fontSize: 32, opacity: 0.7 }}>&#10024;</div>
         </div>
       </div>
 
-      {/* Cycle indicator */}
-      <div className="mono-hint" style={{ color: vibe.muted, marginTop: 4 }}>{t('day.cycleOf', { current: cycle + 1, total: TOTAL_CYCLES })}</div>
+      {/* Text cue — no countdown numbers */}
+      <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 16, color: vibe.accent, textAlign: 'center', opacity: 0.85 }}>
+        {phase.label}
+      </div>
 
-      {/* Stop button */}
-      <button onClick={stopMeditation} style={{
-        background: `${vibe.accent}15`, border: `1.5px solid ${vibe.accent}35`, borderRadius: 24,
-        padding: '10px 28px', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 14,
-        fontWeight: 600, color: vibe.accent, marginTop: 8,
-      }}>{t('day.stop')}</button>
+      {/* Subtle progress bar */}
+      <div style={{ width: '60%', height: 2, background: `${vibe.accent}15`, borderRadius: 1, overflow: 'hidden' }}>
+        <div style={{
+          width: `${overallProgress * 100}%`, height: '100%',
+          background: vibe.accent, borderRadius: 1,
+          transition: 'width 0.1s linear',
+        }} />
+      </div>
+
+      {/* Minimal stop */}
+      <button onClick={stopMoment} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: vibe.muted, marginTop: 4 }}>
+        &#10005; end
+      </button>
     </div>
   )
 }
@@ -437,7 +558,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
       return (
         <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
           {vibeLabel(vibeContent.labels.quote)}
-          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: typo.headingWeight, fontSize: 20, color: textColor, lineHeight: 1.4, marginBottom: 8 }}>"{content?.quote}"</div>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8 }}>"{content?.quote}"</div>
           <div className="mono-sm" style={{ color: vibe.accent }}>— {content?.quoteAuthor}</div>
         </Card>
       )
@@ -478,13 +599,13 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     if (component === 'affirmation') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.affirmation)}
-        <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 24, fontWeight: typo.headingWeight, color: vibe.accent, lineHeight: 1.3, textAlign: 'center', padding: '8px 0' }}>{content?.affirmation}</div>
+        <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 18, fontWeight: typo.headingWeight, color: vibe.accent, lineHeight: 1.4, textAlign: 'center', padding: '8px 0' }}>{content?.affirmation}</div>
       </Card>
     )
     if (component === 'journal') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.journal)}
-        <div style={{ fontSize: 14, color: textColor, fontFamily: typo.headingFont, fontStyle: 'italic', lineHeight: 1.4, marginBottom: 12 }}>{content?.journalPrompt}</div>
+        <div style={{ fontSize: 16, color: textColor, fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, lineHeight: 1.4, marginBottom: 12 }}>{content?.journalPrompt}</div>
         <textarea value={journalText} onChange={e => setJournalText(e.target.value)} placeholder={t('day.writePlaceholder')} style={inputStyle} />
         <button onClick={saveJournal} style={{ marginTop: 8, background: journalSaved ? `${vibe.accent}20` : vibe.accent, color: journalSaved ? vibe.accent : 'white', border: journalSaved ? `1px solid ${vibe.accent}40` : 'none', borderRadius: 10, padding: '10px 18px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont, transition: 'all 0.2s' }}>
           {journalSaved ? t('day.saved') : t('day.saveEntry')}
@@ -494,22 +615,22 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     if (component === 'gratitude') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.gratitude)}
-        <div style={{ fontSize: 14, color: textColor, fontFamily: typo.headingFont, fontStyle: 'italic', lineHeight: 1.4 }}>{content?.gratitudePrompt}</div>
+        <div style={{ fontSize: 16, color: textColor, fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, lineHeight: 1.4 }}>{content?.gratitudePrompt}</div>
       </Card>
     )
     if (component === 'meditation' || component === 'breathing') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
-        {vibeLabel(vibeContent.labels.breathing)}
+        <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
           <button onClick={() => { setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `${vibe.accent}15`, border: `1px solid ${vibe.accent}30`, borderRadius: 12, padding: '20px', cursor: 'pointer', fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 14, color: vibe.accent }}>
-            {t('day.startMeditation')}
+            Take a moment · ~35s
           </button>
         ) : (
-          <GuidedBreathing
+          <YourMoment
             vibe={vibe}
             typo={typo}
-            openingLine={content?.breathingOpening || `${data.name}, take a moment just for you.`}
-            closingLine={content?.breathingClosing || `You've got this, ${data.name}.`}
+            openingLine={content?.breathingOpening || ''}
+            closingLine={content?.breathingClosing || ''}
             genres={data.genres}
             onComplete={() => track('breathing_completed', { day_number: dayNumber })}
             onStop={() => setMeditationStarted(false)}
@@ -528,7 +649,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
         <button onClick={onSettings} className="flex-center" style={{ position: 'absolute', top: 20, right: 22, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', fontSize: 14, zIndex: 1 }}>⚙️</button>
         <div style={{ textAlign: 'center' }}>
           {/* Tagline */}
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 500, color: vibe.accent, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8, textShadow: `0 0 8px ${vibe.accent}60` }}>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8, textShadow: `0 0 8px ${vibe.accent}60` }}>
             {vibeContent.dayHeader.tagline}
           </div>
           {/* Title */}
@@ -574,18 +695,18 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left side: You're on + day number + of X days */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 2 }}>You're on day</div>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 2 }}>You're on day</div>
               <div style={{
                 fontFamily: (data.vibe === 'lighthearted') ? "'Nunito', sans-serif" : "'Cormorant Garamond', serif",
                 fontWeight: 900,
-                fontSize: 56,
+                fontSize: 44,
                 color: (data.vibe === 'fierce') ? '#FDF6F0' : (data.vibe === 'nurturing') ? '#3D1810' : (data.vibe === 'calm') ? '#E8F4F0' : (data.vibe === 'lighthearted') ? '#1A0A00' : '#F0EAF8',
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
               }}>
                 {dayNumber}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
                 of {data.cycleDays} days
               </div>
             </div>
@@ -643,7 +764,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
           ))}
           <Card cardBg={cardBg} cardBorder={cardBorder} style={{ textAlign: 'center', padding: '28px 18px' }}>
             <div style={{ fontSize: 32 }}>🔒</div>
-            <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 22, color: textColor, lineHeight: 1.2, marginTop: 8 }}>{t('day.lockedHeading', { day: dayNumber })}</div>
+            <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 18, color: textColor, lineHeight: 1.3, marginTop: 8 }}>{t('day.lockedHeading', { day: dayNumber })}</div>
             <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 13, color: mutedColor, lineHeight: 1.5, margin: '8px 0 16px' }}>{t('day.lockedMessage')}</div>
             <button onClick={onUnlock} className="btn-primary" style={{ background: '#C4614A' }}>{t('day.unlockButton')}</button>
             <div className="mono-xs" style={{ color: mutedColor, marginTop: 8 }}>{t('day.unlockHint')}</div>
@@ -661,7 +782,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
                 color: vibe.accent, letterSpacing: '0.15em', textTransform: 'uppercase',
               }}>{vibeContent.friendNote.heading}</span>
             </div>
-            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: typo.headingWeight, fontSize: 16, color: textColor, lineHeight: 1.5, textAlign: 'center', padding: '8px 4px' }}>
+            <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 18, color: textColor, lineHeight: 1.5, textAlign: 'center', padding: '8px 4px' }}>
               {content?.friendNote || vibeContent.friendNote.text.replace('[name]', data.name).replace('[X]', String(dayNumber))}
             </div>
             <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: vibe.accent, textAlign: 'center', marginTop: 8 }}>

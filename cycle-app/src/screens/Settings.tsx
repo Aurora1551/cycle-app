@@ -19,11 +19,14 @@ interface Props {
   onDeleteAccount: () => void
   onLogout: () => void
   onBack: () => void
+  isPaused?: boolean
+  onPause?: () => void
+  onResume?: () => void
 }
 
 type EditMode = null | 'name' | 'treatment' | 'cycleDays' | 'vibe' | 'genres' | 'components' | 'notifyTime' | 'privacy' | 'language'
 
-const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onBack }) => {
+const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onBack, isPaused, onPause, onResume }) => {
   const { t, i18n } = useTranslation()
   const visible = useFadeIn()
   const [editMode, setEditMode] = useState<EditMode>(null)
@@ -267,6 +270,22 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </>
           )}
 
+        </Card>
+
+        {/* Take a break */}
+        <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
+          <button onClick={() => isPaused ? onResume?.() : onPause?.()} className="settings-row" style={{ cursor: 'pointer' }}>
+            <div className="settings-icon" style={{ background: isPaused ? 'rgba(100,200,140,0.12)' : `${vibe.accent}15` }}>{isPaused ? '💚' : '🌙'}</div>
+            <div style={{ flex: 1 }}>
+              <div className="mono-hint" style={{ color: isPaused ? '#7BD4A0' : vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>
+                {isPaused ? 'JOURNEY PAUSED' : 'TAKE A BREAK'}
+              </div>
+              <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>
+                {isPaused ? 'Your journey is on hold. Tap to continue.' : 'Pause your cycle — no pressure, no guilt.'}
+              </div>
+            </div>
+            <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
+          </button>
         </Card>
 
         <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.account')}</div>

@@ -72,6 +72,9 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
           className="btn-primary" style={{ background: selected.length > 0 ? accent : `${accent}44` }}>
           {t('onboardingMusic.seeJourney')}
         </button>
+        <button onClick={() => onContinue(['pop', 'ambient'])} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: muted, padding: '10px 0 0', width: '100%', textAlign: 'center' }}>
+          Skip for now
+        </button>
       </div>
     </div>
   )

@@ -28,7 +28,7 @@ const Summary: React.FC<Props> = ({ data, onStartFree, onUnlock }) => {
 
       <div className="content" style={{ gap: 14 }}>
         <div className="step-label" style={{ color: vibe.accent }}>{t('summary.allSet')}</div>
-        <h1 style={{ fontFamily: typo.headingFont, fontSize: 34, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, fontStyle: 'italic', margin: 0 }}>
+        <h1 style={{ fontFamily: typo.headingFont, fontSize: 32, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, fontStyle: typo.headingStyle, margin: 0 }}>
           {t('summary.readyForYou', { name: '' })}<br /><span style={{ color: vibe.accent }}>{data.name}.</span>
         </h1>
         <p className="subtext" style={{ color: mutedColor }}>{t('summary.heresYourJourney')}</p>

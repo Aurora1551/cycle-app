@@ -7,9 +7,10 @@ import { VIBE_CONTENT } from '../lib/constants'
 interface SplashScreenProps {
   onBegin: () => void
   onHaveAccount: () => void
+  onGift?: () => void
 }
 
-const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount }) => {
+const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onGift }) => {
   const [visible, setVisible] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const { t, i18n } = useTranslation()
@@ -100,6 +101,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount }) =
       }}>
         {t('haveAccount')}
       </button>
+
+      {onGift && <>
+        <div className="mono-xs" style={{ color: '#333', margin: '4px 0' }}>{t('or')}</div>
+        <button onClick={onGift} className="btn-ghost" style={{
+          color: 'rgba(253,246,240,0.5)', border: '1px solid rgba(255,255,255,0.12)', width: '100%',
+        }}>
+          {t('giftToSomeone', 'Gift it to someone')}
+        </button>
+      </>}
 
       <LanguagePicker open={langOpen} onClose={() => setLangOpen(false)} />
     </div>

@@ -43,42 +43,14 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
       return
     }
     setLoading(true); setError('')
-    try {
-      const profileId = profileData?.name || localStorage.getItem('cycle_onboarding_data') ? JSON.parse(localStorage.getItem('cycle_onboarding_data') || '{}').name : null
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, profileId }),
-      })
-      const body = await res.json()
-      if (!res.ok) {
-        if (body.error === 'Account already exists') {
-          setError(t('createAccount.accountExists'))
-        } else {
-          setError(body.error || t('createAccount.genericError'))
-        }
-        setLoading(false)
-        return
-      }
-
-      // Link profile to account if we have profile data
-      if (profileId) {
-        await fetch('/api/link-profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, profileId }),
-        })
-      }
-
+    // MOCK REGISTRATION: skip API calls, simulate success after brief delay
+    setTimeout(() => {
       localStorage.setItem('cycle_account_email', email)
       localStorage.setItem('cycle_is_guest', '0')
       track('account_created')
       setLoading(false)
       onSuccess()
-    } catch {
-      setError(t('createAccount.networkError'))
-      setLoading(false)
-    }
+    }, 600)
   }
 
   const fieldStyle: React.CSSProperties = { background: fieldBg, border: `1.5px solid ${fieldBorder}`, borderRadius: 12, padding: '12px 14px' }
@@ -112,9 +84,9 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
           className="btn-primary" style={{ background: email && password && confirmPassword ? vibeAccent : `${vibeAccent}44` }}>
           {loading ? t('createAccount.creating') : t('createAccount.createButton')}
         </button>
-        <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.8 }}>
+        <div className="text-center" style={{ fontSize: 12, color: mutedColor, lineHeight: 1.8 }}>
           {t('createAccount.alreadyHaveAccount')}{' '}
-          <button onClick={onLogin} className="btn-icon" style={{ color: vibeAccent, fontSize: 11, padding: 0, textDecoration: 'underline' }}>{t('createAccount.logIn')}</button>
+          <button onClick={onLogin} className="btn-icon" style={{ color: vibeAccent, fontSize: 12, padding: 0, textDecoration: 'underline' }}>{t('createAccount.logIn')}</button>
         </div>
         <div className="text-center" style={{ fontSize: 11, color: mutedColor, lineHeight: 1.5 }}>{t('createAccount.legalText')}</div>
       </div>

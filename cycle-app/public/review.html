@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle App — UX Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Karla:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 48px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(196,97,74,0.2); }
+  .item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
+  .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
+  .item-num { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.25); min-width: 24px; }
+  .item-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: #FDF6F0; flex: 1; line-height: 1.2; }
+  .severity { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .critical { background: rgba(220,60,60,0.15); color: #E86A6A; border: 1px solid rgba(220,60,60,0.25); }
+  .high { background: rgba(232,165,152,0.12); color: #E8A598; border: 1px solid rgba(232,165,152,0.2); }
+  .medium { background: rgba(245,200,66,0.1); color: #F5C842; border: 1px solid rgba(245,200,66,0.2); }
+  .quick { background: rgba(100,200,140,0.1); color: #7BD4A0; border: 1px solid rgba(100,200,140,0.2); }
+  .item-problem { font-size: 14px; color: rgba(253,246,240,0.65); line-height: 1.6; margin-bottom: 12px; }
+  .item-fix { background: rgba(196,97,74,0.06); border: 1px solid rgba(196,97,74,0.12); border-radius: 10px; padding: 14px; font-size: 13px; color: rgba(253,246,240,0.75); line-height: 1.6; }
+  .item-fix-label { font-family: 'DM Mono', monospace; font-size: 9px; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .status { display: flex; gap: 8px; margin-top: 14px; }
+  .status-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: none; color: rgba(253,246,240,0.4); cursor: pointer; transition: all 0.2s; }
+  .status-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(253,246,240,0.7); }
+  .status-btn.active-yes { background: rgba(100,200,140,0.15); border-color: rgba(100,200,140,0.3); color: #7BD4A0; }
+  .status-btn.active-no { background: rgba(220,60,60,0.1); border-color: rgba(220,60,60,0.2); color: #E86A6A; }
+  .status-btn.active-later { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.2); color: #F5C842; }
+  .counter { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 18px; font-family: 'DM Mono', monospace; font-size: 11px; z-index: 100; backdrop-filter: blur(10px); }
+  .counter div { margin-bottom: 4px; }
+  .counter .c-yes { color: #7BD4A0; }
+  .counter .c-no { color: #E86A6A; }
+  .counter .c-later { color: #F5C842; }
+  .note { font-size: 12px; color: rgba(253,246,240,0.3); font-style: italic; margin-top: 8px; }
+  .comment-box { margin-top: 10px; }
+  .comment-box textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 12px; font-family: 'Karla', sans-serif; font-size: 13px; color: #FDF6F0; resize: vertical; min-height: 40px; outline: none; caret-color: #C4614A; transition: border-color 0.2s; }
+  .comment-box textarea:focus { border-color: rgba(196,97,74,0.4); }
+  .comment-box textarea::placeholder { color: rgba(253,246,240,0.2); }
+  .comment-saved { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(100,200,140,0.6); margin-top: 4px; opacity: 0; transition: opacity 0.3s; }
+</style>
+</head>
+<body>
+
+<h1>UX Review</h1>
+<p class="subtitle">Click Yes / No / Later on each item to track your decisions. Progress saves locally.</p>
+
+<div class="counter" id="counter">
+  <div class="c-yes">Yes: <span id="count-yes">0</span></div>
+  <div class="c-no">No: <span id="count-no">0</span></div>
+  <div class="c-later">Later: <span id="count-later">0</span></div>
+  <div style="color: rgba(253,246,240,0.25); margin-top: 4px;">Total: <span id="count-total">0</span>/19</div>
+</div>
+
+<!-- ======================== CRITICAL ======================== -->
+<div class="section">
+  <div class="section-title">Critical — Will lose users</div>
+
+  <div class="item" data-id="1">
+    <div class="item-header">
+      <span class="item-num">01</span>
+      <span class="item-title">No "bad day" or failed cycle path</span>
+      <span class="severity critical">Critical</span>
+    </div>
+    <div class="item-problem">If a user's cycle fails, transfer doesn't work, or they get a negative test — the app has nothing for them. It keeps showing cheerful quotes and affirmations. On r/infertility and r/IVF, this is the #1 complaint about wellness apps. Users going through the hardest moment of their journey get tone-deaf positivity.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a "This cycle didn't go as planned" option accessible from the day screen or settings. Lead to grief-appropriate content: acknowledgment ("This is devastating, and your feelings are valid"), a gentle breathing exercise, a journal prompt about processing loss, and an option to pause the cycle. The AI content generation should shift tone entirely when this is active.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="2">
+    <div class="item-header">
+      <span class="item-num">02</span>
+      <span class="item-title">No pause functionality</span>
+      <span class="severity critical">Critical</span>
+    </div>
+    <div class="item-problem">If a user needs a break (bad news, procedure recovery, emotional burnout), they can't pause. The daily content keeps piling up, and they feel behind. This creates guilt, and guilty users churn silently rather than coming back.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a "Take a break" option in Settings. Pauses the cycle counter. When they return, show a gentle "Welcome back" screen that acknowledges the break without asking why. Don't lose any progress or streak data.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="3">
+    <div class="item-header">
+      <span class="item-num">03</span>
+      <span class="item-title">Content will feel repetitive by week 2</span>
+      <span class="severity critical">Critical</span>
+    </div>
+    <div class="item-problem">The AI generates similar-toned content daily using the same vibe instructions. By day 8-10, quotes start sounding alike, affirmations blur together, journal prompts repeat themes. This is the "content wall" — the #1 churn driver in daily content apps.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Vary content type and emotional tone across the cycle. Early days: hopeful/energetic. Mid-cycle: grounding/patient. Late cycle (TWW): calming/reassuring. Pass the cycle phase to the AI prompt. Also rotate card order day-to-day so the page layout feels fresh. Consider adding a new content type every few days (e.g., "fun fact about your body" on day 5, "letter to future you" on day 10).
+    </div>
+    <div class="status"></div>
+  </div>
+</div>
+
+<!-- ======================== HIGH ======================== -->
+<div class="section">
+  <div class="section-title">High Priority — Significantly impacts experience</div>
+
+  <div class="item" data-id="4">
+    <div class="item-header">
+      <span class="item-num">04</span>
+      <span class="item-title">Onboarding has no skip option</span>
+      <span class="severity high">High</span>
+    </div>
+    <div class="item-problem">Every onboarding step requires a selection. No "Skip" or "I'll decide later." If someone gets stuck at treatment type (their situation is complex, they're not sure, or they're just exploring), they abandon. Required fields on emotional questions create friction.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add "Skip for now" as a subtle text link on steps 2-6 (keep name required). Default to reasonable fallbacks: general wellness content, calm vibe, all components enabled.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="5">
+    <div class="item-header">
+      <span class="item-num">05</span>
+      <span class="item-title">No onboarding resume if interrupted</span>
+      <span class="severity high">High</span>
+    </div>
+    <div class="item-problem">If a user closes the app mid-onboarding (phone call, notification, battery dies), they restart from step 1. On mobile, interruptions are constant. Redoing 3-4 steps after an interruption causes immediate abandonment.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Save each onboarding step to localStorage as the user completes it (not just the final profile). On app open, check for partial onboarding data and resume from the last completed step.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="6">
+    <div class="item-header">
+      <span class="item-num">06</span>
+      <span class="item-title">Paywall has no social proof</span>
+      <span class="severity high">High</span>
+    </div>
+    <div class="item-problem">Users are asked to pay &pound;9.99 with zero evidence that it works. No testimonials, no user count, no ratings, no "as featured in" badges. For a health/wellness app targeting a vulnerable audience, trust is everything. Without it, conversion stays low.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add 1-2 short testimonials below the plan cards. E.g.: <em>"The daily quotes got me through my TWW. I actually looked forward to opening the app."</em> — Sarah, IVF cycle 2. Even placeholder quotes initially signal that real people use this.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="7">
+    <div class="item-header">
+      <span class="item-num">07</span>
+      <span class="item-title">"Complete Day" action is confusing</span>
+      <span class="severity high">High</span>
+    </div>
+    <div class="item-problem">There's a button to mark the day done, but it's not clear what "completing" means. Do I need to read everything? Do the breathing? Just open it? Confused users either don't engage or don't feel accomplished when they do.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a gentle "Done for today" button at the bottom of the content cards with a brief celebration micro-animation (confetti or a gentle glow). Don't require any specific action — the value is in showing up. Label it "I showed up today" rather than "Complete Day."
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="8">
+    <div class="item-header">
+      <span class="item-num">08</span>
+      <span class="item-title">No treatment-phase awareness</span>
+      <span class="severity high">High</span>
+    </div>
+    <div class="item-problem">The app knows the user is doing IVF but doesn't know what phase: stims, retrieval, transfer, TWW. Content should shift dramatically between these. A quote about patience on stim day 1 is irrelevant; on TWW day 8 it's everything. Generic content undermines the personalisation promise.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a treatment phase selector (even just: preparing, stimming, procedure week, waiting, results). This could be a new onboarding step or auto-inferred from cycle day + treatment type. Feed it to the AI content generation prompt so tone and themes shift with the phase.
+    </div>
+    <div class="status"></div>
+  </div>
+</div>
+
+<!-- ======================== MEDIUM ======================== -->
+<div class="section">
+  <div class="section-title">Medium Priority — Improves retention</div>
+
+  <div class="item" data-id="9">
+    <div class="item-header">
+      <span class="item-num">09</span>
+      <span class="item-title">No streaks or gentle accountability</span>
+      <span class="severity medium">Medium</span>
+    </div>
+    <div class="item-problem">Daily apps live or die on return visits. There's no streak counter, no "7 days in a row" moment, nothing that makes tomorrow feel different from skipping.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a subtle streak counter in the day header card. Not aggressive — frame it as "7 days of showing up for yourself" rather than a gamified number. Celebrate milestones gently at 3, 7, 14, and cycle-end.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="10">
+    <div class="item-header">
+      <span class="item-num">10</span>
+      <span class="item-title">No evening check-in</span>
+      <span class="severity medium">Medium</span>
+    </div>
+    <div class="item-problem">The app is morning-only. Fertility journeys are hardest at night — lying in bed overthinking, doom-scrolling, worrying about tomorrow's appointment. A short evening touchpoint would catch users when they need support most.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add an optional evening card: a single calming quote or 20-second breathing exercise. Could be triggered by the evening notification time already in settings. Keep it light — one card, not a full day screen.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="11">
+    <div class="item-header">
+      <span class="item-num">11</span>
+      <span class="item-title">No way to revisit favorite content</span>
+      <span class="severity medium">Medium</span>
+    </div>
+    <div class="item-problem">Once a day passes, the quote, affirmation, and journal prompt are gone. Users can't bookmark the one that really resonated. The quote that got someone through a hard afternoon disappears by tomorrow.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a "Save" heart icon on quote and affirmation cards. Store favorites in localStorage. Show them in a "Favorites" section accessible from Progress or Settings.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="12">
+    <div class="item-header">
+      <span class="item-num">12</span>
+      <span class="item-title">End of Cycle has no reflection</span>
+      <span class="severity medium">Medium</span>
+    </div>
+    <div class="item-problem">The cycle ends with stats and a share button, but no emotional closure. No "What did you learn about yourself?" or "What surprised you?" The most meaningful moment of the journey is reduced to numbers.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a short reflection journal prompt before showing the stats. Make it optional but prominent. E.g., "Before we celebrate — what's one thing you want to remember from this cycle?" Save the response and show it if they start a new cycle.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="13">
+    <div class="item-header">
+      <span class="item-num">13</span>
+      <span class="item-title">No partner involvement</span>
+      <span class="severity medium">Medium</span>
+    </div>
+    <div class="item-problem">Fertility is rarely a solo journey. Partners want to help but don't know how. There's no way to include them. This limits the app's reach and the support system it could create.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Light version: Add a "Share today's quote" button via WhatsApp/text on the quote card. Medium version: Add partner-specific daily prompts ("Ask your partner how they're feeling about tomorrow"). These are low-effort features with high emotional value.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="14">
+    <div class="item-header">
+      <span class="item-num">14</span>
+      <span class="item-title">No emotional state logging</span>
+      <span class="severity medium">Medium</span>
+    </div>
+    <div class="item-problem">The app sends content but never asks how the user is feeling. This is a missed opportunity for personalisation (content could adapt to mood) and self-awareness (users could see mood trends over the cycle).</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a simple mood selector (5 emojis: great, good, okay, tough, hard) at the top of the day screen. Use it to subtly adjust content tone via the AI prompt. Show mood trends as a simple line in the Progress tab.
+    </div>
+    <div class="status"></div>
+  </div>
+</div>
+
+<!-- ======================== QUICK WINS ======================== -->
+<div class="section">
+  <div class="section-title">Quick Wins — Low effort, high impact</div>
+
+  <div class="item" data-id="15">
+    <div class="item-header">
+      <span class="item-num">15</span>
+      <span class="item-title">Splash screen has too many options</span>
+      <span class="severity quick">Quick Win</span>
+    </div>
+    <div class="item-problem">Three equal-sized buttons (Begin, I have an account, Gift) plus a language selector. New users hesitate when given too many equal choices. The primary action doesn't stand out enough from secondary ones.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Keep "Begin" as the dominant hero CTA. Make "I have an account" a text link (not a button). Move "Gift it to someone" to a smaller, separate text link. Reduce visual weight of secondary options.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="16">
+    <div class="item-header">
+      <span class="item-num">16</span>
+      <span class="item-title">"Take a moment" button doesn't convey value</span>
+      <span class="severity quick">Quick Win</span>
+    </div>
+    <div class="item-problem">The breathing exercise CTA says "Take a moment &middot; ~35s" which sounds like a task. Users skip things that sound like effort, especially when they're already exhausted from treatment.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Rename to "Breathe with me &middot; 35s" — the word "breathe" is instantly calming, and "with me" creates intimacy. Alternatively, just "Your Moment" with a play icon.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="17">
+    <div class="item-header">
+      <span class="item-num">17</span>
+      <span class="item-title">Add "Share this quote" to quote card</span>
+      <span class="severity quick">Quick Win</span>
+    </div>
+    <div class="item-problem">Quotes are the most shareable content type in the app. There's no easy way to share one. Every share is free marketing to someone who might also be going through fertility treatment.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a small share icon on the quote card. On tap, open native share sheet or copy the quote + "via Cycle app" attribution. Could also generate a branded image for Instagram stories.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="18">
+    <div class="item-header">
+      <span class="item-num">18</span>
+      <span class="item-title">Add medication/appointment reminder card</span>
+      <span class="severity quick">Quick Win</span>
+    </div>
+    <div class="item-problem">The #1 feature request on fertility forums. Users juggle complex medication schedules (sometimes 3-4 injections at specific times). Even a basic reminder would make the app indispensable — it becomes the thing they open every morning.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a "Today's reminders" card at the top of the day screen. Simple text input where users add 1-3 reminders with optional times. Stored in localStorage. No backend needed. This single feature could drive daily opens more than any content.
+    </div>
+    <div class="status"></div>
+  </div>
+
+  <div class="item" data-id="19">
+    <div class="item-header">
+      <span class="item-num">19</span>
+      <span class="item-title">Show blurred content preview on paywall</span>
+      <span class="severity quick">Quick Win</span>
+    </div>
+    <div class="item-problem">The paywall shows plan options but no preview of what you're unlocking. Users don't know what "One Cycle" actually contains. The locked day 4 screen does show blurred cards, but the paywall itself (shown during onboarding or from the register gate) doesn't.</div>
+    <div class="item-fix">
+      <div class="item-fix-label">Suggested fix</div>
+      Add a "What you'll get" section below the plans with icons + short descriptions: daily personalised quotes, curated music, guided journaling, breathing exercises, affirmations. Make it visual, not just text. Show what a day looks like.
+    </div>
+    <div class="status"></div>
+  </div>
+</div>
+
+<!-- Export feedback -->
+<div style="text-align: center; padding: 40px 0 20px;">
+  <button onclick="exportFeedback()" style="background: #C4614A; color: white; border: none; border-radius: 12px; padding: 14px 32px; font-family: 'Karla', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;">
+    Export all feedback
+  </button>
+  <div id="export-output" style="display: none; margin-top: 20px; text-align: left; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <span style="font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase;">Your Feedback</span>
+      <button onclick="copyFeedback()" style="background: rgba(196,97,74,0.15); color: #C4614A; border: 1px solid rgba(196,97,74,0.2); border-radius: 8px; padding: 6px 14px; font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer;">Copy to clipboard</button>
+    </div>
+    <pre id="export-text" style="font-family: 'Karla', sans-serif; font-size: 13px; color: rgba(253,246,240,0.7); line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;"></pre>
+  </div>
+  <div style="color: rgba(253,246,240,0.15); font-family: 'DM Mono', monospace; font-size: 10px; margin-top: 20px;">
+    Cycle App — UX Review — 2026-04-05
+  </div>
+</div>
+
+<script>
+// Load saved decisions and comments
+const decisions = JSON.parse(localStorage.getItem('cycle_ux_review') || '{}')
+const comments = JSON.parse(localStorage.getItem('cycle_ux_comments') || '{}')
+
+function updateCounters() {
+  const vals = Object.values(decisions)
+  document.getElementById('count-yes').textContent = vals.filter(v => v === 'yes').length
+  document.getElementById('count-no').textContent = vals.filter(v => v === 'no').length
+  document.getElementById('count-later').textContent = vals.filter(v => v === 'later').length
+  document.getElementById('count-total').textContent = vals.length
+}
+
+document.querySelectorAll('.item').forEach(item => {
+  const id = item.dataset.id
+  const statusDiv = item.querySelector('.status')
+
+  // Decision buttons
+  const options = ['yes', 'no', 'later']
+  options.forEach(opt => {
+    const btn = document.createElement('button')
+    btn.className = 'status-btn'
+    btn.textContent = opt === 'yes' ? 'Yes, do this' : opt === 'no' ? 'No, skip' : 'Later'
+    btn.onclick = () => {
+      decisions[id] = opt
+      localStorage.setItem('cycle_ux_review', JSON.stringify(decisions))
+      render()
+    }
+    statusDiv.appendChild(btn)
+  })
+
+  // Comment box
+  const commentBox = document.createElement('div')
+  commentBox.className = 'comment-box'
+  const textarea = document.createElement('textarea')
+  textarea.placeholder = 'Your notes or feedback...'
+  textarea.rows = 2
+  textarea.value = comments[id] || ''
+  const savedLabel = document.createElement('div')
+  savedLabel.className = 'comment-saved'
+  savedLabel.textContent = 'Saved'
+
+  let saveTimeout
+  textarea.addEventListener('input', () => {
+    comments[id] = textarea.value
+    localStorage.setItem('cycle_ux_comments', JSON.stringify(comments))
+    savedLabel.style.opacity = '1'
+    clearTimeout(saveTimeout)
+    saveTimeout = setTimeout(() => { savedLabel.style.opacity = '0' }, 1500)
+  })
+
+  commentBox.appendChild(textarea)
+  commentBox.appendChild(savedLabel)
+  statusDiv.after(commentBox)
+
+  function render() {
+    statusDiv.querySelectorAll('.status-btn').forEach((btn, i) => {
+      btn.className = 'status-btn'
+      if (decisions[id] === options[i]) {
+        btn.classList.add(`active-${options[i]}`)
+      }
+    })
+    if (decisions[id] === 'no') {
+      item.style.opacity = '0.4'
+    } else if (decisions[id] === 'yes') {
+      item.style.borderColor = 'rgba(100,200,140,0.2)'
+    } else if (decisions[id] === 'later') {
+      item.style.borderColor = 'rgba(245,200,66,0.15)'
+    } else {
+      item.style.opacity = '1'
+      item.style.borderColor = 'rgba(255,255,255,0.06)'
+    }
+    updateCounters()
+  }
+
+  render()
+})
+
+function exportFeedback() {
+  const d = JSON.parse(localStorage.getItem('cycle_ux_review') || '{}')
+  const c = JSON.parse(localStorage.getItem('cycle_ux_comments') || '{}')
+  const items = document.querySelectorAll('.item')
+  let output = 'CYCLE APP — UX REVIEW FEEDBACK\n' + '='.repeat(40) + '\n\n'
+
+  items.forEach(item => {
+    const id = item.dataset.id
+    const title = item.querySelector('.item-title')?.textContent || ''
+    const severity = item.querySelector('.severity')?.textContent || ''
+    const decision = d[id] ? d[id].toUpperCase() : 'NOT DECIDED'
+    const comment = c[id] || ''
+
+    output += `#${id}. ${title}\n`
+    output += `Severity: ${severity} | Decision: ${decision}\n`
+    if (comment) output += `Comment: ${comment}\n`
+    output += '\n'
+  })
+
+  document.getElementById('export-output').style.display = 'block'
+  document.getElementById('export-text').textContent = output
+}
+
+function copyFeedback() {
+  const text = document.getElementById('export-text').textContent
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target
+    btn.textContent = 'Copied!'
+    setTimeout(() => { btn.textContent = 'Copy to clipboard' }, 2000)
+  })
+}
+</script>
+</body>
+</html>

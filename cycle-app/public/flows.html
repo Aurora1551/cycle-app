@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle App — User Journeys</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Karla:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: rgba(253,246,240,0.4); font-size: 14px; margin-bottom: 48px; }
+  .journey { margin-bottom: 64px; }
+  .journey-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; color: #C4614A; }
+  .journey-desc { color: rgba(253,246,240,0.5); font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
+  .flow { display: flex; gap: 16px; overflow-x: auto; padding: 12px 0 24px; scroll-snap-type: x mandatory; }
+  .flow::-webkit-scrollbar { height: 6px; }
+  .flow::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+  .flow::-webkit-scrollbar-thumb { background: rgba(196,97,74,0.4); border-radius: 3px; }
+  .arrow { display: flex; align-items: center; color: rgba(253,246,240,0.2); font-size: 24px; flex-shrink: 0; padding: 0 4px; }
+
+  .phone { width: 280px; min-width: 280px; height: 540px; border-radius: 28px; overflow: hidden; position: relative; flex-shrink: 0; scroll-snap-align: start; border: 2px solid rgba(255,255,255,0.08); }
+  .phone-content { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 32px 20px 24px; overflow-y: auto; }
+  .phone-content::-webkit-scrollbar { display: none; }
+  .phone .screen-label { position: absolute; top: -28px; left: 0; font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(253,246,240,0.3); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+  .phone-wrapper { position: relative; padding-top: 32px; }
+
+  /* Dark theme */
+  .dark { background: #0E0E0E; }
+  .dark .text { color: #FDF6F0; }
+  .dark .muted { color: rgba(253,246,240,0.45); }
+  .dark .field { background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+
+  /* Light theme */
+  .light { background: #FDF6F0; }
+  .light .text { color: #1C0F0C; }
+  .light .muted { color: #9B7B74; }
+  .light .field { background: white; border: 1.5px solid rgba(196,97,74,0.2); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+
+  /* Vibe themes */
+  .fierce { background: #1C0F0C; }
+  .nurturing { background: #FDF0EC; }
+  .calm { background: #0D1F2D; }
+  .lighthearted { background: #FFFBF0; }
+  .spiritual { background: #120A2A; }
+
+  .heading { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; line-height: 1.1; margin-bottom: 8px; }
+  .step-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #C4614A; margin-bottom: 6px; }
+  .subtext { font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+  .btn { width: 100%; border-radius: 14px; padding: 14px; font-family: 'Karla', sans-serif; font-size: 14px; font-weight: 700; border: none; cursor: pointer; text-align: center; margin-bottom: 8px; }
+  .btn-accent { background: #C4614A; color: white; }
+  .btn-dark { background: #1C0F0C; color: #FDF6F0; }
+  .btn-ghost-dark { background: none; border: 1px solid rgba(255,255,255,0.12) !important; color: rgba(253,246,240,0.5); }
+  .btn-ghost-light { background: none; border: 1px solid rgba(196,97,74,0.2) !important; color: #9B7B74; }
+  .btn-disabled { opacity: 0.4; }
+  .field-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+  .field-value { font-size: 13px; opacity: 0.5; }
+  .spacer { flex: 1; }
+  .center { text-align: center; }
+  .emoji-lg { font-size: 48px; margin-bottom: 12px; }
+  .emoji-xl { font-size: 64px; margin-bottom: 12px; }
+  .mono-xs { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+  .back-btn { font-size: 13px; font-weight: 500; margin-bottom: 16px; }
+  .card { border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .card-dark { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+  .card-light { background: rgba(255,255,255,0.8); border: 1px solid rgba(196,97,74,0.15); }
+  .blurred { filter: blur(3px); opacity: 0.35; }
+  .lock-icon { font-size: 32px; text-align: center; margin: 8px 0; }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+  .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin: 0 2px; }
+  .dot-filled { background: #C4614A; }
+  .dot-empty { background: rgba(196,97,74,0.2); }
+  .plan-card { border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; }
+  .nav-bar { display: flex; justify-content: space-around; padding: 12px 0 4px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto; font-size: 11px; }
+  .nav-item { text-align: center; font-size: 10px; }
+  .nav-active { color: #C4614A; }
+
+  .toc { max-width: 600px; margin: 0 auto 48px; }
+  .toc a { color: #C4614A; text-decoration: none; font-size: 15px; display: block; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .toc a:hover { color: #E8A598; }
+  .toc-num { color: rgba(253,246,240,0.3); font-family: 'DM Mono', monospace; font-size: 12px; margin-right: 12px; }
+</style>
+</head>
+<body>
+
+<h1>Cycle App</h1>
+<p class="subtitle">User Journey Documentation</p>
+
+<div class="toc">
+  <a href="#j1"><span class="toc-num">01</span> New Guest User (Free)</a>
+  <a href="#j2"><span class="toc-num">02</span> Guest Upgrade to Premium</a>
+  <a href="#j3"><span class="toc-num">03</span> Returning User (Login)</a>
+  <a href="#j4"><span class="toc-num">04</span> Gift from Splash (New Visitor)</a>
+  <a href="#j5"><span class="toc-num">05</span> Gift from Paywall / End of Cycle</a>
+  <a href="#j-email"><span class="toc-num">06</span> Gift Email — Full Mockup</a>
+  <a href="#j6"><span class="toc-num">07</span> Gift Recipient Redeems (app flow)</a>
+  <a href="#j7"><span class="toc-num">08</span> Free User Hits Day 4 Lock</a>
+</div>
+
+<!-- ======================== JOURNEY 1 ======================== -->
+<div class="journey" id="j1">
+  <div class="journey-title">1. New Guest User (Free)</div>
+  <div class="journey-desc">A new user opens the app, goes through onboarding, chooses the free plan, and experiences days 1-3.</div>
+  <div class="flow">
+
+    <!-- Splash -->
+    <div class="phone-wrapper"><div class="screen-label">Splash</div>
+    <div class="phone dark">
+      <div class="phone-content center" style="justify-content: center; gap: 12px;">
+        <div class="mono-xs" style="color: rgba(253,246,240,0.4); letter-spacing: 0.2em;">FERTILITY COMPANION</div>
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #E8A598, #C4614A); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 28px;">&#127800;</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 700; color: #FDF6F0;">Cycle</div>
+        <div style="font-size: 12px; color: rgba(253,246,240,0.4);">Your daily companion through fertility</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Begin</div>
+        <div class="mono-xs center" style="color: #333;">or</div>
+        <div class="btn btn-ghost-dark">I have an account</div>
+        <div class="mono-xs center" style="color: #333;">or</div>
+        <div class="btn btn-ghost-dark">Gift it to someone</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Onboarding Name -->
+    <div class="phone-wrapper"><div class="screen-label">Onboarding — Name</div>
+    <div class="phone" style="background: #FDF6F0;">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="step-label">STEP 1 OF 6</div>
+        <div class="heading" style="color: #1C0F0C;">What should we call you?</div>
+        <div class="subtext muted" style="color: #9B7B74;">This is how we'll personalise your journey</div>
+        <div class="field" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div class="field-label" style="color: #9B7B74;">YOUR NAME</div>
+          <div class="field-value" style="color: #1C0F0C;">Sarah</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Continue</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Onboarding Treatment -->
+    <div class="phone-wrapper"><div class="screen-label">Onboarding — Treatment</div>
+    <div class="phone" style="background: #FDF6F0;">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="back-btn" style="color: #9B7B74;">&lsaquo; Back</div>
+        <div class="step-label">STEP 2 OF 6</div>
+        <div class="heading" style="color: #1C0F0C;">What treatment are you going through?</div>
+        <div class="plan-card" style="background: #1C0F0C; border: 2px solid #C4614A; color: #FDF6F0; font-size: 13px; font-weight: 600;">IVF</div>
+        <div class="plan-card" style="background: white; border: 1.5px solid rgba(196,97,74,0.2); color: #1C0F0C; font-size: 13px;">Egg Freezing</div>
+        <div class="plan-card" style="background: white; border: 1.5px solid rgba(196,97,74,0.2); color: #1C0F0C; font-size: 13px;">IUI</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Continue</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Summary -->
+    <div class="phone-wrapper"><div class="screen-label">Summary</div>
+    <div class="phone" style="background: #FDF6F0;">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="step-label">YOUR JOURNEY</div>
+        <div class="heading" style="color: #1C0F0C;">Here's your journey, Sarah</div>
+        <div class="card card-light" style="font-size: 12px; color: #1C0F0C;">
+          <div style="margin-bottom: 4px;"><strong>Vibe:</strong> Fierce &#128293;</div>
+          <div style="margin-bottom: 4px;"><strong>Treatment:</strong> IVF</div>
+          <div style="margin-bottom: 4px;"><strong>Cycle:</strong> 28 days</div>
+          <div><strong>Content:</strong> Quote, Music, Journal</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Start Free Trial</div>
+        <div class="btn btn-ghost-light" style="color: #9B7B74;">Unlock Full Access</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Day 1 -->
+    <div class="phone-wrapper"><div class="screen-label">Day 1</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 1 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">
+          <div style="font-size: 16px; margin-bottom: 6px;">&#128172;</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; line-height: 1.4;">"You are stronger than you know."</div>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">
+          <div style="font-size: 16px; margin-bottom: 4px;">&#127925;</div>
+          <div>Today's playlist</div>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">
+          <div style="font-size: 16px; margin-bottom: 4px;">&#128221;</div>
+          <div>Journal</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day &rarr;</div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Day 2, Day 3 -->
+    <div class="phone-wrapper"><div class="screen-label">Day 2 &rarr; Day 3</div>
+    <div class="phone fierce">
+      <div class="phone-content center" style="justify-content: center; gap: 12px;">
+        <div style="font-size: 36px;">&#128262;</div>
+        <div class="heading" style="color: #FDF6F0; font-size: 22px;">Days 2 & 3</div>
+        <div class="subtext" style="color: rgba(253,246,240,0.45);">Same as Day 1 — full content access. Complete each day to advance.</div>
+        <div style="margin-top: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<!-- ======================== JOURNEY 2 ======================== -->
+<div class="journey" id="j2">
+  <div class="journey-title">2. Guest Registers & Upgrades to Premium</div>
+  <div class="journey-desc">After completing day 3, the guest is prompted to register. After registration, they see the paywall. Paying takes them to day 4 with all content unlocked.</div>
+  <div class="flow">
+
+    <!-- Day 3 Complete -->
+    <div class="phone-wrapper"><div class="screen-label">Day 3 — Complete</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 3 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote of the day</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#127925; Music</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128221; Journal</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day 3 &rarr;</div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Register Gate -->
+    <div class="phone-wrapper"><div class="screen-label">Register Gate</div>
+    <div class="phone dark">
+      <div class="phone-content center" style="justify-content: center; gap: 14px;">
+        <div class="emoji-lg">&#128274;</div>
+        <div class="heading" style="color: #FDF6F0;">Save your journey</div>
+        <div class="subtext" style="color: rgba(253,246,240,0.45);">Create an account to keep your progress and unlock more days</div>
+        <div class="btn btn-accent">Create Account</div>
+        <div style="font-size: 12px; color: rgba(253,246,240,0.4); text-decoration: underline;">Continue as guest</div>
+        <div class="mono-xs" style="color: rgba(253,246,240,0.25);">&#9888; Guest data may be lost if you clear your browser</div>
+        <div style="margin-top: 12px; padding: 10px; border-radius: 10px; background: rgba(196,97,74,0.08); border: 1px solid rgba(196,97,74,0.15);">
+          <div class="mono-xs" style="color: rgba(253,246,240,0.3);">&#8635; "Continue as guest" loops back to Day 3</div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Create Account -->
+    <div class="phone-wrapper"><div class="screen-label">Create Account (mocked)</div>
+    <div class="phone dark">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="back-btn" style="color: rgba(253,246,240,0.45);">&lsaquo; Back</div>
+        <div class="step-label">SAVE YOUR JOURNEY</div>
+        <div class="heading" style="color: #FDF6F0;">Create your account</div>
+        <div class="subtext" style="color: rgba(253,246,240,0.45);">Your progress will be saved securely</div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">EMAIL</div>
+          <div class="field-value" style="color: #FDF6F0;">sarah@example.com</div>
+        </div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">PASSWORD</div>
+          <div class="field-value" style="color: #FDF6F0;">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+        </div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">CONFIRM PASSWORD</div>
+          <div class="field-value" style="color: #FDF6F0;">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Create Account</div>
+        <div class="center" style="font-size: 11px; color: rgba(253,246,240,0.45);">Already have an account? <span style="color: #C4614A; text-decoration: underline;">Log in</span></div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Paywall -->
+    <div class="phone-wrapper"><div class="screen-label">Paywall</div>
+    <div class="phone light">
+      <div class="phone-content" style="gap: 8px;">
+        <div class="back-btn" style="color: #9B7B74;">&lsaquo; Back</div>
+        <div class="step-label">UNLOCK YOUR JOURNEY</div>
+        <div class="heading" style="color: #1C0F0C;">Choose your plan</div>
+        <div class="subtext" style="color: #9B7B74;">Continue your journey beyond the free trial</div>
+        <div class="plan-card" style="border: 1.5px dashed rgba(196,97,74,0.3); background: transparent;">
+          <div style="display: flex; justify-content: space-between; color: #1C0F0C;">
+            <span style="font-size: 13px; font-weight: 600;">Free</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #9B7B74;">&pound;0</span>
+          </div>
+          <div style="font-size: 10px; color: #9B7B74;">3 days only</div>
+        </div>
+        <div class="plan-card" style="background: #1C0F0C; border: 2px solid #C4614A; position: relative;">
+          <div style="position: absolute; top: -8px; right: 12px; background: #C4614A; color: white; font-size: 8px; font-family: 'DM Mono', monospace; letter-spacing: 0.12em; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">Best Value</div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 13px; font-weight: 600; color: #FDF6F0;">One Cycle</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #E8A598;">&pound;5.99</span>
+          </div>
+          <div style="font-size: 10px; color: rgba(253,246,240,0.5);">Full cycle access</div>
+        </div>
+        <div class="plan-card" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div style="display: flex; justify-content: space-between; color: #1C0F0C;">
+            <span style="font-size: 13px; font-weight: 600;">Gift a Cycle</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #C4614A;">&pound;12.99</span>
+          </div>
+          <div style="font-size: 10px; color: #9B7B74;">Give the gift of support</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Start Journey</div>
+        <div class="mono-xs center" style="color: #9B7B74;">First 3 days always free</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <!-- Day 4 Premium -->
+    <div class="phone-wrapper"><div class="screen-label">Day 4 (Premium)</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 4 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote — unlocked</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#127925; Music — unlocked</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128221; Journal — unlocked</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day 4 &rarr;</div>
+        <div style="text-align: center; margin-top: 4px;">
+          <div class="mono-xs" style="color: rgba(253,246,240,0.3);">&#10003; Premium — all days unlocked</div>
+        </div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<!-- ======================== JOURNEY 3 ======================== -->
+<div class="journey" id="j3">
+  <div class="journey-title">3. Returning User (Login)</div>
+  <div class="journey-desc">A user with an existing account logs in and is taken to the last day they completed.</div>
+  <div class="flow">
+
+    <div class="phone-wrapper"><div class="screen-label">Splash</div>
+    <div class="phone dark">
+      <div class="phone-content center" style="justify-content: center; gap: 12px;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #E8A598, #C4614A); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 28px;">&#127800;</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 700; color: #FDF6F0;">Cycle</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Begin</div>
+        <div class="btn btn-ghost-dark" style="border: 1px solid rgba(255,255,255,0.12);">I have an account &larr;</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Login (mocked)</div>
+    <div class="phone dark">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="back-btn" style="color: rgba(253,246,240,0.45);">&lsaquo; Back</div>
+        <div class="heading" style="color: #FDF6F0;">Welcome back</div>
+        <div class="subtext" style="color: rgba(253,246,240,0.45);">Log in to continue your journey</div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">EMAIL</div>
+          <div class="field-value" style="color: #FDF6F0;">sarah@example.com</div>
+        </div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">PASSWORD</div>
+          <div class="field-value" style="color: #FDF6F0;">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Log in</div>
+        <div class="center" style="font-size: 11px; color: rgba(253,246,240,0.45);">Don't have an account? <span style="color: #C4614A; text-decoration: underline;">Sign up</span></div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Last completed day (e.g. Day 12)</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 12 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span style="color: rgba(253,246,240,0.3); font-size: 11px; margin-left: 4px;">...</span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#127925; Music</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128221; Journal</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day 12 &rarr;</div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<!-- ======================== JOURNEY 4 ======================== -->
+<div class="journey" id="j4">
+  <div class="journey-title">4. Gift from Splash (New Visitor)</div>
+  <div class="journey-desc">Someone visits the app to gift a Cycle to a friend. They fill in recipient details, pay, and an email is automatically sent.</div>
+  <div class="flow">
+
+    <div class="phone-wrapper"><div class="screen-label">Splash</div>
+    <div class="phone dark">
+      <div class="phone-content center" style="justify-content: center; gap: 12px;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #E8A598, #C4614A); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 28px;">&#127800;</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 700; color: #FDF6F0;">Cycle</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Begin</div>
+        <div class="btn btn-ghost-dark">I have an account</div>
+        <div class="btn btn-ghost-dark" style="border-color: #C4614A !important; color: #C4614A;">Gift it to someone &larr;</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Gift — Compose</div>
+    <div class="phone light">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="back-btn" style="color: #9B7B74;">&lsaquo; Back</div>
+        <div class="step-label">GIFT A CYCLE</div>
+        <div class="heading" style="color: #1C0F0C;">Send support to someone you love</div>
+        <div style="background: rgba(196,97,74,0.06); border: 1px solid rgba(196,97,74,0.15); border-radius: 12px; padding: 10px 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: #1C0F0C; line-height: 1.5;">A Cycle is the gift of daily support through someone's fertility journey</div>
+        </div>
+        <div class="field" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div class="field-label" style="color: #9B7B74;">THEIR NAME</div>
+          <div class="field-value" style="color: #1C0F0C;">Sarah</div>
+        </div>
+        <div class="field" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div class="field-label" style="color: #9B7B74;">THEIR EMAIL</div>
+          <div class="field-value" style="color: #1C0F0C;">sarah@email.com</div>
+        </div>
+        <div class="field" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div class="field-label" style="color: #9B7B74;">PERSONAL MESSAGE</div>
+          <div class="field-value" style="color: #1C0F0C;">Thinking of you on this journey</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Continue to Payment</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Gift — Payment (mocked)</div>
+    <div class="phone light">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="back-btn" style="color: #9B7B74;">&lsaquo; Back</div>
+        <div class="step-label">COMPLETE YOUR GIFT</div>
+        <div class="heading" style="color: #1C0F0C;">Almost there</div>
+        <div class="subtext" style="color: #9B7B74;">For Sarah — one full cycle of daily support</div>
+        <div class="btn" style="background: #000; color: white;">&#127822; Apple Pay</div>
+        <div class="btn" style="background: white; color: #1a73e8; border: 2px solid #dadce0;">G Google Pay</div>
+        <div class="divider">
+          <div class="divider-line" style="background: rgba(196,97,74,0.15);"></div>
+          <span class="mono-xs" style="color: #9B7B74;">or pay by card</span>
+          <div class="divider-line" style="background: rgba(196,97,74,0.15);"></div>
+        </div>
+        <div class="field" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div class="field-label" style="color: #9B7B74;">CARD NUMBER</div>
+          <div class="field-value" style="color: #9B7B74;">4242 4242 4242 4242</div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <div class="field" style="flex: 1; background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+            <div class="field-label" style="color: #9B7B74;">MM/YY</div>
+          </div>
+          <div class="field" style="flex: 1; background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+            <div class="field-label" style="color: #9B7B74;">CVC</div>
+          </div>
+        </div>
+        <div class="btn btn-accent">Pay & Send Gift</div>
+        <div class="mono-xs center" style="color: #9B7B74;">&#128274; Secure checkout</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Sending...</div>
+    <div class="phone light">
+      <div class="phone-content center" style="justify-content: center; gap: 16px;">
+        <div style="font-size: 48px;">&#9993;&#65039;</div>
+        <div style="font-size: 14px; color: #9B7B74;">Sending gift to Sarah...</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Gift Sent!</div>
+    <div class="phone light">
+      <div class="phone-content center" style="justify-content: center; gap: 14px;">
+        <div style="font-size: 56px;">&#9993;&#65039;</div>
+        <div class="heading" style="color: #1C0F0C;">Gift sent!</div>
+        <div class="subtext" style="color: #9B7B74; line-height: 1.6;">We've sent an email to <strong style="color: #1C0F0C;">sarah@email.com</strong> with instructions to create their account.</div>
+        <div class="card card-light center">
+          <div class="mono-xs" style="color: #9B7B74;">SENT TO</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #1C0F0C;">Sarah</div>
+          <div style="font-size: 12px; color: #9B7B74;">sarah@email.com</div>
+        </div>
+        <div class="btn btn-accent">Done</div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<!-- ======================== JOURNEY 5 ======================== -->
+<div class="journey" id="j5">
+  <div class="journey-title">5. Gift from Paywall / End of Cycle</div>
+  <div class="journey-desc">An existing user selects "Gift" from the paywall or "Gift to a friend" from the end-of-cycle screen. Same compose &rarr; payment &rarr; sent flow. The buyer does NOT receive premium — the gift is for someone else. "Done" returns them to Day 3.</div>
+  <div class="flow">
+
+    <div class="phone-wrapper"><div class="screen-label">Paywall (Gift selected)</div>
+    <div class="phone light">
+      <div class="phone-content" style="gap: 8px;">
+        <div class="step-label">UNLOCK YOUR JOURNEY</div>
+        <div class="heading" style="color: #1C0F0C;">Choose your plan</div>
+        <div class="plan-card" style="border: 1.5px dashed rgba(196,97,74,0.3);">
+          <div style="font-size: 13px; color: #1C0F0C;">Free — &pound;0</div>
+        </div>
+        <div class="plan-card" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div style="font-size: 13px; color: #1C0F0C;">One Cycle — &pound;5.99</div>
+        </div>
+        <div class="plan-card" style="background: rgba(196,97,74,0.04); border: 2px solid #C4614A;">
+          <div style="font-size: 13px; font-weight: 600; color: #1C0F0C;">Gift a Cycle — &pound;12.99 &#10003;</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Gift a Cycle</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">OR: End of Cycle</div>
+    <div class="phone fierce">
+      <div class="phone-content center" style="justify-content: center; gap: 14px;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #E8A598, #C4614A); margin: 0 auto; box-shadow: 0 0 40px rgba(196,97,74,0.6);"></div>
+        <div class="heading" style="color: #FDF6F0;">You completed your cycle, Sarah</div>
+        <div class="btn btn-accent">Start New Cycle</div>
+        <div class="btn btn-ghost-dark">Gift to a Friend</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Compose &rarr; Pay &rarr; Sent</div>
+    <div class="phone light">
+      <div class="phone-content center" style="justify-content: center; gap: 14px;">
+        <div style="font-size: 36px;">&#128260;</div>
+        <div class="heading" style="color: #1C0F0C; font-size: 20px;">Same flow as Journey 4</div>
+        <div class="subtext" style="color: #9B7B74;">Compose &rarr; Payment &rarr; Sending &rarr; Sent</div>
+        <div style="padding: 10px; border-radius: 10px; background: rgba(196,97,74,0.06); border: 1px solid rgba(196,97,74,0.12);">
+          <div class="mono-xs" style="color: #9B7B74;">Buyer does NOT get premium.<br>"Done" returns to Day 3 (still free).<br>Only the recipient gets premium.</div>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<!-- ======================== EMAIL MOCKUP ======================== -->
+<div class="journey" id="j-email" style="margin-bottom: 48px;">
+  <div class="journey-title">Gift Email — What the recipient sees</div>
+  <div class="journey-desc">This is the email sent automatically to the recipient after payment. It contains the sender's name, personal message, and a CTA to create an account.</div>
+
+  <div style="max-width: 520px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+    <!-- Email client chrome -->
+    <div style="background: #1a1a1a; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <div style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f57;"></div>
+        <div style="width: 10px; height: 10px; border-radius: 50%; background: #febc2e;"></div>
+        <div style="width: 10px; height: 10px; border-radius: 50%; background: #28c840;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(253,246,240,0.3); letter-spacing: 0.05em;">FROM</div>
+          <div style="font-size: 13px; color: rgba(253,246,240,0.7);">Cycle <span style="color: rgba(253,246,240,0.3);">&lt;noreply@cycle.app&gt;</span></div>
+        </div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(253,246,240,0.25);">Just now</div>
+      </div>
+      <div style="margin-top: 6px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(253,246,240,0.3); letter-spacing: 0.05em;">TO</div>
+        <div style="font-size: 13px; color: rgba(253,246,240,0.7);">sarah@email.com</div>
+      </div>
+      <div style="margin-top: 8px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(253,246,240,0.3); letter-spacing: 0.05em;">SUBJECT</div>
+        <div style="font-size: 15px; font-weight: 600; color: #FDF6F0;">Anna gifted you something special &#127873;</div>
+      </div>
+    </div>
+
+    <!-- Email body -->
+    <div style="background: #FDF6F0; padding: 0;">
+      <!-- Header with orb -->
+      <div style="background: #0E0E0E; padding: 40px 32px; text-align: center;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #E8A598, #C4614A); margin: 0 auto 16px; box-shadow: 0 8px 30px rgba(196,97,74,0.5); display: flex; align-items: center; justify-content: center; font-size: 24px;">&#127800;</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; color: #FDF6F0; margin-bottom: 4px;">Cycle</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.35); letter-spacing: 0.2em; text-transform: uppercase;">A gift for you</div>
+      </div>
+
+      <!-- Body content -->
+      <div style="padding: 32px;">
+        <div style="font-family: 'Karla', sans-serif; font-size: 15px; color: #1C0F0C; line-height: 1.7;">
+          <p style="margin: 0 0 16px;">Hi <strong>Sarah</strong>,</p>
+          <p style="margin: 0 0 16px;"><strong>Anna</strong> has gifted you full access to <strong>Cycle</strong> — a daily companion through your fertility journey.</p>
+        </div>
+
+        <!-- Personal message card -->
+        <div style="background: rgba(196,97,74,0.06); border: 1px solid rgba(196,97,74,0.15); border-radius: 14px; padding: 20px; margin: 20px 0; text-align: center;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: #9B7B74; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">A message from Anna</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; color: #1C0F0C; line-height: 1.5;">"Thinking of you on this journey. You're not alone in this."</div>
+        </div>
+
+        <!-- What you get -->
+        <div style="font-family: 'Karla', sans-serif; font-size: 13px; color: #9B7B74; line-height: 1.6; margin: 20px 0 8px;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;">What you'll get</div>
+          <div style="display: flex; gap: 8px; margin-bottom: 6px; align-items: center;">
+            <span style="font-size: 14px;">&#128172;</span>
+            <span style="color: #1C0F0C;">Daily personalised quotes</span>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 6px; align-items: center;">
+            <span style="font-size: 14px;">&#127925;</span>
+            <span style="color: #1C0F0C;">Curated playlists for your mood</span>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 6px; align-items: center;">
+            <span style="font-size: 14px;">&#128221;</span>
+            <span style="color: #1C0F0C;">Guided journaling prompts</span>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 6px; align-items: center;">
+            <span style="font-size: 14px;">&#128588;</span>
+            <span style="color: #1C0F0C;">Daily affirmations & meditation</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 14px;">&#127793;</span>
+            <span style="color: #1C0F0C;">Full cycle of daily support</span>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div style="text-align: center; margin: 28px 0 20px;">
+          <a href="#" style="display: inline-block; background: #C4614A; color: white; font-family: 'Karla', sans-serif; font-size: 16px; font-weight: 700; padding: 16px 48px; border-radius: 14px; text-decoration: none; box-shadow: 0 4px 16px rgba(196,97,74,0.35);">Open Your Gift</a>
+        </div>
+
+        <div style="text-align: center; font-family: 'Karla', sans-serif; font-size: 12px; color: #9B7B74; line-height: 1.6; margin-bottom: 8px;">
+          Create your account and start your journey.<br>No payment needed — it's already been taken care of.
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="border-top: 1px solid rgba(196,97,74,0.1); padding: 20px 32px; text-align: center;">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 700; color: #1C0F0C; margin-bottom: 4px;">Cycle</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: #9B7B74; letter-spacing: 0.1em;">Your daily companion through fertility</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 8px; color: #ccc; margin-top: 12px; line-height: 1.6;">
+          You received this email because someone gifted you a Cycle.<br>
+          <span style="text-decoration: underline;">Unsubscribe</span> &middot; <span style="text-decoration: underline;">Privacy Policy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== JOURNEY 6 ======================== -->
+<div class="journey" id="j6">
+  <div class="journey-title">6. Gift Recipient Redeems</div>
+  <div class="journey-desc">The recipient clicks "Open Your Gift" in the email, lands on the redeem page, creates an account (premium auto-granted), then goes through onboarding with all days unlocked.</div>
+  <div class="flow">
+
+    <div class="phone-wrapper"><div class="screen-label">Clicks "Open Your Gift" in email</div>
+    <div class="phone" style="background: #f5f5f5;">
+      <div class="phone-content center" style="justify-content: center; gap: 12px;">
+        <div style="font-size: 40px;">&#9993;&#65039;</div>
+        <div style="font-size: 14px; font-weight: 600; color: #1C0F0C;">Inbox</div>
+        <div style="background: white; border-radius: 12px; padding: 14px; width: 100%; border: 1px solid #e0e0e0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <div style="font-size: 12px; font-weight: 700; color: #1C0F0C;">Cycle</div>
+            <div style="font-size: 10px; color: #999;">Just now</div>
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: #1C0F0C; margin-bottom: 4px;">Anna gifted you something special &#127873;</div>
+          <div style="font-size: 11px; color: #666; line-height: 1.4;">Hi Sarah, Anna has gifted you full access to Cycle...</div>
+        </div>
+        <div style="font-size: 11px; color: #999; margin-top: 4px;">Taps email &rarr; Taps "Open Your Gift"</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Gift Redeem — Welcome</div>
+    <div class="phone dark">
+      <div class="phone-content center" style="justify-content: center; gap: 14px;">
+        <div class="emoji-xl">&#127873;</div>
+        <div class="heading" style="color: #FDF6F0;">Someone gifted you<br>a Cycle</div>
+        <div style="font-size: 13px; color: rgba(253,246,240,0.45);">From <span style="color: #C4614A;">Anna</span></div>
+        <div class="card card-dark center">
+          <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #FDF6F0; line-height: 1.6;">"Thinking of you on this journey"</div>
+        </div>
+        <div class="subtext" style="color: rgba(253,246,240,0.45); line-height: 1.6;">You've been given full access to Cycle. Create an account to begin.</div>
+        <div class="btn btn-accent">Create your account</div>
+        <div class="center" style="font-size: 11px; color: rgba(253,246,240,0.45);">Already have an account? <span style="color: #C4614A; text-decoration: underline;">Log in</span></div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Gift Redeem — Register</div>
+    <div class="phone dark">
+      <div class="phone-content" style="gap: 10px;">
+        <div class="back-btn" style="color: rgba(253,246,240,0.45);">&lsaquo; Back</div>
+        <div class="step-label">YOUR GIFT AWAITS</div>
+        <div class="heading" style="color: #FDF6F0;">Create your account</div>
+        <div class="subtext" style="color: rgba(253,246,240,0.45);">Your Cycle has been paid for — just set up your account.</div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">EMAIL</div>
+          <div class="field-value" style="color: #FDF6F0;">sarah@email.com</div>
+        </div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">PASSWORD</div>
+          <div class="field-value" style="color: #FDF6F0;">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+        </div>
+        <div class="field">
+          <div class="field-label" style="color: rgba(253,246,240,0.45);">CONFIRM PASSWORD</div>
+          <div class="field-value" style="color: #FDF6F0;">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Start your journey</div>
+        <div class="mono-xs center" style="color: rgba(253,246,240,0.3);">No payment needed — this is a gift</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Onboarding (premium)</div>
+    <div class="phone" style="background: #FDF6F0;">
+      <div class="phone-content center" style="justify-content: center; gap: 14px;">
+        <div style="font-size: 36px;">&#128260;</div>
+        <div class="heading" style="color: #1C0F0C; font-size: 20px;">Full onboarding</div>
+        <div class="subtext" style="color: #9B7B74;">Name &rarr; Treatment &rarr; Cycle Length &rarr; Components &rarr; Vibe &rarr; Music &rarr; Summary</div>
+        <div style="padding: 10px; border-radius: 10px; background: rgba(196,97,74,0.06); border: 1px solid rgba(196,97,74,0.12);">
+          <div class="mono-xs" style="color: #9B7B74;">No paywall — premium already granted. Goes straight to Day 1 with all days unlocked.</div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Day 1 (all unlocked)</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 1 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#127925; Music</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128221; Journal</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day 1 &rarr;</div>
+        <div class="mono-xs center" style="color: rgba(253,246,240,0.3);">&#10003; Gift from Anna — all days unlocked</div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<!-- ======================== JOURNEY 7 ======================== -->
+<div class="journey" id="j7">
+  <div class="journey-title">7. Free User Hits Day 4 Lock</div>
+  <div class="journey-desc">A registered free user tries to access day 4. Content is blurred with a lock overlay and an upgrade button leading to the paywall.</div>
+  <div class="flow">
+
+    <div class="phone-wrapper"><div class="screen-label">Day 3 — Free user</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 3 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#127925; Music</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day 3 &rarr;</div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Day 4 — Locked</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 4 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark blurred" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote — blurred</div>
+        <div class="card card-dark blurred" style="color: #FDF6F0; font-size: 12px;">&#127925; Music — blurred</div>
+        <div class="card card-dark center" style="padding: 20px;">
+          <div class="lock-icon">&#128274;</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #FDF6F0; margin-bottom: 6px;">Day 4 is locked</div>
+          <div style="font-size: 11px; color: rgba(253,246,240,0.45); margin-bottom: 12px;">Unlock to continue your journey</div>
+          <div class="btn btn-accent" style="font-size: 13px;">Unlock Full Access</div>
+        </div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Paywall</div>
+    <div class="phone light">
+      <div class="phone-content" style="gap: 8px;">
+        <div class="step-label">UNLOCK YOUR JOURNEY</div>
+        <div class="heading" style="color: #1C0F0C;">Choose your plan</div>
+        <div class="plan-card" style="border: 1.5px dashed rgba(196,97,74,0.3);">
+          <div style="display: flex; justify-content: space-between; color: #1C0F0C;">
+            <span style="font-size: 13px;">Free</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #9B7B74;">&pound;0</span>
+          </div>
+          <div style="font-size: 10px; color: #9B7B74;">3 days only</div>
+        </div>
+        <div class="plan-card" style="background: #1C0F0C; border: 2px solid #C4614A;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 13px; font-weight: 600; color: #FDF6F0;">One Cycle</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #E8A598;">&pound;5.99</span>
+          </div>
+        </div>
+        <div class="plan-card" style="background: white; border: 1.5px solid rgba(196,97,74,0.2);">
+          <div style="display: flex; justify-content: space-between; color: #1C0F0C;">
+            <span style="font-size: 13px;">Gift</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #C4614A;">&pound;12.99</span>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Start Journey</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&rarr;</div>
+
+    <div class="phone-wrapper"><div class="screen-label">Day 4 — Unlocked</div>
+    <div class="phone fierce">
+      <div class="phone-content" style="gap: 10px;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.4);">Day 4 of 28</div>
+        <div style="margin-bottom: 8px;">
+          <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span>
+        </div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128172; Quote — unlocked</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#127925; Music — unlocked</div>
+        <div class="card card-dark" style="color: #FDF6F0; font-size: 12px;">&#128221; Journal — unlocked</div>
+        <div class="spacer"></div>
+        <div class="btn btn-accent">Complete Day 4 &rarr;</div>
+        <div class="mono-xs center" style="color: rgba(253,246,240,0.3);">&#10003; Premium</div>
+        <div class="nav-bar" style="border-color: rgba(255,255,255,0.06);">
+          <div class="nav-item nav-active">Today</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Progress</div>
+          <div class="nav-item" style="color: rgba(253,246,240,0.3);">Settings</div>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+<div style="text-align: center; padding: 40px 0; color: rgba(253,246,240,0.2); font-family: 'DM Mono', monospace; font-size: 11px;">
+  Cycle App &mdash; User Journey Documentation &mdash; Generated 2026-04-05
+</div>
+
+</body>
+</html>

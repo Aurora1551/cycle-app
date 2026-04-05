@@ -18,7 +18,6 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest }) => 
   const mutedColor = 'rgba(253,246,240,0.45)'
 
   const handleContinueGuest = () => {
-    localStorage.setItem('cycle_register_dismissed', '1')
     onContinueGuest()
   }
 
@@ -26,10 +25,10 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest }) => 
     <ScreenShell bg={bg} visible={visible}>
       <div className="content" style={{ gap: 16, textAlign: 'center', justifyContent: 'center', minHeight: '80vh' }}>
         <div style={{ fontSize: 48, marginBottom: 8 }}>🔒</div>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 700, color: textColor, lineHeight: 1.1, margin: 0 }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: textColor, lineHeight: 1.1, margin: 0 }}>
           {t('registerGate.heading')}
         </h1>
-        <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, color: mutedColor, lineHeight: 1.6, margin: '0 0 12px' }}>
+        <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: mutedColor, lineHeight: 1.6, margin: '0 0 12px' }}>
           {t('registerGate.subtext')}
         </p>
 

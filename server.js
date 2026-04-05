@@ -174,12 +174,24 @@ const LANGUAGE_NAMES = {
   en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese'
 }
 
+function getCyclePhase(dayNumber, totalDays) {
+  const progress = dayNumber / totalDays
+  if (progress <= 0.15) return { phase: 'beginning', tone: 'hopeful, energetic, fresh start energy. The user is just starting — content should feel like opening a new chapter. Be encouraging about the journey ahead without being naive about the difficulty.' }
+  if (progress <= 0.35) return { phase: 'early', tone: 'building momentum, settling in. The novelty has worn off but routine hasn\'t set in yet. Content should acknowledge that showing up repeatedly takes real effort. Be warm but honest.' }
+  if (progress <= 0.55) return { phase: 'middle', tone: 'grounding, patient, steady. This is the long middle — content should help the user stay present rather than constantly looking ahead. Focus on today, not the outcome. Deeper journal prompts, more reflective quotes.' }
+  if (progress <= 0.75) return { phase: 'late', tone: 'calming, reassuring, gentle. The user may be anxious about results or what comes next. Content should be soothing and validate any feelings of uncertainty. Avoid toxic positivity — acknowledge that waiting is hard.' }
+  return { phase: 'final', tone: 'celebratory but tender. The end is near — content should honour everything they\'ve been through. Reflective, meaningful, looking back with pride while staying open to whatever comes next.' }
+}
+
 function buildUserPrompt({ name, treatment, dayNumber, totalDays, vibe, genres, language }) {
   const lang = LANGUAGE_NAMES[language] || 'English'
   const langInstruction = language && language !== 'en'
     ? `\n\nIMPORTANT: Generate ALL content in ${lang}. The quote, affirmation, journal prompt, gratitude prompt, breathing lines, and song recommendation should all be in ${lang}. For song recommendations, prefer songs in ${lang} or that are popular in ${lang}-speaking countries, but you may also suggest well-known English songs if they fit the vibe.`
     : ''
+  const { phase, tone: phaseTone } = getCyclePhase(dayNumber, totalDays)
   return `Generate today's content for ${name} who is on Day ${dayNumber} of ${totalDays} of their ${treatment} cycle. Their vibe is ${vibe}. Their music preferences are ${genres.join(', ')}.
+
+CYCLE PHASE: ${phase} (day ${dayNumber}/${totalDays}). Emotional tone for this phase: ${phaseTone}
 
 Generate:
 1) A powerful quote relevant to her specific day and treatment — use varied quotes from diverse women including Frida Kahlo, Maya Angelou, Rupi Kaur, Brené Brown, Gloria Anzaldúa, Michelle Obama and others — never the same quote twice across the cycle.
