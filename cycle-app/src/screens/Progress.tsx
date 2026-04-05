@@ -68,6 +68,29 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay }) => {
             ))}
           </div>
         </Card>
+        {/* Saved favorites */}
+        {(() => {
+          let favs: Array<{ type: string; text: string; author?: string; day: number }> = []
+          try { favs = JSON.parse(localStorage.getItem('cycle_favorites') || '[]') } catch {}
+          if (favs.length === 0) return null
+          return (
+            <Card cardBg={cardBg} cardBorder={cardBorder}>
+              <SectionLabel color={vibe.accent}>&#9829; {t('progress.saved', 'Saved')}</SectionLabel>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {favs.map((f, i) => (
+                  <div key={i} style={{ borderBottom: i < favs.length - 1 ? `1px solid ${cardBorder}` : 'none', paddingBottom: i < favs.length - 1 ? 12 : 0 }}>
+                    <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 15, color: textColor, lineHeight: 1.4 }}>
+                      {f.type === 'quote' ? `"${f.text}"` : f.text}
+                    </div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 4, letterSpacing: '0.1em' }}>
+                      {f.author ? `— ${f.author} · ` : ''}{f.type.toUpperCase()} · DAY {f.day}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )
+        })()}
       </div>
     </ScreenShell>
   )

@@ -47,7 +47,7 @@ export const VIBE_CONTENT: Record<string, {
   friendNote: { emoji: string; heading: string; text: string }
 }> = {
   fierce: {
-    splash: { tagline: 'DAY BY DAY, FIRE BY FIRE', subtitle: 'Your daily strength companion · 14-day egg freezing cycle' },
+    splash: { tagline: 'DAY BY DAY, FIRE BY FIRE', subtitle: 'Your daily strength companion' },
     dayHeader: { tagline: 'DAY BY DAY, FIRE BY FIRE', title: "She's Got This", subtitle: 'Your daily strength companion' },
     labels: {
       quote: { emoji: '🔥', text: "TODAY'S FIRE" },

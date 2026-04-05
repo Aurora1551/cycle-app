@@ -417,11 +417,16 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
   const [error, setError] = useState<string | null>(null)
   const [journalText, setJournalText] = useState('')
   const [journalSaved, setJournalSaved] = useState(false)
+  const [favorites, setFavorites] = useState<Array<{ type: string; text: string; author?: string; day: number }>>(() => {
+    try { return JSON.parse(localStorage.getItem('cycle_favorites') || '[]') } catch { return [] }
+  })
   const [dayDone, setDayDone] = useState(() => localStorage.getItem(`cycle_day_${dayNumber}_done`) === '1')
   const [meditationStarted, setMeditationStarted] = useState(false)
   const [spotifyConnected, setSpotifyConnected] = useState(() => localStorage.getItem('spotify_connected') === '1')
   const [spotifyTrack, setSpotifyTrack] = useState<{ trackUri: string; trackUrl: string } | null>(null)
   const [showSpotifyPopup, setShowSpotifyPopup] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
+  const [mood, setMood] = useState<string | null>(() => localStorage.getItem(`cycle_mood_day${dayNumber}`))
   const visible = useFadeIn(80)
 
   const vibe = resolveVibe(data.vibe)
@@ -437,6 +442,17 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     }
     return set
   }, [data.cycleDays, dayDone, dayNumber])
+
+  // Streak: count consecutive completed days ending at current position
+  const streak = React.useMemo(() => {
+    let count = 0
+    for (let d = dayNumber; d >= 1; d--) {
+      if (completedDays.has(d)) count++
+      else break
+    }
+    return count
+  }, [completedDays, dayNumber])
+
   // Cache key includes user name + vibe to bust cache when profile changes
   const localKey = `cycle_content_${data.name}_${data.vibe}_day${dayNumber}`
 
@@ -521,7 +537,9 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     if (dayDone) return
     localStorage.setItem(`cycle_day_${dayNumber}_done`, '1')
     setDayDone(true)
+    setShowCelebration(true)
     track('day_marked_done', { day_number: dayNumber })
+    setTimeout(() => setShowCelebration(false), 3000)
     onDayComplete()
   }
 
@@ -529,6 +547,17 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     localStorage.removeItem(`cycle_day_${dayNumber}_done`)
     setDayDone(false)
   }
+
+  const toggleFavorite = (type: string, text: string, author?: string) => {
+    const exists = favorites.some(f => f.type === type && f.day === dayNumber)
+    const next = exists
+      ? favorites.filter(f => !(f.type === type && f.day === dayNumber))
+      : [...favorites, { type, text, author, day: dayNumber }]
+    setFavorites(next)
+    localStorage.setItem('cycle_favorites', JSON.stringify(next))
+  }
+
+  const isFavorited = (type: string) => favorites.some(f => f.type === type && f.day === dayNumber)
   const spotifySearchUrl = content ? `https://open.spotify.com/search/${encodeURIComponent(`${content.songTitle} ${content.songArtist}`)}` : ''
   // Deduplicate: meditation and breathing both render the same Guided Breathing card
   const deduped = [...data.components].sort((a, b) => COMPONENT_ORDER.indexOf(a) - COMPONENT_ORDER.indexOf(b))
@@ -559,7 +588,25 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
         <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
           {vibeLabel(vibeContent.labels.quote)}
           <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8 }}>"{content?.quote}"</div>
-          <div className="mono-sm" style={{ color: vibe.accent }}>— {content?.quoteAuthor}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="mono-sm" style={{ color: vibe.accent }}>— {content?.quoteAuthor}</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => { toggleFavorite('quote', content?.quote || '', content?.quoteAuthor); track('quote_favorited', { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '4px 0', transition: 'transform 0.2s' }} title="Save quote">
+                {isFavorited('quote') ? <span style={{ color: '#E8707A' }}>&#9829;</span> : <span style={{ opacity: 0.35 }}>&#9825;</span>}
+              </button>
+              <button onClick={() => {
+                const text = `"${content?.quote}" — ${content?.quoteAuthor}\n\nShared via Cycle`
+                if (navigator.share) {
+                  navigator.share({ text }).catch(() => {})
+                } else {
+                  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+                }
+                track('quote_shared', { day_number: dayNumber })
+              }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, opacity: 0.5, padding: '4px 0' }} title="Share">
+                &#8599;
+              </button>
+            </div>
+          </div>
         </Card>
       )
     }
@@ -600,6 +647,11 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.affirmation)}
         <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 18, fontWeight: typo.headingWeight, color: vibe.accent, lineHeight: 1.4, textAlign: 'center', padding: '8px 0' }}>{content?.affirmation}</div>
+        <div style={{ textAlign: 'center' }}>
+          <button onClick={() => { toggleFavorite('affirmation', content?.affirmation || ''); track('affirmation_favorited', { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '4px 8px' }}>
+            {isFavorited('affirmation') ? <span style={{ color: '#E8707A' }}>&#9829;</span> : <span style={{ opacity: 0.35 }}>&#9825;</span>}
+          </button>
+        </div>
       </Card>
     )
     if (component === 'journal') return (
@@ -623,7 +675,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
         <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
           <button onClick={() => { setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `${vibe.accent}15`, border: `1px solid ${vibe.accent}30`, borderRadius: 12, padding: '20px', cursor: 'pointer', fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 14, color: vibe.accent }}>
-            Take a moment · ~35s
+            Breathe with me · 35s
           </button>
         ) : (
           <YourMoment
@@ -709,6 +761,11 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
               <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
                 of {data.cycleDays} days
               </div>
+              {streak > 0 && (
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.08em', marginTop: 6, opacity: 0.8 }}>
+                  &#127793; {streak} {streak === 1 ? 'day' : 'days'} of loving yourself
+                </div>
+              )}
             </div>
             {/* Right side: clickable dots grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, alignSelf: 'center' }}>
@@ -741,6 +798,33 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
             </div>
           </div>
         </Card>
+      </div>
+
+      {/* Mood check-in */}
+      <div style={{ padding: '0 18px 8px', display: 'flex', justifyContent: 'center', gap: 6 }}>
+        {[
+          { key: 'great', emoji: '&#128525;', label: 'Great' },
+          { key: 'good', emoji: '&#128522;', label: 'Good' },
+          { key: 'okay', emoji: '&#128528;', label: 'Okay' },
+          { key: 'tough', emoji: '&#128532;', label: 'Tough' },
+          { key: 'hard', emoji: '&#128557;', label: 'Hard' },
+        ].map(m => (
+          <button key={m.key} onClick={() => {
+            const val = mood === m.key ? null : m.key
+            setMood(val)
+            if (val) { localStorage.setItem(`cycle_mood_day${dayNumber}`, val); track('mood_logged', { day_number: dayNumber, mood: val }) }
+            else localStorage.removeItem(`cycle_mood_day${dayNumber}`)
+          }} style={{
+            background: mood === m.key ? `${vibe.accent}20` : 'transparent',
+            border: mood === m.key ? `1.5px solid ${vibe.accent}40` : '1.5px solid transparent',
+            borderRadius: 10, padding: '6px 10px', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+            transition: 'all 0.2s', opacity: mood && mood !== m.key ? 0.4 : 1,
+          }}>
+            <span style={{ fontSize: 20 }} dangerouslySetInnerHTML={{ __html: m.emoji }} />
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, letterSpacing: '0.05em' }}>{m.label}</span>
+          </button>
+        ))}
       </div>
 
       {loading ? (
@@ -847,23 +931,34 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
           transition: 'all 0.2s', flexShrink: 0,
         }}
       >‹</button>
-      {/* Mark Day X done / completed with undo */}
-      {dayDone ? (
+      {/* Mark Day done / celebration / undo */}
+      {showCelebration ? (
+        <div style={{
+          flex: 1, height: 48, borderRadius: 14,
+          background: `${vibe.accent}20`,
+          border: `1.5px solid ${vibe.accent}40`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 14,
+          color: vibe.accent, animation: 'fadeIn 0.5s ease',
+        }}>
+          &#10024; Day {dayNumber} — you showed up &#10024;
+        </div>
+      ) : dayDone ? (
         <button
           onClick={unmarkDone}
           style={{
             flex: 1, height: 48, borderRadius: 14,
             background: 'transparent',
             color: vibe.accent,
-            border: `1.5px solid ${vibe.accent}50`,
-            fontFamily: typo.bodyFont, fontWeight: 700, fontSize: 14,
+            border: `1.5px solid ${vibe.accent}40`,
+            fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13,
             cursor: 'pointer',
             transition: 'all 0.3s',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           }}
         >
-          <span>✓ Day {dayNumber} complete</span>
-          <span style={{ fontSize: 15, opacity: 0.7 }}>↩</span>
+          <span>&#10003; Day {dayNumber} done</span>
+          <span style={{ fontSize: 11, opacity: 0.5 }}>undo</span>
         </button>
       ) : (
         <button
@@ -878,7 +973,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
             transition: 'all 0.3s',
           }}
         >
-          Mark Day {dayNumber} done ✓
+          I showed up today &#10003;
         </button>
       )}
       {/* Right arrow */}

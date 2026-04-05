@@ -60,6 +60,24 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
           <div style={{ fontSize: 11, color: M }}>{t('paywall.giftDetails')}</div>
         </button>
 
+        {/* What you'll get */}
+        <div style={{ background: 'rgba(196,97,74,0.04)', border: `1px solid rgba(196,97,74,0.1)`, borderRadius: 14, padding: '14px 16px', marginTop: 4 }}>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: A, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>What you'll get every day</div>
+          {[
+            { emoji: '&#128172;', text: 'Personalised daily quote' },
+            { emoji: '&#127925;', text: 'Curated music for your mood' },
+            { emoji: '&#9998;', text: 'Guided journaling prompts' },
+            { emoji: '&#10024;', text: '35-second breathing exercise' },
+            { emoji: '&#9889;', text: 'Daily affirmation' },
+            { emoji: '&#128155;', text: 'A note from your person' },
+          ].map((f, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 0' }}>
+              <span style={{ fontSize: 14 }} dangerouslySetInnerHTML={{ __html: f.emoji }} />
+              <span style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: T }}>{f.text}</span>
+            </div>
+          ))}
+        </div>
+
         <div className="spacer" />
         <button onClick={() => { if (selected === 'free') onStartFree(); else onSelectPlan(selected) }} className="btn-primary" style={{ background: A }}>
           {selected === 'free' ? t('paywall.startFree') : selected === 'gift' ? t('paywall.giftButton') : t('paywall.startJourney')}

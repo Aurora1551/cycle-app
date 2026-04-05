@@ -16,6 +16,8 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
   const { t } = useTranslation()
   const visible = useFadeIn(80)
   const [orb, setOrb] = useState(false)
+  const [reflection, setReflection] = useState('')
+  const [reflectionSaved, setReflectionSaved] = useState(false)
 
   const vibe = resolveVibe(data.vibe)
   const typo = resolveTypo(data.vibe)
@@ -46,6 +48,41 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
         <p style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 16, color: mutedColor, lineHeight: 1.6, textAlign: 'center', maxWidth: 280 }}>
           {t('endOfCycle.message', { days: data.cycleDays })}
         </p>
+
+        {/* Reflection prompt */}
+        <Card cardBg={cardBg} cardBorder={cardBorder} style={{ width: '100%' }}>
+          <SectionLabel color={vibe.accent}>&#128140; BEFORE YOU GO</SectionLabel>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 16, color: textColor, lineHeight: 1.5, marginBottom: 12 }}>
+            What's one thing you want to remember from this cycle?
+          </div>
+          <textarea
+            value={reflection}
+            onChange={e => setReflection(e.target.value)}
+            placeholder="This is just for you..."
+            rows={3}
+            style={{
+              width: '100%', background: `${vibe.accent}08`, border: `1px solid ${cardBorder}`, borderRadius: 10,
+              padding: '12px', fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 14,
+              color: textColor, resize: 'vertical', outline: 'none', caretColor: vibe.accent,
+              lineHeight: 1.5, boxSizing: 'border-box',
+            }}
+          />
+          {reflection.trim() && (
+            <button onClick={() => {
+              localStorage.setItem('cycle_reflection', JSON.stringify({ text: reflection, date: new Date().toISOString(), cycleDays: data.cycleDays }))
+              setReflectionSaved(true)
+              setTimeout(() => setReflectionSaved(false), 2000)
+            }} style={{
+              marginTop: 8, background: reflectionSaved ? `${vibe.accent}20` : vibe.accent,
+              color: reflectionSaved ? vibe.accent : 'white',
+              border: reflectionSaved ? `1px solid ${vibe.accent}40` : 'none',
+              borderRadius: 10, padding: '10px 18px', fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', fontFamily: typo.bodyFont, transition: 'all 0.2s',
+            }}>
+              {reflectionSaved ? 'Saved &#10003;' : 'Save this'}
+            </button>
+          )}
+        </Card>
 
         <Card cardBg={cardBg} cardBorder={cardBorder} style={{ width: '100%' }}>
           <SectionLabel color={vibe.accent}>{t('endOfCycle.yourJourney')}</SectionLabel>

@@ -65,10 +65,18 @@
       <span class="item-title">No "bad day" or failed cycle path</span>
       <span class="severity critical">Critical</span>
     </div>
-    <div class="item-problem">If a user's cycle fails, transfer doesn't work, or they get a negative test — the app has nothing for them. It keeps showing cheerful quotes and affirmations. On r/infertility and r/IVF, this is the #1 complaint about wellness apps. Users going through the hardest moment of their journey get tone-deaf positivity.</div>
+    <div class="item-problem"><strong>You only know a cycle failed at the end</strong> — when results come in. You don't know on day 8. So this isn't a mid-cycle feature, it's an <strong>end-of-cycle branch</strong>.<br><br>Currently the end-of-cycle screen is purely celebratory ("You did it!", stats, share). But not every cycle ends in good news. If a user just got a negative result, the celebration screen is devastating. It needs a second path.<br><br><strong>How it differs from Pause (#2):</strong> Pause = "I need a break." This = "My cycle ended and it didn't work." Pause happens anytime. This happens specifically at the end.</div>
     <div class="item-fix">
       <div class="item-fix-label">Suggested fix</div>
-      Add a "This cycle didn't go as planned" option accessible from the day screen or settings. Lead to grief-appropriate content: acknowledgment ("This is devastating, and your feelings are valid"), a gentle breathing exercise, a journal prompt about processing loss, and an option to pause the cycle. The AI content generation should shift tone entirely when this is active.
+      Restructure the end-of-cycle screen into two moments:<br><br>
+      <strong>Moment 1 — Celebrate the completion (everyone sees this):</strong><br>
+      "You completed this cycle." Glowing orb, stats (days completed, journal entries, songs played). This is the achievement — showing up every single day IS the thing worth celebrating, regardless of what comes next. Breathing exercise. Reflection prompt ("What's one thing you want to remember from this cycle?").<br><br>
+      <strong>Moment 2 — Gently ask what's next:</strong><br>
+      After the celebration, a simple question: "What's next for you?"<br>
+      &bull; <strong>"Good news — I'm moving forward"</strong> &rarr; extra celebration, option to start new cycle or gift to a friend<br>
+      &bull; <strong>"It didn't go as I hoped"</strong> &rarr; tender acknowledgment ("This is hard. You showed up every single day, and that matters."), option to take a break or start a new cycle when ready<br>
+      &bull; <strong>"I'm not sure yet"</strong> &rarr; gentle pause state, "We're here when you're ready"<br><br>
+      The key: completing the cycle is always honoured first. The outcome question comes second.
     </div>
     <div class="status"></div>
   </div>
@@ -77,12 +85,12 @@
     <div class="item-header">
       <span class="item-num">02</span>
       <span class="item-title">No pause functionality</span>
-      <span class="severity critical">Critical</span>
+      <span class="severity critical">Critical &middot; IMPLEMENTED</span>
     </div>
-    <div class="item-problem">If a user needs a break (bad news, procedure recovery, emotional burnout), they can't pause. The daily content keeps piling up, and they feel behind. This creates guilt, and guilty users churn silently rather than coming back.</div>
+    <div class="item-problem"><strong>Already built.</strong> "Take a break" toggle in Settings pauses the cycle counter. Welcome-back overlay on return says "You took a break, and that's okay." No progress lost.<br><br><strong>Different from #1:</strong> Pause is for when you just need to step away — between cycles, recovering from procedure, emotional exhaustion. No bad news necessarily, just need space. #1 is specifically about the cycle failing and needing grief-appropriate content.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Add a "Take a break" option in Settings. Pauses the cycle counter. When they return, show a gentle "Welcome back" screen that acknowledges the break without asking why. Don't lose any progress or streak data.
+      <div class="item-fix-label">Status</div>
+      Done. Available in Settings &rarr; "Take a break" row. Freezes cycle counter, shows gentle welcome-back on return.
     </div>
     <div class="status"></div>
   </div>
@@ -91,12 +99,14 @@
     <div class="item-header">
       <span class="item-num">03</span>
       <span class="item-title">Content will feel repetitive by week 2</span>
-      <span class="severity critical">Critical</span>
+      <span class="severity critical">Critical &middot; PARTIALLY DONE</span>
     </div>
-    <div class="item-problem">The AI generates similar-toned content daily using the same vibe instructions. By day 8-10, quotes start sounding alike, affirmations blur together, journal prompts repeat themes. This is the "content wall" — the #1 churn driver in daily content apps.</div>
+    <div class="item-problem">The AI generates similar-toned content daily. By day 8-10, quotes start sounding alike, affirmations blur together. This is the "content wall" — the #1 churn driver in daily content apps.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Vary content type and emotional tone across the cycle. Early days: hopeful/energetic. Mid-cycle: grounding/patient. Late cycle (TWW): calming/reassuring. Pass the cycle phase to the AI prompt. Also rotate card order day-to-day so the page layout feels fresh. Consider adding a new content type every few days (e.g., "fun fact about your body" on day 5, "letter to future you" on day 10).
+      <div class="item-fix-label">What's done</div>
+      <strong>Cycle-phase tone variation is implemented.</strong> The AI prompt now shifts emotional tone across 5 phases: beginning (hopeful), early (building momentum), middle (grounding/patient), late (calming/reassuring), final (celebratory but tender). This is in <code>server.js</code> via <code>getCyclePhase()</code>.<br><br>
+      <strong>Card order stays fixed</strong> — you rightly flagged that rotating cards would feel inconsistent and disruptive. The layout is the same every day (quote &rarr; music &rarr; affirmation &rarr; journal &rarr; breathing &rarr; friend note). Consistency in structure, variation in substance.<br><br>
+      <strong>What's not done yet:</strong> Varying content <em>depth</em> within each phase — e.g., early journal prompts are simple ("What are you carrying into this cycle?") while mid-cycle prompts go deeper ("What have you learned about patience?"). This would need more specific instructions in the AI prompt per phase.
     </div>
     <div class="status"></div>
   </div>
@@ -110,12 +120,13 @@
     <div class="item-header">
       <span class="item-num">04</span>
       <span class="item-title">Onboarding has no skip option</span>
-      <span class="severity high">High</span>
+      <span class="severity high">High &middot; IMPLEMENTED</span>
     </div>
-    <div class="item-problem">Every onboarding step requires a selection. No "Skip" or "I'll decide later." If someone gets stuck at treatment type (their situation is complex, they're not sure, or they're just exploring), they abandon. Required fields on emotional questions create friction.</div>
+    <div class="item-problem">Every onboarding step required a selection. Users stuck at treatment type (complex situation, exploring) would abandon.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Add "Skip for now" as a subtle text link on steps 2-6 (keep name required). Default to reasonable fallbacks: general wellness content, calm vibe, all components enabled.
+      <div class="item-fix-label">Status</div>
+      Done. "Skip for now" link added on steps 2-6 (name stays required). Defaults: treatment=IVF, cycle=28 days, components=all main ones, vibe=calm, music=pop+ambient. Users can change everything later in Settings.<br><br>
+      <strong>Open question:</strong> Should the skip default use "fertility journey" instead of "IVF" to avoid showing the wrong treatment? Would need a neutral AI prompt path. Currently defaults to IVF since it's most common.
     </div>
     <div class="status"></div>
   </div>
@@ -124,12 +135,12 @@
     <div class="item-header">
       <span class="item-num">05</span>
       <span class="item-title">No onboarding resume if interrupted</span>
-      <span class="severity high">High</span>
+      <span class="severity high">High &middot; IMPLEMENTED</span>
     </div>
-    <div class="item-problem">If a user closes the app mid-onboarding (phone call, notification, battery dies), they restart from step 1. On mobile, interruptions are constant. Redoing 3-4 steps after an interruption causes immediate abandonment.</div>
+    <div class="item-problem">If a user closed the app mid-onboarding, they'd restart from step 1.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Save each onboarding step to localStorage as the user completes it (not just the final profile). On app open, check for partial onboarding data and resume from the last completed step.
+      <div class="item-fix-label">Status</div>
+      Done. Each onboarding step saves to localStorage via the existing <code>update()</code> function. On app reopen, if partial profile data exists (name but missing later fields), the app resumes from the exact step where they left off. Subtle — no "resume?" dialog, just picks up where they were.
     </div>
     <div class="status"></div>
   </div>
@@ -140,10 +151,12 @@
       <span class="item-title">Paywall has no social proof</span>
       <span class="severity high">High</span>
     </div>
-    <div class="item-problem">Users are asked to pay &pound;9.99 with zero evidence that it works. No testimonials, no user count, no ratings, no "as featured in" badges. For a health/wellness app targeting a vulnerable audience, trust is everything. Without it, conversion stays low.</div>
+    <div class="item-problem">Users are asked to pay &pound;9.99 with zero evidence that the app works. No testimonials, no user count. Trust is everything for a health/wellness app targeting a vulnerable audience.</div>
     <div class="item-fix">
       <div class="item-fix-label">Suggested fix</div>
-      Add 1-2 short testimonials below the plan cards. E.g.: <em>"The daily quotes got me through my TWW. I actually looked forward to opening the app."</em> — Sarah, IVF cycle 2. Even placeholder quotes initially signal that real people use this.
+      Add a short testimonial below the plan cards on the paywall. Something like:<br><br>
+      <em>"I just wanted something that showed up for me every morning. Cycle was that."</em><br>— W., egg freezing<br><br>
+      Add a second testimonial later from a beta tester or early user.
     </div>
     <div class="status"></div>
   </div>
@@ -168,10 +181,10 @@
       <span class="item-title">No treatment-phase awareness</span>
       <span class="severity high">High</span>
     </div>
-    <div class="item-problem">The app knows the user is doing IVF but doesn't know what phase: stims, retrieval, transfer, TWW. Content should shift dramatically between these. A quote about patience on stim day 1 is irrelevant; on TWW day 8 it's everything. Generic content undermines the personalisation promise.</div>
+    <div class="item-problem">The app knows the user is doing IVF but not what phase: stims, retrieval, transfer, TWW. Protocols vary hugely user to user — some stim for 8 days, others 14. Fresh transfer vs freeze-all changes everything.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Add a treatment phase selector (even just: preparing, stimming, procedure week, waiting, results). This could be a new onboarding step or auto-inferred from cycle day + treatment type. Feed it to the AI content generation prompt so tone and themes shift with the phase.
+      <div class="item-fix-label">Revised approach</div>
+      <strong>Deferred to v2.</strong> The cycle-phase tone variation already implemented (beginning/early/middle/late/final based on day number) gives 80% of the benefit without asking the user anything. Adding treatment-phase questions would clutter the experience and ask too much of the user. Revisit once there's user feedback requesting it.
     </div>
     <div class="status"></div>
   </div>
@@ -201,10 +214,12 @@
       <span class="item-title">No evening check-in</span>
       <span class="severity medium">Medium</span>
     </div>
-    <div class="item-problem">The app is morning-only. Fertility journeys are hardest at night — lying in bed overthinking, doom-scrolling, worrying about tomorrow's appointment. A short evening touchpoint would catch users when they need support most.</div>
+    <div class="item-problem">The app generates one content set per day. If you open at 10pm, you see the same cards as 7am. There's no evening-specific content and no evening notification to trigger a second visit.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Add an optional evening card: a single calming quote or 20-second breathing exercise. Could be triggered by the evening notification time already in settings. Keep it light — one card, not a full day screen.
+      <div class="item-fix-label">How it would work</div>
+      The app checks the local time when opened. If after ~7pm, it shows an additional "wind down" card at the top — a calming quote or short breathing exercise, different from the morning content. No separate notification needed — it just adapts to when the user opens it.<br><br>
+      <strong>Complexity:</strong> Requires generating two content sets per day (morning + evening) in one API call, time detection, and handling edge cases (what if someone only opens at night — do they miss morning content? Answer: no, they see both, evening card just appears at the top).<br><br>
+      <strong>Recommendation: v2.</strong> Adds real value but needs design work. For launch, the single daily content set works fine. Most users will open in the morning via notification.
     </div>
     <div class="status"></div>
   </div>
@@ -215,10 +230,10 @@
       <span class="item-title">No way to revisit favorite content</span>
       <span class="severity medium">Medium</span>
     </div>
-    <div class="item-problem">Once a day passes, the quote, affirmation, and journal prompt are gone. Users can't bookmark the one that really resonated. The quote that got someone through a hard afternoon disappears by tomorrow.</div>
+    <div class="item-problem">Once a day passes, the quote, affirmation, and journal prompt are gone. Users can't bookmark the one that really resonated.</div>
     <div class="item-fix">
       <div class="item-fix-label">Suggested fix</div>
-      Add a "Save" heart icon on quote and affirmation cards. Store favorites in localStorage. Show them in a "Favorites" section accessible from Progress or Settings.
+      Add a "Save" heart icon on quote and affirmation cards. Store favorites in localStorage (key: <code>cycle_favorites</code>). Show saved items in a small "Saved" section within the Progress tab — not a separate page, just a collapsible section below the day grid. No analytics page needed.
     </div>
     <div class="status"></div>
   </div>
@@ -240,13 +255,18 @@
   <div class="item" data-id="13">
     <div class="item-header">
       <span class="item-num">13</span>
-      <span class="item-title">No partner involvement</span>
+      <span class="item-title">Share today's quote</span>
       <span class="severity medium">Medium</span>
     </div>
-    <div class="item-problem">Fertility is rarely a solo journey. Partners want to help but don't know how. There's no way to include them. This limits the app's reach and the support system it could create.</div>
+    <div class="item-problem">Quotes are the most shareable content in the app. There's no way to share one. Every share is free marketing to someone who may also be going through fertility treatment.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Light version: Add a "Share today's quote" button via WhatsApp/text on the quote card. Medium version: Add partner-specific daily prompts ("Ask your partner how they're feeling about tomorrow"). These are low-effort features with high emotional value.
+      <div class="item-fix-label">Revised approach — Share only, no partner prompts</div>
+      <strong>Dropped the partner-specific prompts idea.</strong> The woman is already doing the injections, the appointments, the emotional labor. Adding "tell your partner to do this" puts MORE work on her.<br><br>
+      Instead: add a share icon on the quote card. One tap &rarr; share sheet or WhatsApp.<br><br>
+      <strong>No approvals needed.</strong> Two approaches, both zero-backend:<br>
+      &bull; <strong>Web Share API</strong> (<code>navigator.share</code>) — triggers the native OS share sheet on mobile. WhatsApp, iMessage, Instagram etc. appear automatically. Works on iOS Safari 15+ and Android Chrome.<br>
+      &bull; <strong>wa.me fallback</strong> — <code>https://wa.me/?text=ENCODED_TEXT</code> opens WhatsApp directly with pre-filled text. No API key, no WhatsApp Business account, no approval.<br><br>
+      The share text would be: <em>"[quote]" — [author] &middot; Shared via Cycle</em> + app link. No backend changes, no API keys, no approvals of any kind. Ready to implement.
     </div>
     <div class="status"></div>
   </div>
@@ -257,10 +277,11 @@
       <span class="item-title">No emotional state logging</span>
       <span class="severity medium">Medium</span>
     </div>
-    <div class="item-problem">The app sends content but never asks how the user is feeling. This is a missed opportunity for personalisation (content could adapt to mood) and self-awareness (users could see mood trends over the cycle).</div>
+    <div class="item-problem">The app sends content but never asks how the user is feeling. This could help personalise content tone (AI adapts to mood) and build self-awareness.</div>
     <div class="item-fix">
-      <div class="item-fix-label">Suggested fix</div>
-      Add a simple mood selector (5 emojis: great, good, okay, tough, hard) at the top of the day screen. Use it to subtly adjust content tone via the AI prompt. Show mood trends as a simple line in the Progress tab.
+      <div class="item-fix-label">Revised approach — Mood logging only, no trend charts</div>
+      Add a simple mood selector (5 emojis) at the top of the day screen. Use it to subtly adjust content tone via the AI prompt (e.g., if user selects "tough", shift quotes toward acknowledging difficulty rather than cheerful motivation).<br><br>
+      <strong>Dropped the mood trends/progress chart idea.</strong> Showing mood data on the Progress tab could feel clinical or discouraging if someone sees a lot of "hard" days. The mood selector should feel like a gentle check-in, not data collection. The value is in the AI adapting, not in the user analysing their own mood graph.
     </div>
     <div class="status"></div>
   </div>
@@ -276,10 +297,11 @@
       <span class="item-title">Splash screen has too many options</span>
       <span class="severity quick">Quick Win</span>
     </div>
-    <div class="item-problem">Three equal-sized buttons (Begin, I have an account, Gift) plus a language selector. New users hesitate when given too many equal choices. The primary action doesn't stand out enough from secondary ones.</div>
+    <div class="item-problem">Three equal-sized buttons (Begin, I have an account, Gift) plus a language selector. New users hesitate when given too many equal choices.</div>
     <div class="item-fix">
       <div class="item-fix-label">Suggested fix</div>
-      Keep "Begin" as the dominant hero CTA. Make "I have an account" a text link (not a button). Move "Gift it to someone" to a smaller, separate text link. Reduce visual weight of secondary options.
+      Keep "Begin" as the dominant hero CTA. Make "I have an account" and "Gift it to someone" smaller text links (not full buttons). Reduce visual weight of secondary options so the eye goes straight to "Begin."<br><br>
+      <strong>Note on "Skip for now" destinations:</strong> If a user skips all onboarding, they get a generic journey: IVF treatment, calm vibe, 28-day cycle, pop/ambient music, all components. They can personalise everything later in Settings. Open question: should the treatment default be "fertility journey" (generic) rather than "IVF" to avoid showing the wrong label?
     </div>
     <div class="status"></div>
   </div>
