@@ -134,55 +134,71 @@
 <!-- ======================== SAVE/HEART ICON ======================== -->
 <div class="section">
   <div class="section-title">Save / Favorite Icon</div>
-  <p class="note" style="margin-bottom: 16px;">All options show as outline when not saved, filled when saved.</p>
+  <p class="note" style="margin-bottom: 16px;">All options show muted when not saved, soft pink when saved. Same size always.</p>
 
   <div class="option-row">
     <div class="option" data-choice="heart" data-value="heart" onclick="select(this)">
-      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
-        <span style="opacity: 0.35;">&#9825;</span>
-        <span style="color: #E8707A;">&#9829;</span>
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 16px;">
+        <span style="color: rgba(232,165,152,0.35);">&#9825;</span>
+        <span style="color: #D4878F;">&#9829;</span>
       </div>
-      <div class="option-label">Heart (current)</div>
+      <div class="option-label">Outline → filled heart</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="heart-mini" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 14px;">
+        <span style="color: rgba(232,165,152,0.35);">&#9825;</span>
+        <span style="color: #D4878F;">&#9829;</span>
+      </div>
+      <div class="option-label">Mini heart (14px)</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="heart-thin" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; align-items: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div class="option-label">Thin SVG heart</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="heart-round" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; align-items: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div class="option-label">Round SVG heart</div>
+    </div>
+
+    <div class="option" data-choice="heart" data-value="heart-dot" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; align-items: center;">
+        <div style="width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(232,165,152,0.35);"></div>
+        <div style="width: 16px; height: 16px; border-radius: 50%; background: #D4878F;"></div>
+      </div>
+      <div class="option-label">Circle dot</div>
     </div>
 
     <div class="option" data-choice="heart" data-value="bookmark" onclick="select(this)">
-      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
-        <span style="opacity: 0.35;">&#9744;</span>
-        <span style="color: #C4614A;">&#9745;</span>
+      <div style="display: flex; gap: 16px; justify-content: center; align-items: center;">
+        <svg width="14" height="16" viewBox="0 0 14 18" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M1 1h12v16l-6-4-6 4V1z"/></svg>
+        <svg width="14" height="16" viewBox="0 0 14 18" fill="#D4878F" stroke="#D4878F" stroke-width="1.5"><path d="M1 1h12v16l-6-4-6 4V1z"/></svg>
       </div>
       <div class="option-label">Bookmark</div>
     </div>
 
-    <div class="option" data-choice="heart" data-value="star" onclick="select(this)">
-      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
-        <span style="opacity: 0.35;">&#9734;</span>
-        <span style="color: #F5C842;">&#9733;</span>
-      </div>
-      <div class="option-label">Star</div>
-    </div>
-
-    <div class="option" data-choice="heart" data-value="ribbon" onclick="select(this)">
-      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
-        <span style="opacity: 0.35;">&#127895;</span>
-        <span style="color: #C4614A;">&#127895;</span>
-      </div>
-      <div class="option-label">Ribbon</div>
-    </div>
-
     <div class="option" data-choice="heart" data-value="sparkle" onclick="select(this)">
-      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
-        <span style="opacity: 0.35;">&#10023;</span>
-        <span style="color: #C4614A;">&#10024;</span>
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 16px;">
+        <span style="color: rgba(232,165,152,0.35);">&#10023;</span>
+        <span style="color: #D4878F;">&#10024;</span>
       </div>
       <div class="option-label">Sparkle</div>
     </div>
 
-    <div class="option" data-choice="heart" data-value="plus" onclick="select(this)">
-      <div style="display: flex; gap: 16px; justify-content: center; font-size: 22px;">
-        <span style="opacity: 0.35;">+</span>
-        <span style="color: #C4614A;">&#10003;</span>
+    <div class="option" data-choice="heart" data-value="star" onclick="select(this)">
+      <div style="display: flex; gap: 16px; justify-content: center; font-size: 16px;">
+        <span style="color: rgba(232,165,152,0.35);">&#9734;</span>
+        <span style="color: #D4878F;">&#9733;</span>
       </div>
-      <div class="option-label">Plus / Check</div>
+      <div class="option-label">Star</div>
     </div>
   </div>
 
@@ -235,6 +251,38 @@
     <div class="option" data-choice="share" data-value="paper" onclick="select(this)">
       <div style="font-size: 22px; opacity: 0.6;">&#9993;</div>
       <div class="option-label">Envelope</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== QUOTE FONT STYLE ======================== -->
+<div class="section">
+  <div class="section-title">Quote Font Style</div>
+
+  <div class="option-row">
+    <div class="option" data-choice="quotestyle" data-value="italic" onclick="select(this)">
+      <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 700; font-size: 18px; color: #FDF6F0; line-height: 1.35; padding: 8px 0;">"She was powerful not because she wasn't scared but because she went on."</div>
+      <div class="option-label">Italic 700 (current — restored)</div>
+    </div>
+
+    <div class="option" data-choice="quotestyle" data-value="italic-light" onclick="select(this)">
+      <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; font-size: 18px; color: #FDF6F0; line-height: 1.35; padding: 8px 0;">"She was powerful not because she wasn't scared but because she went on."</div>
+      <div class="option-label">Italic 400 (lighter, more elegant)</div>
+    </div>
+
+    <div class="option" data-choice="quotestyle" data-value="normal-bold" onclick="select(this)">
+      <div style="font-family: 'Cormorant Garamond', serif; font-style: normal; font-weight: 700; font-size: 18px; color: #FDF6F0; line-height: 1.35; padding: 8px 0;">"She was powerful not because she wasn't scared but because she went on."</div>
+      <div class="option-label">Normal 700 (strong, no italic)</div>
+    </div>
+
+    <div class="option" data-choice="quotestyle" data-value="italic-larger" onclick="select(this)">
+      <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 700; font-size: 22px; color: #FDF6F0; line-height: 1.3; padding: 8px 0;">"She was powerful not because she wasn't scared but because she went on."</div>
+      <div class="option-label">Italic 700 at 22px (bigger impact)</div>
+    </div>
+
+    <div class="option" data-choice="quotestyle" data-value="italic-accent" onclick="select(this)">
+      <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 700; font-size: 18px; color: #C4614A; line-height: 1.35; padding: 8px 0;">"She was powerful not because she wasn't scared but because she went on."</div>
+      <div class="option-label">Italic 700 in accent color</div>
     </div>
   </div>
 </div>
@@ -347,6 +395,162 @@
   </div>
 </div>
 
+<!-- ======================== FULL MOCKUPS ======================== -->
+<div class="section">
+  <div class="section-title">Full Screen Mockups</div>
+
+  <div style="display: flex; gap: 24px; overflow-x: auto; padding-bottom: 16px;">
+
+    <!-- Quote card mockup -->
+    <div style="min-width: 300px;">
+      <div class="option-label" style="margin-bottom: 8px;">Quote card with heart + share</div>
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.06);">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+          <span style="font-size: 13px;">&#128293;</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #C4614A; letter-spacing: 0.15em;">TODAY'S FIRE</span>
+        </div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 700; font-size: 22px; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: #C4614A;">— Atticus</div>
+          <div style="display: flex; gap: 10px;">
+            <span style="font-size: 15px; color: rgba(232,165,152,0.4); cursor: pointer;">&#9825;</span>
+            <span style="font-size: 15px; color: rgba(232,165,152,0.4); cursor: pointer;">&#8599;</span>
+          </div>
+        </div>
+      </div>
+      <div class="option-label" style="margin-top: 12px;">After hearting</div>
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); margin-top: 4px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+          <span style="font-size: 13px;">&#128293;</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #C4614A; letter-spacing: 0.15em;">TODAY'S FIRE</span>
+        </div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 700; font-size: 22px; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: #C4614A;">— Atticus</div>
+          <div style="display: flex; gap: 10px;">
+            <span style="font-size: 15px; color: #E8707A; cursor: pointer;">&#9829;</span>
+            <span style="font-size: 15px; color: rgba(232,165,152,0.4); cursor: pointer;">&#8599;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day completion mockup -->
+    <div style="min-width: 300px;">
+      <div class="option-label" style="margin-bottom: 8px;">Day completion — 3 states</div>
+      <!-- Not done -->
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px;">
+        <div class="option-label" style="margin-bottom: 6px; color: rgba(253,246,240,0.2);">Not done</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.3); font-size: 16px;">&#8249;</div>
+          <div style="flex: 1; height: 44px; border-radius: 14px; background: #C4614A; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white;">Done &#10003;</div>
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #C4614A; display: flex; align-items: center; justify-content: center; color: #C4614A; font-size: 16px;">&#8250;</div>
+        </div>
+      </div>
+      <!-- Celebration -->
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px;">
+        <div class="option-label" style="margin-bottom: 6px; color: rgba(253,246,240,0.2);">Sparkle celebration (3s)</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.3); font-size: 16px;">&#8249;</div>
+          <div style="flex: 1; height: 44px; border-radius: 14px; background: rgba(196,97,74,0.2); border: 1.5px solid rgba(196,97,74,0.4); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 18px; color: #C4614A;">&#10024; &#10003; &#10024;</div>
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #C4614A; display: flex; align-items: center; justify-content: center; color: #C4614A; font-size: 16px;">&#8250;</div>
+        </div>
+      </div>
+      <!-- Done (toggle to undo) -->
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.06);">
+        <div class="option-label" style="margin-bottom: 6px; color: rgba(253,246,240,0.2);">Done — tap again to undo</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; color: rgba(196,97,74,0.3); font-size: 16px;">&#8249;</div>
+          <div style="flex: 1; height: 44px; border-radius: 14px; background: rgba(196,97,74,0.15); border: 1.5px solid rgba(196,97,74,0.3); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #C4614A;">Done &#10003;</div>
+          <div style="width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #C4614A; display: flex; align-items: center; justify-content: center; color: #C4614A; font-size: 16px;">&#8250;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress tab with saved items -->
+    <div style="min-width: 300px;">
+      <div class="option-label" style="margin-bottom: 8px;">Progress tab — Saved section</div>
+      <div style="background: #1C0F0C; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06);">
+        <!-- Week grid snippet -->
+        <div style="padding: 16px 16px 8px;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 8px;">DAY BY DAY</div>
+          <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+            <div style="font-family: 'DM Mono', monospace; font-size: 7px; color: rgba(253,246,240,0.3); width: 20px;">WK1</div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: white;">1</span></div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: white;">2</span></div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: #C4614A; display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: white;">3</span></div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: rgba(196,97,74,0.4); border: 2px solid #C4614A; display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: #C4614A;">4</span></div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: rgba(253,246,240,0.3);">5</span></div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: rgba(253,246,240,0.3);">6</span></div>
+            <div style="flex: 1; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;"><span style="font-family: 'DM Mono', monospace; font-size: 7px; color: rgba(253,246,240,0.3);">7</span></div>
+          </div>
+          <div style="font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(253,246,240,0.2); margin-top: 6px;">...</div>
+        </div>
+        <!-- Stats -->
+        <div style="padding: 8px 16px 12px; display: flex; justify-content: space-around; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; font-style: italic; color: #C4614A;">3</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(253,246,240,0.3);">DAYS DONE</div>
+          </div>
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; font-style: italic; color: #C4614A;">28</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(253,246,240,0.3);">TOTAL</div>
+          </div>
+        </div>
+        <!-- Saved favorites -->
+        <div style="padding: 12px 16px 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 12px;">&#9829; SAVED</div>
+          <!-- Saved quote 1 -->
+          <div style="padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #FDF6F0; line-height: 1.4;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); margin-top: 4px; letter-spacing: 0.08em;">— Atticus &middot; QUOTE &middot; DAY 2</div>
+          </div>
+          <!-- Saved affirmation -->
+          <div style="padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #FDF6F0; line-height: 1.4;">I am stronger than the uncertainty I feel today.</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); margin-top: 4px; letter-spacing: 0.08em;">AFFIRMATION &middot; DAY 3</div>
+          </div>
+          <!-- Saved quote 2 -->
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #FDF6F0; line-height: 1.4;">"You are allowed to be both a masterpiece and a work in progress simultaneously."</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); margin-top: 4px; letter-spacing: 0.08em;">— Sophia Bush &middot; QUOTE &middot; DAY 1</div>
+          </div>
+        </div>
+        <!-- Nav -->
+        <div style="display: flex; justify-content: space-around; padding: 10px 0 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 10px;">
+          <span style="color: rgba(253,246,240,0.3);">Today</span>
+          <span style="color: #C4614A;">Progress</span>
+          <span style="color: rgba(253,246,240,0.3);">Settings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Take a break mockup -->
+    <div style="min-width: 300px;">
+      <div class="option-label" style="margin-bottom: 8px;">Settings — Take a break</div>
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.06);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer;">
+          <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(196,97,74,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px;">&#127769;</div>
+          <div style="flex: 1;">
+            <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.15em; margin-bottom: 2px;">TAKE A BREAK</div>
+            <div style="font-size: 13px; color: #FDF6F0;">Pause your cycle. Rest is part of the journey too.</div>
+          </div>
+          <div style="color: rgba(253,246,240,0.3); font-size: 16px;">&#8250;</div>
+        </div>
+      </div>
+
+      <div class="option-label" style="margin-top: 16px; margin-bottom: 8px;">Welcome back overlay</div>
+      <div style="background: #1C0F0C; border-radius: 20px; padding: 32px 20px; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 12px;">&#127800;</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; color: #FDF6F0; line-height: 1.2; margin-bottom: 8px;">Welcome back, Sarah</div>
+        <div style="font-size: 13px; color: rgba(253,246,240,0.45); line-height: 1.6; max-width: 240px; margin: 0 auto 16px;">You took a break, and that's okay. You're here now, and that's what matters.</div>
+        <div style="background: #C4614A; color: white; border-radius: 14px; padding: 14px; font-weight: 700; font-size: 14px;">Continue my journey</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div style="text-align: center; padding: 20px 0; color: rgba(253,246,240,0.12); font-family: 'DM Mono', monospace; font-size: 10px;">
   Click options to select &middot; Your choices save locally
 </div>
@@ -416,11 +620,13 @@ const MOOD_SETS = {
 
 const HEART_MAP = {
   heart: { unsaved: '&#9825;', saved: '&#9829;' },
-  bookmark: { unsaved: '&#9744;', saved: '&#9745;' },
-  star: { unsaved: '&#9734;', saved: '&#9733;' },
-  ribbon: { unsaved: '&#127895;', saved: '&#127895;' },
+  'heart-mini': { unsaved: '<span style="font-size:14px">&#9825;</span>', saved: '<span style="font-size:14px">&#9829;</span>' },
+  'heart-thin': { unsaved: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>', saved: '<svg width="15" height="15" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' },
+  'heart-round': { unsaved: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>', saved: '<svg width="15" height="15" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' },
+  'heart-dot': { unsaved: '<div style="width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;"></div>', saved: '<div style="width:14px;height:14px;border-radius:50%;background:#D4878F;display:inline-block;"></div>' },
+  bookmark: { unsaved: '<svg width="13" height="15" viewBox="0 0 14 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1h12v16l-6-4-6 4V1z"/></svg>', saved: '<svg width="13" height="15" viewBox="0 0 14 18" fill="#D4878F" stroke="#D4878F" stroke-width="1.5"><path d="M1 1h12v16l-6-4-6 4V1z"/></svg>' },
   sparkle: { unsaved: '&#10023;', saved: '&#10024;' },
-  plus: { unsaved: '+', saved: '&#10003;' },
+  star: { unsaved: '&#9734;', saved: '&#9733;' },
 }
 
 const SHARE_MAP = {

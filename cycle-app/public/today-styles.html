@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Today Tab — Style Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Karla:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 48px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .options { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px; }
+  .phone { width: 320px; min-width: 320px; border-radius: 24px; overflow: hidden; border: 2px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.25); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .fierce { background: #1C0F0C; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 16px; margin: 0 14px 10px; }
+  .label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .cg { font-family: 'Cormorant Garamond', serif; }
+  .karla { font-family: 'Karla', sans-serif; }
+  .accent { color: #C4614A; }
+  .text { color: #FDF6F0; }
+  .muted { color: rgba(253,246,240,0.4); }
+  .actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .actions span { font-size: 15px; color: rgba(232,165,152,0.4); cursor: pointer; }
+  .highlight { border: 2px solid rgba(196,97,74,0.4) !important; }
+</style>
+</head>
+<body>
+
+<h1>Today Tab Styles</h1>
+<p class="subtitle">Compare different font and styling approaches for the Today page cards</p>
+
+<!-- ======================== FULL PAGE OPTIONS ======================== -->
+<div class="section">
+  <div class="section-title">Option A — Current (italic quotes, normal prompts)</div>
+  <div class="options">
+    <div>
+      <div class="phone-label">Fierce vibe · Day 5</div>
+      <div class="phone fierce" style="padding: 16px 0;">
+        <!-- Quote -->
+        <div class="card">
+          <div class="label"><span>&#128293;</span> TODAY'S FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 22px; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono" style="font-size: 11px; color: #C4614A;">— Atticus</div>
+            <div class="actions"><span>&#9825;</span><span>&#10148;</span></div>
+          </div>
+        </div>
+        <!-- Anthem -->
+        <div class="card">
+          <div class="label"><span>&#127925;</span> TODAY'S ANTHEM</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(196,97,74,0.25); display: flex; align-items: center; justify-content: center; font-size: 18px;">&#127925;</div>
+            <div style="flex: 1;">
+              <div class="karla" style="font-size: 15px; font-weight: 600; color: #FDF6F0;">Dog Days Are Over</div>
+              <div class="karla" style="font-size: 12px; color: rgba(253,246,240,0.4);">Florence + The Machine</div>
+            </div>
+            <div style="background: #1DB954; color: white; border-radius: 20px; padding: 6px 12px; font-size: 10px; font-weight: 700;">Play</div>
+          </div>
+        </div>
+        <!-- Affirmation -->
+        <div class="card" style="text-align: center;">
+          <div class="label" style="justify-content: center;"><span>&#9889;</span> YOUR POWER</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 18px; color: #C4614A; line-height: 1.4; padding: 8px 0;">I am stronger than the uncertainty I feel today.</div>
+          <div class="actions" style="justify-content: center;"><span>&#9825;</span></div>
+        </div>
+        <!-- Journal -->
+        <div class="card">
+          <div class="label"><span>&#9998;&#65039;</span> YOUR FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 16px; color: #FDF6F0; line-height: 1.4; margin-bottom: 10px;">What does strength look like for you right now?</div>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; font-size: 13px; color: rgba(253,246,240,0.3); min-height: 60px; font-style: italic;">Write here...</div>
+        </div>
+        <!-- Breathing -->
+        <div class="card">
+          <div class="label"><span>&#10024;</span> YOUR MOMENT</div>
+          <div style="background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 18px; text-align: center; font-weight: 600; font-size: 14px; color: #C4614A;">Breathe with me &middot; 35s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Option B — More italic + larger quote, bolder affirmation</div>
+  <div class="options">
+    <div>
+      <div class="phone-label">Fierce vibe · Day 5</div>
+      <div class="phone fierce" style="padding: 16px 0;">
+        <div class="card">
+          <div class="label"><span>&#128293;</span> TODAY'S FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 24px; color: #FDF6F0; line-height: 1.3; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono" style="font-size: 11px; color: #C4614A;">— Atticus</div>
+            <div class="actions"><span>&#9825;</span><span>&#10148;</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#127925;</span> TODAY'S ANTHEM</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(196,97,74,0.25); display: flex; align-items: center; justify-content: center; font-size: 18px;">&#127925;</div>
+            <div style="flex: 1;">
+              <div class="cg" style="font-size: 17px; font-weight: 700; font-style: italic; color: #FDF6F0;">Dog Days Are Over</div>
+              <div class="karla" style="font-size: 12px; color: rgba(253,246,240,0.4);">Florence + The Machine</div>
+            </div>
+            <div style="background: #1DB954; color: white; border-radius: 20px; padding: 6px 12px; font-size: 10px; font-weight: 700;">Play</div>
+          </div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="label" style="justify-content: center;"><span>&#9889;</span> YOUR POWER</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 20px; color: #C4614A; line-height: 1.35; padding: 12px 0;">I am stronger than the uncertainty I feel today.</div>
+          <div class="actions" style="justify-content: center;"><span>&#9825;</span></div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#9998;&#65039;</span> YOUR FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 400; font-size: 17px; color: #FDF6F0; line-height: 1.5; margin-bottom: 10px;">What does strength look like for you right now? It doesn't have to be loud.</div>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; font-size: 13px; color: rgba(253,246,240,0.3); min-height: 60px; font-style: italic;">Write here...</div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#10024;</span> YOUR MOMENT</div>
+          <div style="background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 18px; text-align: center; font-weight: 600; font-size: 14px; color: #C4614A;">Breathe with me &middot; 35s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Option C — Mixed: italic Cormorant for emotional content, clean Karla for prompts</div>
+  <div class="options">
+    <div>
+      <div class="phone-label">Fierce vibe · Day 5</div>
+      <div class="phone fierce" style="padding: 16px 0;">
+        <div class="card">
+          <div class="label"><span>&#128293;</span> TODAY'S FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 22px; color: #FDF6F0; line-height: 1.35; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono" style="font-size: 11px; color: #C4614A;">— Atticus</div>
+            <div class="actions"><span>&#9825;</span><span>&#10148;</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#127925;</span> TODAY'S ANTHEM</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(196,97,74,0.25); display: flex; align-items: center; justify-content: center; font-size: 18px;">&#127925;</div>
+            <div style="flex: 1;">
+              <div class="karla" style="font-size: 15px; font-weight: 600; color: #FDF6F0;">Dog Days Are Over</div>
+              <div class="karla" style="font-size: 12px; color: rgba(253,246,240,0.4);">Florence + The Machine</div>
+            </div>
+            <div style="background: #1DB954; color: white; border-radius: 20px; padding: 6px 12px; font-size: 10px; font-weight: 700;">Play</div>
+          </div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="label" style="justify-content: center;"><span>&#9889;</span> YOUR POWER</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 18px; color: #C4614A; line-height: 1.4; padding: 8px 0;">I am stronger than the uncertainty I feel today.</div>
+          <div class="actions" style="justify-content: center;"><span>&#9825;</span></div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#9998;&#65039;</span> YOUR FIRE</div>
+          <div class="karla" style="font-weight: 400; font-size: 15px; color: #FDF6F0; line-height: 1.5; margin-bottom: 10px;">What does strength look like for you right now? It doesn't have to be loud — it can be quiet and gentle.</div>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; font-size: 13px; color: rgba(253,246,240,0.3); min-height: 60px; font-style: italic;">Write here...</div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#10024;</span> YOUR MOMENT</div>
+          <div style="background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 18px; text-align: center; font-weight: 600; font-size: 14px; color: #C4614A;">Breathe with me &middot; 35s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Option D — All italic Cormorant, everything feels like poetry</div>
+  <div class="options">
+    <div>
+      <div class="phone-label">Fierce vibe · Day 5</div>
+      <div class="phone fierce" style="padding: 16px 0;">
+        <div class="card">
+          <div class="label"><span>&#128293;</span> TODAY'S FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 400; font-size: 22px; color: #FDF6F0; line-height: 1.4; margin-bottom: 8px;">"She was powerful not because she wasn't scared but because she went on so strongly, despite the fear."</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono" style="font-size: 11px; color: #C4614A;">— Atticus</div>
+            <div class="actions"><span>&#9825;</span><span>&#10148;</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#127925;</span> TODAY'S ANTHEM</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(196,97,74,0.25); display: flex; align-items: center; justify-content: center; font-size: 18px;">&#127925;</div>
+            <div style="flex: 1;">
+              <div class="cg" style="font-size: 16px; font-weight: 400; font-style: italic; color: #FDF6F0;">Dog Days Are Over</div>
+              <div class="cg" style="font-size: 13px; font-style: italic; color: rgba(253,246,240,0.4);">Florence + The Machine</div>
+            </div>
+            <div style="background: #1DB954; color: white; border-radius: 20px; padding: 6px 12px; font-size: 10px; font-weight: 700;">Play</div>
+          </div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="label" style="justify-content: center;"><span>&#9889;</span> YOUR POWER</div>
+          <div class="cg" style="font-style: italic; font-weight: 400; font-size: 19px; color: #C4614A; line-height: 1.45; padding: 8px 0;">I am stronger than the uncertainty I feel today.</div>
+          <div class="actions" style="justify-content: center;"><span>&#9825;</span></div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#9998;&#65039;</span> YOUR FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 400; font-size: 17px; color: #FDF6F0; line-height: 1.5; margin-bottom: 10px;">What does strength look like for you right now? It doesn't have to be loud — it can be quiet and gentle.</div>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: rgba(253,246,240,0.3); min-height: 60px;">Write here...</div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#10024;</span> YOUR MOMENT</div>
+          <div style="background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 18px; text-align: center; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: #C4614A;">Breathe with me &middot; 35s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Option E — Bold headings + light italic body, high contrast</div>
+  <div class="options">
+    <div>
+      <div class="phone-label">Fierce vibe · Day 5</div>
+      <div class="phone fierce" style="padding: 16px 0;">
+        <div class="card">
+          <div class="label"><span>&#128293;</span> TODAY'S FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 700; font-size: 24px; color: #FDF6F0; line-height: 1.25; margin-bottom: 10px;">"She was powerful not because she wasn't scared but because she went on."</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono" style="font-size: 10px; color: #C4614A; letter-spacing: 0.1em;">— ATTICUS</div>
+            <div class="actions"><span>&#9825;</span><span>&#10148;</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#127925;</span> TODAY'S ANTHEM</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(196,97,74,0.25); display: flex; align-items: center; justify-content: center; font-size: 18px;">&#127925;</div>
+            <div style="flex: 1;">
+              <div class="karla" style="font-size: 15px; font-weight: 700; color: #FDF6F0;">Dog Days Are Over</div>
+              <div class="karla" style="font-size: 11px; font-weight: 300; color: rgba(253,246,240,0.4); letter-spacing: 0.02em;">Florence + The Machine</div>
+            </div>
+            <div style="background: #1DB954; color: white; border-radius: 20px; padding: 6px 12px; font-size: 10px; font-weight: 700;">Play</div>
+          </div>
+        </div>
+        <div class="card" style="text-align: center; padding: 20px 16px;">
+          <div class="label" style="justify-content: center;"><span>&#9889;</span> YOUR POWER</div>
+          <div class="cg" style="font-style: normal; font-weight: 700; font-size: 20px; color: #C4614A; line-height: 1.35; padding: 4px 0; letter-spacing: -0.02em;">I am stronger than the uncertainty I feel today.</div>
+          <div class="actions" style="justify-content: center; margin-top: 8px;"><span>&#9825;</span></div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#9998;&#65039;</span> YOUR FIRE</div>
+          <div class="cg" style="font-style: italic; font-weight: 300; font-size: 17px; color: rgba(253,246,240,0.8); line-height: 1.5; margin-bottom: 10px;">What does strength look like for you right now? It doesn't have to be loud.</div>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; font-size: 13px; color: rgba(253,246,240,0.3); min-height: 60px; font-style: italic;">Write here...</div>
+        </div>
+        <div class="card">
+          <div class="label"><span>&#10024;</span> YOUR MOMENT</div>
+          <div style="background: rgba(196,97,74,0.15); border: 1px solid rgba(196,97,74,0.3); border-radius: 12px; padding: 18px; text-align: center; font-weight: 600; font-size: 14px; color: #C4614A;">Breathe with me &middot; 35s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center; padding: 32px 0; max-width: 500px; margin: 0 auto;">
+  <div class="section-title">Summary</div>
+  <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.4);">A — Current</td>
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.7);">Italic bold quotes, vibe-style prompts</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.4);">B — Bolder</td>
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.7);">Larger quote (24px), bigger affirmation (20px), italic song title</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.4);">C — Mixed</td>
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.7);">Italic Cormorant for emotional (quote, affirmation), clean Karla for practical (journal)</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.4);">D — Poetic</td>
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.7);">All Cormorant italic 400, everything feels like a letter to yourself</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.4);">E — High contrast</td>
+      <td style="padding: 8px 0; color: rgba(253,246,240,0.7);">Bold 700 headings, light 300 italic prompts, author in caps mono</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>

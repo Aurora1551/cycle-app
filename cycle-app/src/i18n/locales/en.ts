@@ -320,7 +320,7 @@ const en = {
 
     // Progress
     progress: {
-      sectionLabel: 'Progress',
+      sectionLabel: 'Journey',
       heading: 'Your journey',
       dayByDay: 'Day by day',
       week: 'W{{n}}',
@@ -403,7 +403,7 @@ const en = {
     // Navigation
     nav: {
       today: 'Today',
-      progress: 'Progress',
+      progress: 'Journey',
     },
 
     // Language picker

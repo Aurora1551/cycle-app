@@ -573,7 +573,7 @@ app.post('/api/link-profile', (req, res) => {
 
 // --- Stripe payment endpoints ---
 
-const PLAN_AMOUNTS = { one_cycle: 599, gift: 1299 }
+const PLAN_AMOUNTS = { one_cycle: 999, gift: 999 }
 
 app.post('/api/create-payment-intent', async (req, res) => {
   if (!stripe) return res.status(500).json({ error: 'Stripe is not configured' })

@@ -15,6 +15,8 @@ interface Props {
   data: OnboardingData
   dayNumber: number
   isPremium: boolean
+  isPaused?: boolean
+  onResume?: () => void
   onDayComplete: () => void
   onSettings: () => void
   onGoToDay?: (day: number) => void
@@ -39,9 +41,20 @@ function getBestVoice(): SpeechSynthesisVoice | null {
   return voices.find(v => v.lang.startsWith('en')) || null
 }
 
+// Unlock speech synthesis on user gesture (mobile browsers block without gesture)
+function unlockSpeech() {
+  if (!('speechSynthesis' in window)) return
+  window.speechSynthesis.cancel()
+  const u = new SpeechSynthesisUtterance('')
+  u.volume = 0
+  window.speechSynthesis.speak(u)
+}
+
 function speak(text: string): Promise<void> {
   return new Promise(resolve => {
     if (!('speechSynthesis' in window)) { resolve(); return }
+    // Cancel any pending speech first
+    window.speechSynthesis.cancel()
     const doSpeak = () => {
       const u = new SpeechSynthesisUtterance(text)
       u.rate = 0.72
@@ -51,11 +64,15 @@ function speak(text: string): Promise<void> {
       if (voice) u.voice = voice
       u.onend = () => resolve()
       u.onerror = () => resolve()
+      // Timeout fallback in case onend never fires
+      const fallback = setTimeout(() => resolve(), text.length * 120 + 3000)
+      u.onend = () => { clearTimeout(fallback); resolve() }
+      u.onerror = () => { clearTimeout(fallback); resolve() }
       window.speechSynthesis.speak(u)
     }
     if (!voicesLoaded && window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = () => { voicesLoaded = true; doSpeak() }
-      setTimeout(() => { voicesLoaded = true; doSpeak() }, 300)
+      setTimeout(() => { voicesLoaded = true; doSpeak() }, 500)
     } else {
       doSpeak()
     }
@@ -410,7 +427,7 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
   )
 }
 
-const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete, onSettings, onGoToDay, onUnlock, onEndOfCycle }) => {
+const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onResume, onDayComplete, onSettings, onGoToDay, onUnlock, onEndOfCycle }) => {
   const { t } = useTranslation()
   const [content, setContent] = useState<DayContent | null>(null)
   const [loading, setLoading] = useState(true)
@@ -459,9 +476,11 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
   // Reset state when day changes and scroll to top
   useEffect(() => {
     setDayDone(localStorage.getItem(`cycle_day_${dayNumber}_done`) === '1')
+    setShowCelebration(false)
     setJournalText(localStorage.getItem(`cycle_day_${dayNumber}_journal`) || '')
     setMeditationStarted(false)
     setJournalSaved(false)
+    setMood(localStorage.getItem(`cycle_mood_day${dayNumber}`))
     // Scroll to top of screen
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [dayNumber])
@@ -533,15 +552,49 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     setTimeout(() => setJournalSaved(false), 2000)
   }
 
+  const spawnConfetti = () => {
+    const container = document.createElement('div')
+    container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden'
+    document.body.appendChild(container)
+    const colors = [vibe.accent, '#D4878F', '#F5C842', '#7BD4A0', '#C4A8E8', '#E8A598']
+    for (let i = 0; i < 35; i++) {
+      const p = document.createElement('div')
+      const size = 4 + Math.random() * 5
+      const color = colors[Math.floor(Math.random() * colors.length)]
+      const startX = 35 + Math.random() * 30
+      const endX = startX + (Math.random() - 0.5) * 30
+      const endY = 80 + Math.random() * 160
+      const rotation = Math.random() * 720 - 360
+      const dur = 0.8 + Math.random() * 0.6
+      const delay = Math.random() * 0.2
+      p.style.cssText = `position:absolute;bottom:100px;left:${startX}%;width:${size}px;height:${size}px;background:${color};border-radius:${Math.random() > 0.5 ? '50%' : '1px'};opacity:0;`
+      p.animate([
+        { transform: `translateY(0) translateX(0) rotate(0deg)`, opacity: 1 },
+        { transform: `translateY(-${endY}px) translateX(${endX - startX}vw) rotate(${rotation}deg)`, opacity: 0 },
+      ], { duration: dur * 1000, delay: delay * 1000, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' })
+      container.appendChild(p)
+    }
+    setTimeout(() => container.remove(), 1800)
+  }
+
   const markDone = () => {
     if (dayDone) return
     localStorage.setItem(`cycle_day_${dayNumber}_done`, '1')
     setDayDone(true)
     setShowCelebration(true)
+    spawnConfetti()
     track('day_marked_done', { day_number: dayNumber })
-    setTimeout(() => setShowCelebration(false), 3000)
     fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, completed: true }) }).catch(() => {})
     onDayComplete()
+    // Auto-advance to next day after celebration
+    setTimeout(() => {
+      setShowCelebration(false)
+      if (dayNumber < data.cycleDays) {
+        onGoToDay?.(dayNumber + 1)
+      } else {
+        onEndOfCycle?.()
+      }
+    }, 1800)
   }
 
   const unmarkDone = () => {
@@ -584,32 +637,35 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     </div>
   )
 
+  // Consistent save + share row — always bottom-right of card
+  const saveShareRow = (type: string, text: string, author?: string) => (
+    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, marginTop: 10, alignItems: 'center' }}>
+      <button onClick={() => { toggleFavorite(type, text, author); track(`${type}_favorited`, { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', transition: 'opacity 0.2s', lineHeight: 0 }}>
+        {isFavorited(type) ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={mutedColor} strokeWidth="1.5" style={{ opacity: 0.5 }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        )}
+      </button>
+      <button onClick={() => {
+        const shareText = author ? `"${text}" — ${author}\n\nShared via Cycle` : `${text}\n\nShared via Cycle`
+        if (navigator.share) { navigator.share({ text: shareText }).catch(() => {}) } else { window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank') }
+        track(`${type}_shared`, { day_number: dayNumber })
+      }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: mutedColor, padding: '2px', lineHeight: 1, opacity: 0.5 }}>
+        &#10148;
+      </button>
+    </div>
+  )
+
   const renderComponent = (component: string) => {
     if (component === 'quote') {
       track('quote_viewed', { day_number: dayNumber })
       return (
         <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
           {vibeLabel(vibeContent.labels.quote)}
-          <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8 }}>"{content?.quote}"</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div className="mono-sm" style={{ color: vibe.accent }}>— {content?.quoteAuthor}</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => { toggleFavorite('quote', content?.quote || '', content?.quoteAuthor); track('quote_favorited', { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '4px 0', transition: 'transform 0.2s' }} title="Save quote">
-                {isFavorited('quote') ? <span style={{ color: '#E8707A' }}>&#9829;</span> : <span style={{ opacity: 0.35 }}>&#9825;</span>}
-              </button>
-              <button onClick={() => {
-                const text = `"${content?.quote}" — ${content?.quoteAuthor}\n\nShared via Cycle`
-                if (navigator.share) {
-                  navigator.share({ text }).catch(() => {})
-                } else {
-                  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
-                }
-                track('quote_shared', { day_number: dayNumber })
-              }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, opacity: 0.5, padding: '4px 0' }} title="Share">
-                &#8599;
-              </button>
-            </div>
-          </div>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: typo.headingWeight, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8 }}>"{content?.quote}"</div>
+          <div className="mono-sm" style={{ color: vibe.accent }}>— {content?.quoteAuthor}</div>
+          {saveShareRow('quote', content?.quote || '', content?.quoteAuthor)}
         </Card>
       )
     }
@@ -650,17 +706,13 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.affirmation)}
         <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 18, fontWeight: typo.headingWeight, color: vibe.accent, lineHeight: 1.4, textAlign: 'center', padding: '8px 0' }}>{content?.affirmation}</div>
-        <div style={{ textAlign: 'center' }}>
-          <button onClick={() => { toggleFavorite('affirmation', content?.affirmation || ''); track('affirmation_favorited', { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '4px 8px' }}>
-            {isFavorited('affirmation') ? <span style={{ color: '#E8707A' }}>&#9829;</span> : <span style={{ opacity: 0.35 }}>&#9825;</span>}
-          </button>
-        </div>
+        {saveShareRow('affirmation', content?.affirmation || '')}
       </Card>
     )
     if (component === 'journal') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.journal)}
-        <div style={{ fontSize: 16, color: textColor, fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, lineHeight: 1.4, marginBottom: 12 }}>{content?.journalPrompt}</div>
+        <div style={{ fontSize: 18, color: textColor, fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, lineHeight: 1.4, marginBottom: 12, borderLeft: `2px solid ${vibe.accent}40`, paddingLeft: 14 }}>{content?.journalPrompt}</div>
         <textarea value={journalText} onChange={e => setJournalText(e.target.value)} placeholder={t('day.writePlaceholder')} style={inputStyle} />
         <button onClick={saveJournal} style={{ marginTop: 8, background: journalSaved ? `${vibe.accent}20` : vibe.accent, color: journalSaved ? vibe.accent : 'white', border: journalSaved ? `1px solid ${vibe.accent}40` : 'none', borderRadius: 10, padding: '10px 18px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont, transition: 'all 0.2s' }}>
           {journalSaved ? t('day.saved') : t('day.saveEntry')}
@@ -670,14 +722,14 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
     if (component === 'gratitude') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.gratitude)}
-        <div style={{ fontSize: 16, color: textColor, fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, lineHeight: 1.4 }}>{content?.gratitudePrompt}</div>
+        <div style={{ fontSize: 18, color: textColor, fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, lineHeight: 1.4, borderLeft: `2px solid ${vibe.accent}40`, paddingLeft: 14 }}>{content?.gratitudePrompt}</div>
       </Card>
     )
     if (component === 'meditation' || component === 'breathing') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
-          <button onClick={() => { setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `${vibe.accent}15`, border: `1px solid ${vibe.accent}30`, borderRadius: 12, padding: '20px', cursor: 'pointer', fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 14, color: vibe.accent }}>
+          <button onClick={() => { unlockSpeech(); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `${vibe.accent}15`, border: `1px solid ${vibe.accent}30`, borderRadius: 12, padding: '20px', cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: vibe.accent }}>
             Breathe with me · 35s
           </button>
         ) : (
@@ -698,7 +750,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
 
   return (
     <>
-    <ScreenShell bg={vibe.bg} visible={visible} transition="opacity 0.5s ease">
+    <ScreenShell bg={vibe.bg} visible={visible} transition="opacity 0.5s ease" style={isPaused ? { filter: 'blur(6px)', opacity: 0.4, pointerEvents: 'none' as const } : undefined}>
       {/* Header — centered tagline, title, subtitle + settings icon top-right */}
       <div style={{ padding: '20px 22px 0', position: 'relative' }}>
         <button onClick={onSettings} className="flex-center" style={{ position: 'absolute', top: 20, right: 22, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', fontSize: 14, zIndex: 1 }}>⚙️</button>
@@ -774,10 +826,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, alignSelf: 'center' }}>
               {Array.from({ length: data.cycleDays }, (_, i) => i + 1).map(d => {
                 const isDone = completedDays.has(d)
-                const isToday = d === dayNumber
-                const isFuture = !isDone && !isToday
-                const dotSize = isToday ? 12 : 8
-                const canNavigate = isDone || d <= dayNumber || (isPremium || d <= 3)
+                const isViewing = d === dayNumber
+                const dotSize = isViewing ? 10 : 8
                 return (
                   <button
                     key={d}
@@ -786,16 +836,23 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
                       onGoToDay?.(d)
                     }}
                     style={{
-                      width: dotSize, height: dotSize, borderRadius: '50%', padding: 0,
-                      background: isDone ? vibe.accent : isToday ? '#F5C842' : `${mutedColor}25`,
-                      border: isToday ? '1.5px solid #F5C842' : 'none',
-                      boxShadow: isToday ? '0 0 6px #F5C84280' : 'none',
-                      opacity: isFuture ? 0.35 : 1,
-                      transition: 'all 0.3s',
-                      margin: 'auto',
+                      width: 18, height: 18, borderRadius: '50%', padding: 0,
+                      background: 'transparent',
+                      border: 'none',
+                      boxShadow: 'none',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer',
+                      margin: 'auto',
                     }}
-                  />
+                  >
+                    <div style={{
+                      width: dotSize, height: dotSize, borderRadius: '50%',
+                      background: isDone ? vibe.accent : `${mutedColor}25`,
+                      border: isViewing && !isDone ? `1.5px solid ${mutedColor}50` : 'none',
+                      opacity: isDone ? 1 : 0.35,
+                      transition: 'all 0.3s',
+                    }} />
+                  </button>
                 )
               })}
             </div>
@@ -842,12 +899,13 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
                 color: vibe.accent, letterSpacing: '0.15em', textTransform: 'uppercase',
               }}>{vibeContent.friendNote.heading}</span>
             </div>
-            <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 18, color: textColor, lineHeight: 1.5, textAlign: 'center', padding: '8px 4px' }}>
+            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 18, color: textColor, lineHeight: 1.5, textAlign: 'center', padding: '8px 4px' }}>
               {content?.friendNote || vibeContent.friendNote.text.replace('[name]', data.name).replace('[X]', String(dayNumber))}
             </div>
             <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: vibe.accent, textAlign: 'center', marginTop: 8 }}>
               I am so proud of you 🔥
             </div>
+            {saveShareRow('friendNote', content?.friendNote || vibeContent.friendNote.text.replace('[name]', data.name).replace('[X]', String(dayNumber)))}
           </Card>
         </div>
       )}
@@ -883,8 +941,31 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
       )}
     </ScreenShell>
 
+    {/* Paused overlay */}
+    {isPaused && (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: 14, padding: 32, textAlign: 'center',
+      }}>
+        <div style={{ fontSize: 36 }}>&#127769;</div>
+        <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 26, color: isDark ? '#FDF6F0' : '#1C0F0C', lineHeight: 1.2 }}>
+          Your journey is paused
+        </div>
+        <div style={{ fontFamily: typo.bodyFont, fontSize: 14, color: isDark ? 'rgba(253,246,240,0.5)' : '#9B7B74', lineHeight: 1.6, maxWidth: 260 }}>
+          Rest is part of the journey too. When you're ready, pick up right where you left off.
+        </div>
+        <button onClick={onResume} style={{ background: vibe.accent, color: 'white', border: 'none', borderRadius: 14, padding: '14px 32px', fontFamily: typo.bodyFont, fontWeight: 700, fontSize: 14, cursor: 'pointer', marginTop: 8 }}>
+          Resume my journey
+        </button>
+        <button onClick={onSettings} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: isDark ? 'rgba(253,246,240,0.35)' : '#9B7B74', marginTop: 4 }}>
+          Settings
+        </button>
+      </div>
+    )}
+
     {/* Pinned bottom navigation row — outside ScreenShell so position:fixed works */}
-    <div style={{
+    {!isPaused && <div style={{
       position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)',
       width: '100%', maxWidth: 390, padding: '10px 18px 12px',
       display: 'flex', alignItems: 'center', gap: 12,
@@ -971,7 +1052,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, onDayComplete,
           transition: 'all 0.2s', flexShrink: 0,
         }}
       >›</button>
-    </div>
+    </div>}
     </>
   )
 }

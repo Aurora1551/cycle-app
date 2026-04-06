@@ -277,7 +277,7 @@ const pt = {
       inShortText: 'Seu diário é privado. Seus dados nunca são vendidos. Você pode excluir tudo a qualquer momento. Coletamos apenas o necessário para personalizar sua experiência.',
     },
     progress: {
-      sectionLabel: 'Progresso',
+      sectionLabel: 'Jornada',
       heading: 'Sua jornada',
       dayByDay: 'Dia a dia',
       week: 'S{{n}}',
@@ -333,7 +333,7 @@ const pt = {
       linkCopied: '✓ Link copiado!',
       backToDay: 'Voltar ao meu dia',
     },
-    nav: { today: 'Hoje', progress: 'Progresso' },
+    nav: { today: 'Hoje', progress: 'Jornada' },
     languagePicker: { title: 'Escolher idioma' },
   },
 }

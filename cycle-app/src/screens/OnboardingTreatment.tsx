@@ -44,7 +44,7 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
             const sel = selected === tr.id
             return (
               <div key={tr.id}>
-                <button onClick={() => setSelected(tr.id)} className="sel-btn" style={{
+                <button onClick={() => { setSelected(tr.id); if (tr.id !== 'other') setTimeout(() => onContinue(tr.id), 350) }} className="sel-btn" style={{
                   gap: 12, background: sel ? 'rgba(196,97,74,0.06)' : 'white',
                   border: sel ? `1.5px solid ${A}` : '1.5px solid rgba(196,97,74,0.12)',
                   boxShadow: sel ? '0 0 0 3px rgba(196,97,74,0.1)' : 'none',
@@ -68,6 +68,7 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
                       type="text"
                       value={otherText}
                       onChange={e => setOtherText(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && otherText.trim()) onContinue(otherText.trim()) }}
                       placeholder={t('onboardingTreatment.otherPlaceholder')}
                       autoFocus
                       style={{

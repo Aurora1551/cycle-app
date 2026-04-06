@@ -12,6 +12,11 @@
 @keyframes spin    { to{transform:rotate(360deg)} }
 @keyframes pulse-orb { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.15);opacity:1} }
 @keyframes glow-ring { 0%,100%{transform:scale(1);opacity:.3} 50%{transform:scale(1.25);opacity:.6} }
+@keyframes confetti-pop {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { opacity: 0.9; }
+  100% { transform: translateY(-180px) scale(0.3); opacity: 0; }
+}
 
 /* ── Layout ── */
 .screen     { width:100%; max-width:390px; min-height:100svh; display:flex; flex-direction:column; }

@@ -277,7 +277,7 @@ const de = {
       inShortText: 'Dein Tagebuch bleibt privat. Deine Daten werden nie verkauft. Du kannst alles jederzeit löschen. Wir sammeln nur, was nötig ist, um dein Erlebnis zu personalisieren.',
     },
     progress: {
-      sectionLabel: 'Fortschritt',
+      sectionLabel: 'Reise',
       heading: 'Deine Reise',
       dayByDay: 'Tag für Tag',
       week: 'W{{n}}',
@@ -333,7 +333,7 @@ const de = {
       linkCopied: '✓ Link kopiert!',
       backToDay: 'Zurück zu meinem Tag',
     },
-    nav: { today: 'Heute', progress: 'Fortschritt' },
+    nav: { today: 'Heute', progress: 'Reise' },
     languagePicker: { title: 'Sprache wählen' },
   },
 }

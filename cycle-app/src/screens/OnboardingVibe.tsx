@@ -24,7 +24,7 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
   const bg = activeVibe?.bg || '#FDF6F0'
   const progress = (5 / 6) * 100
 
-  const handleSelect = (key: VibeKey) => { setSelected(key); onPreview(key) }
+  const handleSelect = (key: VibeKey) => { setSelected(key); onPreview(key); setTimeout(() => onContinue(key), 400) }
 
   return (
     <div className="screen" style={{
@@ -54,8 +54,6 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
                 transition: 'all 0.25s ease', boxShadow: sel ? `0 0 0 3px ${accent}33` : 'none',
                 position: 'relative',
               }}
-                onMouseEnter={() => !selected && onPreview(v.key)}
-                onMouseLeave={() => !selected && onPreview(null)}
               >
                 {sel && <div className="check-circle" style={{ position: 'absolute', top: 8, right: 10, width: 16, height: 16, background: accent, fontSize: 9 }}>✓</div>}
                 <div style={{ fontSize: 26, marginBottom: 6 }}>{v.emoji}</div>

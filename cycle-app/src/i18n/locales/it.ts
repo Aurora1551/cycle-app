@@ -277,7 +277,7 @@ const it = {
       inShortText: 'Il tuo diario resta privato. I tuoi dati non vengono mai venduti. Puoi eliminare tutto in qualsiasi momento. Raccogliamo solo ciò che serve per personalizzare la tua esperienza.',
     },
     progress: {
-      sectionLabel: 'Progressi',
+      sectionLabel: 'Percorso',
       heading: 'Il tuo percorso',
       dayByDay: 'Giorno per giorno',
       week: 'S{{n}}',
@@ -333,7 +333,7 @@ const it = {
       linkCopied: '✓ Link copiato!',
       backToDay: 'Torna al mio giorno',
     },
-    nav: { today: 'Oggi', progress: 'Progressi' },
+    nav: { today: 'Oggi', progress: 'Percorso' },
     languagePicker: { title: 'Scegli la lingua' },
   },
 }

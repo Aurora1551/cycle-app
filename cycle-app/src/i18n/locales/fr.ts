@@ -277,7 +277,7 @@ const fr = {
       inShortText: "Ton journal reste privé. Tes données ne sont jamais vendues. Tu peux tout supprimer à tout moment. Nous ne collectons que ce qui est nécessaire pour personnaliser ton expérience.",
     },
     progress: {
-      sectionLabel: 'Progrès',
+      sectionLabel: 'Parcours',
       heading: 'Ton parcours',
       dayByDay: 'Jour par jour',
       week: 'S{{n}}',
@@ -333,7 +333,7 @@ const fr = {
       linkCopied: '✓ Lien copié !',
       backToDay: 'Retour à ma journée',
     },
-    nav: { today: "Aujourd'hui", progress: 'Progrès' },
+    nav: { today: "Aujourd'hui", progress: 'Parcours' },
     languagePicker: { title: 'Choisir la langue' },
   },
 }
