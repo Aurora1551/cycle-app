@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Reflection Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 48px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .section-desc { font-size: 13px; color: rgba(253,246,240,0.45); margin-bottom: 20px; line-height: 1.6; }
+  .phones { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 12px; }
+  .phone { width: 320px; min-height: 480px; background: #1C0F0C; border-radius: 28px; border: 1px solid rgba(255,255,255,0.06); padding: 24px 18px; flex-shrink: 0; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .flow { display: flex; gap: 4px; align-items: center; overflow-x: auto; padding-bottom: 8px; margin-bottom: 20px; }
+  .step { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; min-width: 110px; max-width: 150px; flex-shrink: 0; text-align: center; }
+  .step-name { font-family: 'DM Mono', monospace; font-size: 8px; color: #C4614A; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+  .step-detail { font-size: 10px; color: rgba(253,246,240,0.5); line-height: 1.4; }
+  .arrow { color: rgba(196,97,74,0.4); font-size: 16px; flex-shrink: 0; }
+  .step.highlight { border-color: #C4614A; background: rgba(196,97,74,0.08); }
+  .mono { font-family: 'DM Mono', monospace; }
+</style>
+</head>
+<body>
+
+<h1>Reflection Journey</h1>
+<p class="subtitle">How reflections are saved, stored, and shown back to the user</p>
+
+<!-- ============================================= -->
+<!-- FLOW DIAGRAM -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">The Flow</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Last Day</div><div class="step-detail">Mark done → confetti → end of cycle</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Cycle Complete</div><div class="step-detail">"You did it, Sarah"</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Reflection</div><div class="step-detail">"What do you want to carry with you?"</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Save</div><div class="step-detail">Stored in localStorage + backend</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Start New Cycle</div><div class="step-detail">Or gift / share</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Welcome Back</div><div class="step-detail">Shows previous reflection before Day 1</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Day 1</div><div class="step-detail">New cycle begins</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- SCREEN 1: END OF CYCLE (CURRENT) -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Screen 1 — End of Cycle (Writing the Reflection)</div>
+  <div class="phones">
+    <div>
+      <div class="phone-label">Current implementation</div>
+      <div class="phone">
+        <!-- Orb -->
+        <div style="text-align:center; margin-bottom:16px">
+          <div style="width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 35% 35%, rgba(196,97,74,0.8), rgba(196,97,74,0.3)); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:28px">🔥</div>
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.15em; margin-bottom:6px">CYCLE COMPLETE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:700; color:#FDF6F0; line-height:1.2">You did it,<br><span style="color:#C4614A">Sarah.</span></div>
+        </div>
+
+        <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:18px; color:#C4614A; line-height:1.4; text-align:center; margin-bottom:16px">
+          18 days of showing up for yourself. That takes incredible strength.
+        </div>
+
+        <!-- Reflection card -->
+        <div class="card">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em; margin-bottom:8px">💌 BEFORE YOU GO</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:16px; color:#FDF6F0; line-height:1.4; margin-bottom:10px">
+            What do you want to carry with you from this cycle?
+          </div>
+          <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px; min-height:70px; font-family:'Karla',sans-serif; font-size:13px; color:rgba(253,246,240,0.7); line-height:1.5">
+            That even on the hardest days, I showed up. And that my body is doing something incredible even when I can't see it.
+          </div>
+          <div style="margin-top:8px; background:#C4614A; color:white; border-radius:10px; padding:10px 18px; font-size:12px; font-weight:600; text-align:center; cursor:pointer">
+            Save this
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-around; text-align:center">
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3)">DAYS DONE</div></div>
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3)">SONGS</div></div>
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3)">QUOTES</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- SCREEN 2: RETURNING — SEES PAST REFLECTION -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Screen 2 — Starting a New Cycle (Seeing Past Reflections)</div>
+  <p class="section-desc">When someone starts a new cycle, before Day 1 loads, we show them what they wrote last time. This creates a moment of continuity and self-compassion between cycles.</p>
+
+  <div class="phones">
+    <!-- Option A: Full-screen moment -->
+    <div>
+      <div class="phone-label">Option A — Full-screen moment before Day 1</div>
+      <div class="phone" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:16px">
+        <div style="font-size:32px">📖</div>
+        <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.15em">FROM YOUR LAST CYCLE</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:20px; color:#FDF6F0; line-height:1.4; max-width:260px; padding:0 8px">
+          "That even on the hardest days, I showed up. And that my body is doing something incredible even when I can't see it."
+        </div>
+        <div class="mono" style="font-size:9px; color:rgba(253,246,240,0.3); letter-spacing:0.05em">
+          IVF · 18 days · March 2026
+        </div>
+        <div style="width:40px; height:1px; background:rgba(196,97,74,0.3); margin:4px 0"></div>
+        <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; color:rgba(253,246,240,0.5); max-width:240px; line-height:1.5">
+          You carried that with you. Now let's begin again.
+        </div>
+        <div style="background:#C4614A; color:white; border-radius:14px; padding:14px 32px; font-weight:700; font-size:14px; cursor:pointer; margin-top:8px">
+          Start my new cycle
+        </div>
+      </div>
+    </div>
+
+    <!-- Option B: Card at top of Day 1 -->
+    <div>
+      <div class="phone-label">Option B — Card at top of Day 1</div>
+      <div class="phone">
+        <div style="text-align:center; margin-bottom:12px">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.15em; margin-bottom:6px">DAY BY DAY, FIRE BY FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700; font-style:italic; color:#FDF6F0">She's Got This</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:900; color:#FDF6F0; margin-top:8px">1</div>
+          <div class="mono" style="font-size:9px; color:rgba(253,246,240,0.3)">OF 18 DAYS</div>
+        </div>
+
+        <!-- Past reflection card — dismissable -->
+        <div style="background:linear-gradient(135deg, rgba(196,97,74,0.08) 0%, rgba(196,97,74,0.03) 100%); border:1px solid rgba(196,97,74,0.15); border-radius:14px; padding:16px; margin-bottom:12px; position:relative">
+          <button style="position:absolute; top:8px; right:10px; background:none; border:none; color:rgba(253,246,240,0.3); font-size:14px; cursor:pointer">×</button>
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em; margin-bottom:8px">📖 FROM YOUR LAST CYCLE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; font-size:15px; color:rgba(253,246,240,0.7); line-height:1.5">
+            "That even on the hardest days, I showed up. And that my body is doing something incredible even when I can't see it."
+          </div>
+          <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.25); margin-top:8px">March 2026 · IVF · 18 days</div>
+        </div>
+
+        <!-- Rest of day 1 content -->
+        <div class="card" style="opacity:0.5">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em; margin-bottom:6px">🔥 TODAY'S FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:#FDF6F0; line-height:1.35">"She believed she could, so she did."</div>
+        </div>
+        <div class="card" style="opacity:0.3">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em">🎵 TODAY'S ANTHEM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option C: In Journey tab -->
+    <div>
+      <div class="phone-label">Option C — In Journey tab as "Past Cycles" section</div>
+      <div class="phone">
+        <div class="mono" style="font-size:9px; color:rgba(253,246,240,0.3); letter-spacing:0.15em; margin-bottom:6px">JOURNEY</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:700; color:#FDF6F0; margin-bottom:16px">Your journey</div>
+
+        <!-- Current cycle stats -->
+        <div class="card">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em; margin-bottom:8px">CURRENT CYCLE</div>
+          <div style="display:flex; justify-content:space-around; text-align:center">
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:700; font-style:italic; color:#C4614A">3</div><div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3)">DAY</div></div>
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3)">TOTAL</div></div>
+          </div>
+        </div>
+
+        <!-- Saved items -->
+        <div class="card">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em; margin-bottom:8px">♡ SAVED</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13px; color:#FDF6F0; line-height:1.4">"She was powerful not because she wasn't scared..."</div>
+          <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.25); margin-top:4px">— Atticus · QUOTE · DAY 2</div>
+        </div>
+
+        <!-- Past cycles -->
+        <div class="card" style="border-color:rgba(196,97,74,0.2)">
+          <div class="mono" style="font-size:9px; color:#C4614A; letter-spacing:0.12em; margin-bottom:10px">📖 PAST CYCLES</div>
+
+          <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px; margin-bottom:12px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px">
+              <div class="mono" style="font-size:9px; color:rgba(253,246,240,0.4)">IVF · 18 DAYS · MAR 2026</div>
+              <div class="mono" style="font-size:9px; color:#C4614A">✓ COMPLETED</div>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:rgba(253,246,240,0.6); line-height:1.4">
+              "That even on the hardest days, I showed up. And that my body is doing something incredible even when I can't see it."
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px">
+              <div class="mono" style="font-size:9px; color:rgba(253,246,240,0.4)">IUI · 28 DAYS · JAN 2026</div>
+              <div class="mono" style="font-size:9px; color:#C4614A">✓ COMPLETED</div>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:rgba(253,246,240,0.6); line-height:1.4">
+              "I am not alone in this. I never was."
+            </div>
+          </div>
+        </div>
+
+        <!-- Nav -->
+        <div style="display:flex; justify-content:space-around; padding:12px 0 4px; border-top:1px solid rgba(255,255,255,0.06); margin-top:8px; font-size:10px">
+          <span style="color:rgba(253,246,240,0.3)">Today</span>
+          <span style="color:#C4614A">Journey</span>
+          <span style="color:rgba(253,246,240,0.3)">Settings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- DATA MODEL -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">How Reflections Are Stored</div>
+  <div class="section-desc">
+    <strong>Current:</strong> Single reflection saved to <code>localStorage</code> as <code>cycle_reflection</code> — overwritten each cycle.<br><br>
+    <strong>Proposed:</strong> Array of reflections saved as <code>cycle_reflections</code> — one per completed cycle. Each entry stores:
+  </div>
+  <div class="card" style="font-family:'DM Mono',monospace; font-size:11px; color:rgba(253,246,240,0.5); line-height:2">
+    <span style="color:#C4614A">cycle_reflections</span> = [<br>
+    &nbsp;&nbsp;{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;text: "That even on the hardest days...",<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;treatment: "IVF",<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;cycleDays: 18,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;date: "2026-03-20",<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;vibe: "fierce"<br>
+    &nbsp;&nbsp;},<br>
+    &nbsp;&nbsp;{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;text: "I am not alone in this...",<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;treatment: "IUI",<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;cycleDays: 28,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;date: "2026-01-15",<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;vibe: "nurturing"<br>
+    &nbsp;&nbsp;}<br>
+    ]
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- RECOMMENDATION -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Recommendation</div>
+  <div class="section-desc">
+    <strong>Use all three options together:</strong><br><br>
+    • <strong>Option A</strong> (full-screen moment) — shows once when starting a new cycle, if a reflection exists. Emotional, intentional, sets the tone.<br>
+    • <strong>Option B</strong> (card on Day 1) — NOT needed if Option A exists, would feel redundant.<br>
+    • <strong>Option C</strong> (Journey tab) — always visible. "Past Cycles" section at the bottom of Journey tab shows all completed cycles with their reflections. This is the permanent home.<br><br>
+    So the journey is: <strong>End of cycle → write reflection → start new cycle → see reflection (Option A) → dismiss → Day 1</strong>. And all reflections are always browsable in the Journey tab (Option C).
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  View at localhost:5000/reflection-flow.html
+</div>
+
+</body>
+</html>

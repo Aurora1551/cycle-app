@@ -41,7 +41,8 @@ const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music'
 const NAV_SCREENS: Screen[] = ['day', 'progress']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
-  if (screen === 'splash' || screen === 'login' || screen === 'register-gate' || screen === 'gift-redeem') return '#0E0E0E'
+  if (screen === 'splash') return '#FFFBF0'
+  if (screen === 'login' || screen === 'register-gate' || screen === 'gift-redeem') return '#0E0E0E'
   const activeVibe = preview || vibe
   if (ONBOARDING_VIBE_SCREENS.includes(screen) && activeVibe) {
     return VIBES.find(v => v.key === activeVibe)?.bg || '#FDF6F0'
@@ -244,12 +245,12 @@ function App() {
       {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('onboarding-name')} />}
       {screen === 'onboarding-name' && <OnboardingName onBack={() => setScreen('splash')} onContinue={name => { update({ name }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-treatment') }} initialValue={data.name} />}
       {screen === 'onboarding-treatment' && <OnboardingTreatment onBack={() => setScreen('onboarding-name')} onContinue={treatment => { update({ treatment }); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-cycle-length') }} initialValue={data.treatment} />}
-      {screen === 'onboarding-cycle-length' && <OnboardingCycleLength onBack={() => setScreen('onboarding-treatment')} onContinue={cycleDays => { update({ cycleDays }); track('onboarding_step_completed', { step: 3 }); setScreen('onboarding-components') }} initialValue={data.cycleDays} />}
+      {screen === 'onboarding-cycle-length' && <OnboardingCycleLength onBack={() => setScreen('onboarding-treatment')} onContinue={cycleDays => { update({ cycleDays }); track('onboarding_step_completed', { step: 3 }); setScreen('onboarding-components') }} initialValue={data.cycleDays} treatment={data.treatment} />}
       {screen === 'onboarding-components' && <OnboardingComponents onBack={() => setScreen('onboarding-cycle-length')} onContinue={components => { update({ components }); track('onboarding_step_completed', { step: 4 }); setScreen('onboarding-vibe') }} initialValue={data.components} />}
       {screen === 'onboarding-vibe' && <OnboardingVibe onBack={() => { setVibePreview(null); setScreen('onboarding-components') }} onContinue={vibeKey => { update({ vibe: vibeKey }); setVibePreview(null); track('onboarding_step_completed', { step: 5 }); setScreen('onboarding-music') }} initialValue={data.vibe || null} onPreview={setVibePreview} />}
       {screen === 'onboarding-music' && data.vibe && <OnboardingMusic onBack={() => setScreen('onboarding-vibe')} onContinue={genres => { update({ genres }); track('onboarding_step_completed', { step: 6 }); setScreen('summary') }} vibe={data.vibe} initialValue={data.genres} />}
-      {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
-      {screen === 'paywall' && <Paywall name={data.name} onBack={() => setScreen('day')} onStartFree={() => { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') }} onSelectPlan={plan => {
+      {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('notification-settings') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
+      {screen === 'paywall' && <Paywall name={data.name} onBack={() => setScreen('day')} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onSelectPlan={plan => {
         track('plan_selected', { plan })
         if (plan === 'free') { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day'); return }
         if (plan === 'gift') { setScreen('gift-flow'); return }

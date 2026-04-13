@@ -45,15 +45,15 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
         <h1 className="heading-xl" style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, color: textColor }}>
           {(() => { const full = t('endOfCycle.heading', { name: data.name }); const idx = full.indexOf(data.name); if (idx === -1) return full; return <>{full.slice(0, idx)}<br /><span style={{ color: vibe.accent }}>{full.slice(idx)}</span></> })()}
         </h1>
-        <p style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 16, color: mutedColor, lineHeight: 1.6, textAlign: 'center', maxWidth: 280 }}>
+        <p style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 20, color: vibe.accent, lineHeight: 1.4, textAlign: 'center', maxWidth: 300 }}>
           {t('endOfCycle.message', { days: data.cycleDays })}
         </p>
 
         {/* Reflection prompt */}
         <Card cardBg={cardBg} cardBorder={cardBorder} style={{ width: '100%' }}>
           <SectionLabel color={vibe.accent}>&#128140; BEFORE YOU GO</SectionLabel>
-          <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 16, color: textColor, lineHeight: 1.5, marginBottom: 12 }}>
-            What's one thing you want to remember from this cycle?
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 18, color: textColor, lineHeight: 1.4, marginBottom: 12 }}>
+            What do you want to carry with you from this cycle?
           </div>
           <textarea
             value={reflection}
@@ -69,7 +69,15 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
           />
           {reflection.trim() && (
             <button onClick={() => {
-              localStorage.setItem('cycle_reflection', JSON.stringify({ text: reflection, date: new Date().toISOString(), cycleDays: data.cycleDays }))
+              // Save as array so multiple cycles accumulate
+              const entry = { text: reflection, date: new Date().toISOString(), cycleDays: data.cycleDays, treatment: data.treatment, vibe: data.vibe }
+              let all: any[] = []
+              try { all = JSON.parse(localStorage.getItem('cycle_reflections') || '[]') } catch {}
+              if (!Array.isArray(all)) all = []
+              all.unshift(entry) // newest first
+              localStorage.setItem('cycle_reflections', JSON.stringify(all))
+              // Also keep legacy key for backwards compat
+              localStorage.setItem('cycle_reflection', JSON.stringify(entry))
               setReflectionSaved(true)
               setTimeout(() => setReflectionSaved(false), 2000)
             }} style={{

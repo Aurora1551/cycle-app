@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — User Journeys with Screenshots</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; text-align: center; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; text-align: center; }
+  .journey { margin-bottom: 64px; max-width: 100%; }
+  .journey-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .journey-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; color: #C4614A; line-height: 1; }
+  .journey-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #FDF6F0; }
+  .journey-desc { font-size: 12px; color: rgba(253,246,240,0.4); margin-bottom: 20px; }
+  .screens { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+  .screen-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .screen-label { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(253,246,240,0.35); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; max-width: 180px; }
+  .phone { width: 180px; min-height: 320px; background: #1C0F0C; border-radius: 20px; border: 2px solid rgba(255,255,255,0.08); padding: 14px 12px; position: relative; overflow: hidden; }
+  .phone.light { background: #FDF6F0; border-color: rgba(196,97,74,0.15); }
+  .phone.calm { background: #0D1F2D; }
+  .phone.spiritual { background: #120A2A; }
+  .phone.nurturing { background: #FDF0EC; }
+  .phone.lighthearted { background: #FFFBF0; }
+  .arrow { color: #C4614A; font-size: 20px; flex-shrink: 0; align-self: center; margin-top: 60px; }
+  .notch { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 0 auto 10px; }
+  .phone.light .notch { background: rgba(0,0,0,0.08); }
+  .mono { font-family: 'DM Mono', monospace; }
+  .btn { border-radius: 12px; padding: 10px 14px; font-size: 11px; font-weight: 700; text-align: center; cursor: default; }
+  .btn-accent { background: #C4614A; color: white; }
+  .btn-ghost { background: transparent; border: 1.5px solid rgba(196,97,74,0.3); color: #C4614A; }
+  .btn-dark { background: #1C0F0C; color: #FDF6F0; border: 2px solid #C4614A; }
+  .btn-green { background: #1DB954; color: white; }
+  .btn-stripe { background: #635BFF; color: white; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .section-break { border-top: 1px solid rgba(196,97,74,0.15); margin: 48px auto; max-width: 600px; }
+  .nav-bar { display: flex; justify-content: space-around; padding: 6px 0 2px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto; font-size: 8px; }
+  .nav-bar span { color: rgba(253,246,240,0.3); }
+  .nav-bar .active { color: #C4614A; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+  .card.light { background: rgba(0,0,0,0.02); border-color: rgba(196,97,74,0.1); }
+</style>
+</head>
+<body>
+
+<h1>User Journeys</h1>
+<p class="subtitle">Screen-by-screen walkthrough of every path through Cycle</p>
+
+<!-- ============================================= -->
+<!-- JOURNEY 1: NEW USER — ONBOARDING + FREE TRIAL -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">1</div><div class="journey-title">New User — Onboarding + Free Trial</div></div>
+  <div class="journey-desc">First-time user discovers the app and goes through the full onboarding</div>
+  <div class="screens">
+    <!-- Splash -->
+    <div class="screen-wrap">
+      <div class="screen-label">Splash</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:30px">
+          <div style="font-size:36px; margin-bottom:12px">🌙</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:#1C0F0C; line-height:1.2; margin-bottom:4px">Cycle</div>
+          <div style="font-size:11px; color:#9B7B74; margin-bottom:24px">Daily strength for your journey</div>
+          <div class="btn btn-accent" style="margin-bottom:8px">Begin your journey</div>
+          <div class="btn btn-ghost" style="margin-bottom:8px">I have an account</div>
+          <div class="btn btn-ghost">Gift it to someone</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Name -->
+    <div class="screen-wrap">
+      <div class="screen-label">Step 1 · Name</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="height:3px; background:linear-gradient(90deg, #C4614A 16%, rgba(196,97,74,0.1) 16%); border-radius:2px; margin-bottom:12px"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">STEP 1 OF 6</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#1C0F0C; margin-bottom:4px">What's your name?</div>
+        <div style="font-size:11px; color:#9B7B74; margin-bottom:12px">So we can make this personal</div>
+        <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:10px; padding:10px; margin-bottom:auto">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#1C0F0C">Sarah</div>
+        </div>
+        <div style="margin-top:40px">
+          <div class="btn btn-accent" style="margin-bottom:6px">Continue</div>
+          <div style="font-size:10px; color:#9B7B74; text-align:center">Skip for now</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Treatment -->
+    <div class="screen-wrap">
+      <div class="screen-label">Step 2 · Treatment</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="height:3px; background:linear-gradient(90deg, #C4614A 33%, rgba(196,97,74,0.1) 33%); border-radius:2px; margin-bottom:12px"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">STEP 2 OF 6</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:10px">What treatment are you on?</div>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <div style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1.5px solid #C4614A; border-radius:10px; background:rgba(196,97,74,0.06)">
+            <span style="font-size:14px">💫</span><span style="font-size:11px; font-weight:600; color:#1C0F0C">IVF</span>
+            <span style="margin-left:auto; width:14px; height:14px; border-radius:50%; background:#C4614A; font-size:8px; color:white; display:flex; align-items:center; justify-content:center">✓</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1.5px solid rgba(196,97,74,0.12); border-radius:10px">
+            <span style="font-size:14px">🌱</span><span style="font-size:11px; color:#1C0F0C">IUI</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1.5px solid rgba(196,97,74,0.12); border-radius:10px">
+            <span style="font-size:14px">🥚</span><span style="font-size:11px; color:#1C0F0C">Egg Freezing</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1.5px solid rgba(196,97,74,0.12); border-radius:10px">
+            <span style="font-size:14px">❄️</span><span style="font-size:11px; color:#1C0F0C">FET</span>
+          </div>
+        </div>
+        <div style="font-size:9px; color:#9B7B74; text-align:center; margin-top:8px">↑ Tap to select · auto-advances</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Cycle Days -->
+    <div class="screen-wrap">
+      <div class="screen-label">Step 3 · Cycle Days</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="height:3px; background:linear-gradient(90deg, #C4614A 50%, rgba(196,97,74,0.1) 50%); border-radius:2px; margin-bottom:12px"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">STEP 3 OF 6</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:10px">How many days?</div>
+        <div style="display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:12px">
+          <div style="display:flex; align-items:center; background:white; border:1.5px solid rgba(196,97,74,0.15); border-radius:10px; overflow:hidden">
+            <div style="padding:8px 12px; font-size:16px; color:#C4614A">−</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700; color:#1C0F0C; width:40px; text-align:center; border-left:1px solid rgba(196,97,74,0.1); border-right:1px solid rgba(196,97,74,0.1); padding:4px 0">18</div>
+            <div style="padding:8px 12px; font-size:16px; color:#C4614A">+</div>
+          </div>
+          <div style="font-size:11px; color:#9B7B74">days</div>
+        </div>
+        <div style="background:white; border:1px solid rgba(196,97,74,0.12); border-radius:10px; padding:10px; text-align:center">
+          <div style="display:flex; align-items:center; justify-content:center; gap:4px; margin-bottom:4px">
+            <div class="dot" style="background:#C4614A; box-shadow:0 0 4px rgba(196,97,74,0.5)"></div>
+            <div style="flex:1; height:2px; background:linear-gradient(to right, #C4614A, rgba(196,97,74,0.3))"></div>
+            <div class="dot" style="background:rgba(196,97,74,0.3); border:1px solid rgba(196,97,74,0.4)"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between">
+            <span class="mono" style="font-size:7px; color:#C4614A">DAY 1</span>
+            <span class="mono" style="font-size:7px; color:#9B7B74">DAY 18</span>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <div class="btn btn-accent">Continue</div>
+          <div style="font-size:9px; color:#9B7B74; text-align:center; margin-top:4px">Press Enter ↵</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Components -->
+    <div class="screen-wrap">
+      <div class="screen-label">Step 4 · Components</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="height:3px; background:linear-gradient(90deg, #C4614A 66%, rgba(196,97,74,0.1) 66%); border-radius:2px; margin-bottom:12px"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">STEP 4 OF 6</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#1C0F0C; margin-bottom:8px">What would you like each day?</div>
+        <div style="display:flex; flex-direction:column; gap:5px; font-size:10px">
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)">
+            <span>💬</span><span style="color:#1C0F0C; font-weight:600">Quote</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)">
+            <span>🎵</span><span style="color:#1C0F0C; font-weight:600">Anthem</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)">
+            <span>🌟</span><span style="color:#1C0F0C; font-weight:600">Affirmation</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)">
+            <span>🍳</span><span style="color:#1C0F0C; font-weight:600">Your Fuel</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)">
+            <span>✍️</span><span style="color:#1C0F0C; font-weight:600">Journal</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)">
+            <span>🧘</span><span style="color:#1C0F0C; font-weight:600">Meditation</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Vibe -->
+    <div class="screen-wrap">
+      <div class="screen-label">Step 5 · Vibe</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="height:3px; background:linear-gradient(90deg, #C4614A 83%, rgba(196,97,74,0.1) 83%); border-radius:2px; margin-bottom:12px"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">STEP 5 OF 6</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#FDF6F0; margin-bottom:8px">Choose your vibe</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px">
+          <div style="border:2px solid #C4614A; border-radius:10px; padding:10px 6px; text-align:center; background:rgba(196,97,74,0.1)">
+            <div style="font-size:20px; margin-bottom:4px">🔥</div>
+            <div style="font-size:10px; font-weight:600; color:#FDF6F0">Fierce</div>
+          </div>
+          <div style="border:1.5px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 6px; text-align:center">
+            <div style="font-size:20px; margin-bottom:4px">🌸</div>
+            <div style="font-size:10px; color:rgba(253,246,240,0.6)">Nurturing</div>
+          </div>
+          <div style="border:1.5px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 6px; text-align:center">
+            <div style="font-size:20px; margin-bottom:4px">🌊</div>
+            <div style="font-size:10px; color:rgba(253,246,240,0.6)">Calm</div>
+          </div>
+          <div style="border:1.5px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 6px; text-align:center">
+            <div style="font-size:20px; margin-bottom:4px">☀️</div>
+            <div style="font-size:10px; color:rgba(253,246,240,0.6)">Lighthearted</div>
+          </div>
+          <div style="border:1.5px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 6px; text-align:center; grid-column:span 2">
+            <div style="font-size:20px; margin-bottom:4px">🙏</div>
+            <div style="font-size:10px; color:rgba(253,246,240,0.6)">Spiritual</div>
+          </div>
+        </div>
+        <div style="font-size:9px; color:rgba(253,246,240,0.3); text-align:center; margin-top:6px">Tap to select · auto-advances</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Summary -->
+    <div class="screen-wrap">
+      <div class="screen-label">Summary</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:10px">
+          <div style="font-size:28px; margin-bottom:8px">🔥</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:4px">Ready, Sarah</div>
+          <div style="font-size:10px; color:#9B7B74; margin-bottom:16px">IVF · 18 days · Fierce vibe</div>
+        </div>
+        <div class="btn btn-accent" style="margin-bottom:8px">Start free (3 days)</div>
+        <div class="btn btn-dark">Unlock full journey — £9.99</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Notifications -->
+    <div class="screen-wrap">
+      <div class="screen-label">Notifications</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">NOTIFICATIONS</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#FDF6F0; margin-bottom:8px">When should we remind you?</div>
+        <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0">
+          <div style="font-family:'DM Mono',monospace; font-size:24px; font-weight:700; color:#FDF6F0; background:rgba(255,255,255,0.06); border:1.5px solid rgba(196,97,74,0.4); border-radius:8px; padding:4px 10px">8</div>
+          <span style="font-size:20px; font-weight:700; color:#FDF6F0">:</span>
+          <div style="font-family:'DM Mono',monospace; font-size:24px; font-weight:700; color:#FDF6F0; background:rgba(255,255,255,0.06); border:1.5px solid rgba(196,97,74,0.4); border-radius:8px; padding:4px 10px">00</div>
+          <div style="display:flex; flex-direction:column; gap:3px; margin-left:4px">
+            <div style="background:#C4614A; border-radius:6px; padding:4px 8px; font-size:10px; font-weight:600; color:white">AM</div>
+            <div style="border:1.5px solid rgba(196,97,74,0.3); border-radius:6px; padding:4px 8px; font-size:10px; color:#FDF6F0">PM</div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <div class="btn btn-accent" style="margin-bottom:6px">Allow notifications</div>
+          <div style="font-size:10px; color:rgba(253,246,240,0.3); text-align:center">Not now</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Day 1 -->
+    <div class="screen-wrap">
+      <div class="screen-label">Day 1</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; margin-bottom:8px">
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.15em">DAY BY DAY, FIRE BY FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; font-style:italic; color:#FDF6F0; margin:4px 0">She's Got This</div>
+        </div>
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:900; color:#FDF6F0; line-height:1">1</div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">OF 18 DAYS</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px">
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(196,97,74,0.3); border:1px solid #C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:#C4614A">1</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:rgba(253,246,240,0.3)">2</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:rgba(253,246,240,0.3)">3</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:4px">🔥 TODAY'S FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:13px; color:#FDF6F0; line-height:1.3">"She believed she could, so she did."</div>
+          <div class="mono" style="font-size:8px; color:#C4614A; margin-top:4px">— R.S. Grey</div>
+        </div>
+        <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.15); border-radius:10px; padding:10px; text-align:center; margin-bottom:8px">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:4px">💪 SAY THIS TO YOURSELF</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-weight:700; font-size:12px; color:#C4614A; line-height:1.3">I am exactly where I need to be.</div>
+          <div class="mono" style="font-size:7px; color:rgba(196,97,74,0.4); margin-top:2px">BREATHE. REPEAT.</div>
+        </div>
+        <div class="nav-bar">
+          <span class="active">Today</span>
+          <span>Journey</span>
+          <span>Settings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 2: FREE → PAID -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">2</div><div class="journey-title">Free → Paid Upgrade</div></div>
+  <div class="journey-desc">User completes free trial, registers, and pays for the full cycle</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="screen-label">Day 3 · Mark Done</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="display:flex; align-items:center; gap:6px; padding:8px; margin-top:auto">
+          <div style="width:28px; height:28px; border-radius:50%; border:1.5px solid rgba(196,97,74,0.3); display:flex; align-items:center; justify-content:center; color:rgba(196,97,74,0.3); font-size:12px">‹</div>
+          <div style="flex:1; height:32px; border-radius:10px; background:#C4614A; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:11px">Done ✓</div>
+          <div style="width:28px; height:28px; border-radius:50%; border:1.5px solid #C4614A; display:flex; align-items:center; justify-content:center; color:#C4614A; font-size:12px">›</div>
+        </div>
+        <div style="text-align:center; font-size:9px; color:rgba(253,246,240,0.3); margin-top:4px">🎉 Confetti → auto-advance</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Register Gate</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:20px">
+          <div style="font-size:28px; margin-bottom:8px">🌟</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#1C0F0C; margin-bottom:6px">Ready to keep going?</div>
+          <div style="font-size:11px; color:#9B7B74; margin-bottom:20px; line-height:1.5">Save your progress and unlock the full journey.</div>
+          <div class="btn btn-accent" style="margin-bottom:8px">Create account →</div>
+          <div style="font-size:10px; color:#9B7B74">Continue without saving</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Create Account</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:8px; margin-top:8px">Create an account</div>
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:8px; padding:8px"><span style="font-size:10px; color:#9B7B74">Email</span></div>
+          <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:8px; padding:8px"><span style="font-size:10px; color:#9B7B74">Password</span></div>
+          <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:8px; padding:8px"><span style="font-size:10px; color:#9B7B74">Confirm password</span></div>
+        </div>
+        <div class="btn btn-accent" style="margin-top:12px">Create account</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Paywall</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">UNLOCK YOUR CYCLE</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#1C0F0C; margin-bottom:10px">Choose your plan</div>
+        <div style="border:1.5px dashed rgba(196,97,74,0.3); border-radius:10px; padding:8px; margin-bottom:6px">
+          <div style="display:flex; justify-content:space-between"><span style="font-size:10px; font-weight:600; color:#1C0F0C">Free trial</span><span style="font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:700; color:#9B7B74">£0</span></div>
+          <div style="font-size:8px; color:#9B7B74">3 days to try it out</div>
+        </div>
+        <div style="border:2px solid #C4614A; border-radius:10px; padding:8px; background:#1C0F0C; margin-bottom:6px; position:relative">
+          <div class="mono" style="position:absolute; top:-8px; right:8px; background:#C4614A; color:white; font-size:7px; padding:2px 6px; border-radius:10px; letter-spacing:0.1em">BEST VALUE</div>
+          <div style="display:flex; justify-content:space-between"><span style="font-size:10px; font-weight:600; color:#FDF6F0">One Cycle</span><span style="font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:700; color:#E8A598">£9.99</span></div>
+          <div style="font-size:8px; color:rgba(253,246,240,0.4)">Full access to your entire cycle</div>
+        </div>
+        <div style="border:1.5px solid rgba(196,97,74,0.2); border-radius:10px; padding:8px; margin-bottom:10px">
+          <div style="display:flex; justify-content:space-between"><span style="font-size:10px; font-weight:600; color:#1C0F0C">Gift a Cycle</span><span style="font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:700; color:#C4614A">£9.99</span></div>
+          <div style="font-size:8px; color:#9B7B74">Send to someone you love</div>
+        </div>
+        <div class="btn btn-accent">Start my journey — £9.99</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Stripe Payment</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; margin-top:8px">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C">One Cycle</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#C4614A">£9.99</div>
+        </div>
+        <div style="background:white; border:1.5px solid rgba(0,0,0,0.1); border-radius:8px; padding:10px; margin-bottom:6px">
+          <div style="font-size:9px; color:#9B7B74; margin-bottom:4px">Card number</div>
+          <div style="font-size:12px; color:#1C0F0C">4242 4242 4242 4242</div>
+        </div>
+        <div style="display:flex; gap:6px; margin-bottom:12px">
+          <div style="flex:1; background:white; border:1.5px solid rgba(0,0,0,0.1); border-radius:8px; padding:10px"><div style="font-size:9px; color:#9B7B74">MM/YY</div></div>
+          <div style="flex:1; background:white; border:1.5px solid rgba(0,0,0,0.1); border-radius:8px; padding:10px"><div style="font-size:9px; color:#9B7B74">CVC</div></div>
+        </div>
+        <div class="btn btn-accent">Pay now</div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:4px; margin-top:8px">
+          <span style="font-size:10px">🔒</span>
+          <span class="mono" style="font-size:7px; color:#9B7B74">Secured by Stripe</span>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Day 4 · Premium</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:20px">
+          <div style="font-size:36px; margin-bottom:8px">✓</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#FDF6F0; margin-bottom:4px">You're in!</div>
+          <div style="font-size:10px; color:rgba(253,246,240,0.4)">Full access unlocked</div>
+        </div>
+        <div style="text-align:center; margin-top:20px">
+          <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:900; color:#FDF6F0">4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 3: PAUSE & RESUME -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">3</div><div class="journey-title">Pause & Resume</div></div>
+  <div class="journey-desc">User takes a break from their cycle and comes back later</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="screen-label">Settings · Pause</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="card" style="margin-top:20px">
+          <div style="display:flex; align-items:center; gap:8px">
+            <div style="width:24px; height:24px; border-radius:6px; background:rgba(196,97,74,0.15); display:flex; align-items:center; justify-content:center; font-size:12px">🌙</div>
+            <div style="flex:1">
+              <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em">TAKE A BREAK</div>
+              <div style="font-size:10px; color:#FDF6F0">Pause your cycle. Rest is part of the journey too.</div>
+            </div>
+            <div style="color:rgba(253,246,240,0.3); font-size:12px">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Paused View</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="position:absolute; inset:0; background:rgba(28,15,12,0.6); border-radius:18px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px; text-align:center; z-index:1">
+          <div style="font-size:28px">🌙</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:18px; color:#FDF6F0; line-height:1.2">Your journey is paused</div>
+          <div style="font-size:11px; color:rgba(253,246,240,0.5); max-width:200px; line-height:1.5">Rest is part of the journey too. When you're ready, pick up right where you left off.</div>
+          <div class="btn btn-accent" style="padding:10px 24px; margin-top:4px">Resume my journey</div>
+          <div style="font-size:9px; color:rgba(253,246,240,0.3)">Settings</div>
+        </div>
+        <div style="filter:blur(4px); opacity:0.3; padding-top:30px; text-align:center">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:16px; color:#FDF6F0">Day 5</div>
+          <div class="card" style="margin-top:10px"><div style="height:40px"></div></div>
+          <div class="card"><div style="height:30px"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Resume</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:50px">
+          <div style="font-size:36px; margin-bottom:10px">🌸</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:#FDF6F0; line-height:1.2">Welcome back,<br>Sarah</div>
+          <div style="font-size:11px; color:rgba(253,246,240,0.5); margin-top:8px; max-width:200px; margin-left:auto; margin-right:auto; line-height:1.5">You took a break, and that's okay. You're here now.</div>
+          <div class="btn btn-accent" style="margin-top:16px">Continue my journey</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 4: END OF CYCLE -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">4</div><div class="journey-title">End of Cycle + New Cycle</div></div>
+  <div class="journey-desc">User completes all days, reflects, and starts a new cycle</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="screen-label">Cycle Complete</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:16px">
+          <div style="width:50px; height:50px; border-radius:50%; background:radial-gradient(circle at 35% 35%, rgba(196,97,74,0.8), rgba(196,97,74,0.3)); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:22px">🔥</div>
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">CYCLE COMPLETE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#FDF6F0; line-height:1.2">You did it,<br><span style="color:#C4614A">Sarah.</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:14px; color:#C4614A; margin-top:6px">18 days of showing up for yourself.</div>
+        </div>
+        <div class="card" style="margin-top:10px">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:4px">💌 BEFORE YOU GO</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:12px; color:#FDF6F0; line-height:1.3; margin-bottom:6px">What do you want to carry with you from this cycle?</div>
+          <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:8px; font-size:10px; color:rgba(253,246,240,0.6); line-height:1.4; min-height:40px">That even on the hardest days, I showed up...</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Reflection Moment</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; height:100%; gap:12px; padding:20px 10px">
+          <div style="font-size:24px">📖</div>
+          <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em">FROM YOUR LAST CYCLE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:15px; color:#FDF6F0; line-height:1.4; max-width:220px">"That even on the hardest days, I showed up. And that my body is doing something incredible."</div>
+          <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">IVF · 18 days · March 2026</div>
+          <div style="width:30px; height:1px; background:rgba(196,97,74,0.3)"></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; color:rgba(253,246,240,0.5); max-width:200px; line-height:1.4">You carried that with you. Now let's begin again.</div>
+          <div class="btn btn-accent" style="padding:10px 24px; margin-top:4px">Start my new cycle</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Step 2 (new treatment)</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#1C0F0C; margin-bottom:8px; margin-top:8px">What treatment this time?</div>
+        <div style="display:flex; flex-direction:column; gap:5px; font-size:10px">
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid rgba(196,97,74,0.12); border-radius:8px"><span>💫</span><span style="color:#1C0F0C">IVF</span></div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid #C4614A; border-radius:8px; background:rgba(196,97,74,0.06)"><span>❄️</span><span style="color:#1C0F0C; font-weight:600">FET</span><span style="margin-left:auto; font-size:8px; color:#C4614A">✓</span></div>
+          <div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1.5px solid rgba(196,97,74,0.12); border-radius:8px"><span>🥚</span><span style="color:#1C0F0C">Egg Freezing</span></div>
+        </div>
+        <div style="font-size:9px; color:#9B7B74; text-align:center; margin-top:8px">May pick a different treatment</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 5: GIFT FLOW -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">5</div><div class="journey-title">Gift Flow (Send + Receive)</div></div>
+  <div class="journey-desc">Someone buys a gift, recipient receives email and creates account</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="screen-label">Buyer · Compose</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#1C0F0C; margin-bottom:8px; margin-top:8px">Gift a Cycle</div>
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:10px">
+          <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:8px; padding:8px"><span style="color:#9B7B74">Their name</span></div>
+          <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:8px; padding:8px"><span style="color:#9B7B74">Their email</span></div>
+          <div style="background:white; border:1.5px solid rgba(196,97,74,0.2); border-radius:8px; padding:8px; min-height:50px"><span style="color:#9B7B74">Personal message...</span></div>
+        </div>
+        <div class="btn btn-accent" style="margin-top:10px">Send gift — £9.99</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Buyer · Sent!</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:40px">
+          <div style="font-size:36px; margin-bottom:8px">💝</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#1C0F0C">Gift sent!</div>
+          <div style="font-size:11px; color:#9B7B74; margin-top:6px">Email sent to emma@email.com</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow" style="font-size:14px; color:rgba(253,246,240,0.3)">📧</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Recipient · Welcome</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:20px">
+          <div style="font-size:32px; margin-bottom:8px">💝</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:4px">Sarah sent you a gift</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13px; color:#9B7B74; line-height:1.5; padding:8px 12px; max-width:220px; margin:0 auto">"I'm so proud of you. This helped me, I hope it helps you too. Love you."</div>
+          <div class="btn btn-accent" style="margin-top:16px">Create your account</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Recipient · Onboarding</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:40px">
+          <div style="font-size:28px; margin-bottom:8px">✨</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#1C0F0C; margin-bottom:8px">Premium activated!</div>
+          <div style="font-size:11px; color:#9B7B74; margin-bottom:16px">Let's personalise your experience</div>
+          <div style="font-size:9px; color:#9B7B74">→ Name → Treatment → Days → etc.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 6: DAILY USAGE -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">6</div><div class="journey-title">Daily Usage — Today Tab</div></div>
+  <div class="journey-desc">What a user sees and does each day (scrolling down the Today tab)</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="screen-label">Quote (Option B)</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="card">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:6px">🔥 TODAY'S FIRE</div>
+          <div style="position:relative; padding:0 6px">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:rgba(196,97,74,0.15); line-height:0.5; position:absolute; top:2px; left:-2px">"</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:14px; color:#FDF6F0; line-height:1.3; padding-left:14px">She was powerful not because she wasn't scared but because she went on.</div>
+          </div>
+          <div class="mono" style="font-size:8px; color:#C4614A; margin-top:6px; padding-left:14px">— Atticus</div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span style="font-size:10px; color:rgba(232,165,152,0.3)">➤</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Affirmation (Mantra)</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.15); border-radius:10px; padding:14px; text-align:center; margin-top:20px">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:6px">💪 SAY THIS TO YOURSELF</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-weight:700; font-size:15px; color:#C4614A; line-height:1.3; padding:4px">I am stronger than the uncertainty I feel today.</div>
+          <div class="mono" style="font-size:7px; color:rgba(196,97,74,0.4); margin-top:4px">BREATHE. REPEAT.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Gratitude (Reflect)</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="card" style="margin-top:20px">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:6px">🙏 PAUSE & REFLECT</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; font-size:13px; color:rgba(253,246,240,0.65); line-height:1.5">What is one thing your body did for you today that you're grateful for?</div>
+          <div style="border-bottom:1px dashed rgba(196,97,74,0.2); margin-top:10px; padding-bottom:14px"></div>
+          <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.2); margin-top:4px">sit with this for a moment</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Your Fuel</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="card" style="margin-top:20px">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:4px">🍳 YOUR FUEL</div>
+          <div style="font-size:9px; color:rgba(253,246,240,0.3); margin-bottom:8px">Protein-rich ideas for today</div>
+          <div style="display:flex; align-items:center; gap:8px; padding:6px 8px; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:4px">
+            <span style="font-size:14px">🥜</span>
+            <div><div style="font-size:10px; font-weight:600; color:#FDF6F0">Greek yoghurt with almonds</div><div class="mono" style="font-size:7px; color:rgba(196,97,74,0.6)">~20g PROTEIN</div></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:6px 8px; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:4px">
+            <span style="font-size:14px">🐟</span>
+            <div><div style="font-size:10px; font-weight:600; color:#FDF6F0">Salmon with sweet potato</div><div class="mono" style="font-size:7px; color:rgba(196,97,74,0.6)">~30g PROTEIN</div></div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:6px">
+            <div style="border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:2px 8px; font-size:8px; color:rgba(253,246,240,0.3)">↻ not for me</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Breathing / Meditation</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px; padding-top:30px">
+          <div style="width:80px; height:80px; border-radius:50%; background:radial-gradient(circle at 40% 40%, rgba(196,97,74,0.6), rgba(196,97,74,0.2)); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(196,97,74,0.3); cursor:pointer">
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:10px; color:rgba(255,255,255,0.85)">Breathe in</div>
+            <div style="font-size:8px; color:rgba(255,255,255,0.7); font-weight:600; margin-top:2px">tap to end</div>
+          </div>
+          <div style="width:50%; height:2px; background:rgba(196,97,74,0.15); border-radius:1px; overflow:hidden">
+            <div style="width:40%; height:100%; background:#C4614A; border-radius:1px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-wrap">
+      <div class="screen-label">Friend Note</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="card" style="margin-top:20px; text-align:center">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:6px">💛 FROM YOUR PERSON</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:13px; color:#FDF6F0; line-height:1.4; padding:4px">I am so proud of you. Every single injection. Every early morning. You are extraordinary.</div>
+          <div style="font-size:10px; color:#C4614A; margin-top:6px">I am so proud of you 🔥</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding:30px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  6 journeys · Cycle app · April 2026<br>
+  View at localhost:5000/journey-screens.html
+</div>
+
+</body>
+</html>

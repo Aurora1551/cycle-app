@@ -49,6 +49,29 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
   })
   const spotifyConfigured = isSpotifyConfigured()
 
+  const DIET_OPTIONS = [
+    { id: 'vegetarian', emoji: '🌱', label: 'Vegetarian' },
+    { id: 'vegan', emoji: '🌿', label: 'Vegan' },
+    { id: 'pescatarian', emoji: '🐟', label: 'Pescatarian' },
+    { id: 'dairy-free', emoji: '🥛', label: 'Dairy-free' },
+    { id: 'gluten-free', emoji: '🌾', label: 'Gluten-free' },
+    { id: 'nut-allergy', emoji: '🥜', label: 'Nut allergy' },
+    { id: 'egg-allergy', emoji: '🥚', label: 'Egg allergy' },
+    { id: 'shellfish-allergy', emoji: '🦐', label: 'Shellfish allergy' },
+    { id: 'soy-free', emoji: '🫘', label: 'Soy-free' },
+    { id: 'halal', emoji: '🕌', label: 'Halal' },
+    { id: 'kosher', emoji: '✡', label: 'Kosher' },
+    { id: 'none', emoji: '🍖', label: 'No restrictions' },
+  ]
+  const [dietPrefs, setDietPrefs] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] }
+  })
+  const toggleDiet = (id: string) => {
+    const next = id === 'none' ? ['none'] : dietPrefs.includes(id) ? dietPrefs.filter(d => d !== id && d !== 'none') : [...dietPrefs.filter(d => d !== 'none'), id]
+    setDietPrefs(next)
+    localStorage.setItem('cycle_diet_prefs', JSON.stringify(next))
+  }
+
   // Check Spotify status on mount
   React.useEffect(() => {
     if (!spotifyConfigured) return
@@ -225,6 +248,29 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           )}
         </Card>
 
+        {/* Dietary preferences */}
+        <div className="mono-hint" style={{ color: mutedColor }}>DIETARY PREFERENCES</div>
+        <Card cardBg={cardBg} cardBorder={cardBorder}>
+          <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor, marginBottom: 4 }}>What should we keep in mind?</div>
+          <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 11, color: mutedColor, marginBottom: 12 }}>So we can suggest foods you'll actually enjoy</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {DIET_OPTIONS.map(opt => {
+              const sel = dietPrefs.includes(opt.id)
+              return (
+                <button key={opt.id} onClick={() => toggleDiet(opt.id)} style={{
+                  padding: '6px 12px', borderRadius: 20, cursor: 'pointer',
+                  border: sel ? `1.5px solid ${vibe.accent}` : `1.5px solid ${cardBorder}`,
+                  background: sel ? `${vibe.accent}12` : 'transparent',
+                  fontFamily: typo.bodyFont, fontSize: 11, color: sel ? vibe.accent : mutedColor,
+                  transition: 'all 0.15s',
+                }}>
+                  {opt.emoji} {opt.label}
+                </button>
+              )
+            })}
+          </div>
+        </Card>
+
         <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.notificationsSection')}</div>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div className="flex-between" style={{ marginBottom: 16 }}>
@@ -271,6 +317,44 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           )}
 
         </Card>
+
+        {/* Past cycles & reflections */}
+        {(() => {
+          let reflections: Array<{ text: string; treatment?: string; cycleDays?: number; date?: string; vibe?: string }> = []
+          try {
+            const arr = JSON.parse(localStorage.getItem('cycle_reflections') || '[]')
+            if (Array.isArray(arr)) reflections = arr
+          } catch {}
+          if (reflections.length === 0) {
+            try {
+              const single = JSON.parse(localStorage.getItem('cycle_reflection') || 'null')
+              if (single && single.text) reflections = [single]
+            } catch {}
+          }
+          if (reflections.length === 0) return null
+          return (
+            <>
+              <div className="mono-hint" style={{ color: mutedColor }}>PAST CYCLES</div>
+              <Card cardBg={cardBg} cardBorder={cardBorder}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {reflections.map((r: any, i: number) => (
+                    <div key={i} style={{ borderBottom: i < reflections.length - 1 ? `1px solid ${cardBorder}` : 'none', paddingBottom: i < reflections.length - 1 ? 14 : 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, letterSpacing: '0.08em' }}>
+                          {r.treatment ? r.treatment.toUpperCase() : ''}{r.cycleDays ? ` · ${r.cycleDays} DAYS` : ''}{r.date ? ` · ${new Date(r.date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}` : ''}
+                        </div>
+                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, letterSpacing: '0.08em' }}>&#10003; COMPLETED</div>
+                      </div>
+                      <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 400, fontSize: 14, color: isDark ? 'rgba(253,246,240,0.6)' : 'rgba(28,15,12,0.6)', lineHeight: 1.4 }}>
+                        "{r.text}"
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </>
+          )
+        })()}
 
         <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.account')}</div>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">

@@ -10,6 +10,7 @@ export interface DayContent {
   breathingOpening?: string
   breathingClosing?: string
   friendNote?: string
+  fuelItems?: Array<{ name: string; emoji: string; protein: string }>
 }
 
 export interface ProfileData {

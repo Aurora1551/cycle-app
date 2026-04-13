@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — All User Journeys</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .journey { margin-bottom: 48px; }
+  .journey-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .journey-desc { font-size: 12px; color: rgba(253,246,240,0.4); margin-bottom: 16px; }
+  .flow { display: flex; gap: 4px; align-items: center; overflow-x: auto; padding-bottom: 12px; flex-wrap: nowrap; }
+  .step { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; min-width: 110px; max-width: 150px; flex-shrink: 0; text-align: center; }
+  .step-name { font-family: 'DM Mono', monospace; font-size: 8px; color: #C4614A; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+  .step-detail { font-size: 10px; color: rgba(253,246,240,0.5); line-height: 1.4; }
+  .arrow { color: rgba(196,97,74,0.4); font-size: 16px; flex-shrink: 0; }
+  .step.highlight { border-color: #C4614A; background: rgba(196,97,74,0.08); }
+  .step.gate { border-color: #F5C842; background: rgba(245,200,66,0.06); }
+  .step.gate .step-name { color: #F5C842; }
+  .step.payment { border-color: #1DB954; background: rgba(29,185,84,0.06); }
+  .step.payment .step-name { color: #1DB954; }
+  .step.end { border-color: rgba(196,97,74,0.5); background: rgba(196,97,74,0.04); }
+  .branch { margin-top: 8px; padding-left: 20px; border-left: 2px solid rgba(196,97,74,0.15); }
+  .branch-label { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(253,246,240,0.3); letter-spacing: 0.1em; margin-bottom: 8px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(253,246,240,0.5); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>All User Journeys</h1>
+<p class="subtitle">Every path through the Cycle app — updated April 2026</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15)"></div> Screen</div>
+  <div class="legend-item"><div class="legend-dot" style="background:rgba(196,97,74,0.08); border:1px solid #C4614A"></div> Key moment</div>
+  <div class="legend-item"><div class="legend-dot" style="background:rgba(245,200,66,0.06); border:1px solid #F5C842"></div> Gate / decision</div>
+  <div class="legend-item"><div class="legend-dot" style="background:rgba(29,185,84,0.06); border:1px solid #1DB954"></div> Payment</div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 1: NEW USER — FREE TRIAL -->
+<!-- ============================================= -->
+<div class="section-title">1. New User — Free Trial</div>
+<div class="journey">
+  <div class="journey-desc">First-time user who starts the free 3-day trial</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Splash</div><div class="step-detail">Begin your journey / Have an account / Gift</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">1. Name</div><div class="step-detail">Enter name or skip ("You")</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">2. Treatment</div><div class="step-detail">Select type (auto-advances)</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">3. Cycle Days</div><div class="step-detail">Pre-filled by treatment, Enter to continue</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">4. Components</div><div class="step-detail">Quote, Music, Journal, Fuel, etc. Enter to continue</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">5. Vibe</div><div class="step-detail">Fierce, Nurturing, Calm, etc. (auto-advances)</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">6. Music</div><div class="step-detail">Genre chips. Enter to continue</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Summary</div><div class="step-detail">"Start free" or "Unlock full journey"</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Notifications</div><div class="step-detail">Pick time (default 8am) or skip</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Day 1</div><div class="step-detail">Quote, Song, Affirmation, Fuel, Journal, Gratitude, Breathing, Friend Note</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Day 2</div><div class="step-detail">Mark done → confetti → auto-advance</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Day 3</div><div class="step-detail">Last free day</div></div>
+    <div class="arrow">→</div>
+    <div class="step gate"><div class="step-name">Gate</div><div class="step-detail">Register or continue as guest (loops back to day 3)</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 2: FREE → PAID UPGRADE -->
+<!-- ============================================= -->
+<div class="section-title">2. Free User → Paid Upgrade</div>
+<div class="journey">
+  <div class="journey-desc">User completes day 3, hits the paywall, and pays</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Day 3 Done</div><div class="step-detail">Confetti → auto-advance triggers gate</div></div>
+    <div class="arrow">→</div>
+    <div class="step gate"><div class="step-name">Register Gate</div><div class="step-detail">Create account or continue as guest</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Create Account</div><div class="step-detail">Email + password</div></div>
+    <div class="arrow">→</div>
+    <div class="step gate"><div class="step-name">Paywall</div><div class="step-detail">Free trial / One Cycle £9.99 / Gift £9.99</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Stripe Payment</div><div class="step-detail">Card form via Stripe Elements</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Payment Success</div><div class="step-detail">Confirms via Stripe API, sets premium</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Day 4+</div><div class="step-detail">Full access to all remaining days</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">If "Continue as guest" on register gate</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Back to Day 3</div><div class="step-detail">Guest stays on day 3, sees register gate again on next done</div></div>
+    </div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">If "Free trial" on paywall</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Day 1 (restart)</div><div class="step-detail">Clean slate, starts from day 1 again</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 3: DIRECT PURCHASE FROM SUMMARY -->
+<!-- ============================================= -->
+<div class="section-title">3. New User — Direct Purchase</div>
+<div class="journey">
+  <div class="journey-desc">User finishes onboarding and pays immediately from Summary</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Onboarding</div><div class="step-detail">Steps 1-6 (name → music)</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Summary</div><div class="step-detail">Clicks "Unlock full journey"</div></div>
+    <div class="arrow">→</div>
+    <div class="step gate"><div class="step-name">Paywall</div><div class="step-detail">Selects "One Cycle £9.99"</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Stripe Payment</div><div class="step-detail">Card details</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Success</div><div class="step-detail">Premium granted</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Day 4</div><div class="step-detail">Skips free days, starts premium</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">If clicks "Back" on paywall</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Day screen</div><div class="step-detail">Returns to current day (preserves position)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 4: GIFT PURCHASE -->
+<!-- ============================================= -->
+<div class="section-title">4. Gift Purchase (Buyer)</div>
+<div class="journey">
+  <div class="journey-desc">Someone buys a gift for a friend — buyer does NOT get premium</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Splash</div><div class="step-detail">"Gift it to someone"</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Gift Compose</div><div class="step-detail">Recipient name, email, personal message</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Gift Payment</div><div class="step-detail">£9.99 via Stripe</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Sending...</div><div class="step-detail">1.5s animation</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Gift Sent!</div><div class="step-detail">"Email sent to {email}" with recipient card</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Done</div><div class="step-detail">Returns to day 3 (if has profile) or splash</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 5: GIFT RECIPIENT -->
+<!-- ============================================= -->
+<div class="section-title">5. Gift Recipient (Redeem)</div>
+<div class="journey">
+  <div class="journey-desc">Someone receives a gift link, creates account, gets premium for free</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Email Link</div><div class="step-detail">/gift/redeem?code=...&from=Sarah</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Gift Welcome</div><div class="step-detail">Sender name + personal message</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Create Account</div><div class="step-detail">Email + password (premium auto-granted)</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Onboarding</div><div class="step-detail">Name → Treatment → ... → Music</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Day 1</div><div class="step-detail">Full premium access from start</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 6: RETURNING USER (LOGIN) -->
+<!-- ============================================= -->
+<div class="section-title">6. Returning User — Login</div>
+<div class="journey">
+  <div class="journey-desc">Existing user logs back in</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Splash</div><div class="step-detail">"I have an account"</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Login</div><div class="step-detail">Email + password</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Last Day</div><div class="step-detail">Taken to last completed day</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 7: RESUME ONBOARDING -->
+<!-- ============================================= -->
+<div class="section-title">7. Resume Partial Onboarding</div>
+<div class="journey">
+  <div class="journey-desc">User started onboarding, left, comes back — resumes from where they stopped</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">App Opens</div><div class="step-detail">Checks localStorage for partial profile</div></div>
+    <div class="arrow">→</div>
+    <div class="step gate"><div class="step-name">Resume Point</div><div class="step-detail">Skips completed steps (e.g. has name + treatment → goes to cycle length)</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Continue</div><div class="step-detail">Finishes remaining steps</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 8: DAILY CYCLE -->
+<!-- ============================================= -->
+<div class="section-title">8. Daily Usage Cycle</div>
+<div class="journey">
+  <div class="journey-desc">What a user does each day inside the app</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Open App</div><div class="step-detail">Lands on Today tab at current day</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Consume Content</div><div class="step-detail">Quote, Song, Affirmation, Fuel, Journal, Gratitude, Breathing, Friend Note</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Save ♡</div><div class="step-detail">Heart any card to save → appears in Journey tab</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Share ➤</div><div class="step-detail">Web Share API → WhatsApp / native share sheet</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Mark Done</div><div class="step-detail">Confetti burst → auto-advance to next day</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">Navigation</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Day Circles</div><div class="step-detail">Tap any numbered circle to jump to that day</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="step-name">← → Arrows</div><div class="step-detail">Navigate between adjacent days</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="step-name">Journey Tab</div><div class="step-detail">Week grid + stats + saved items</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 9: PAUSE & RESUME -->
+<!-- ============================================= -->
+<div class="section-title">9. Take a Break (Pause & Resume)</div>
+<div class="journey">
+  <div class="journey-desc">User pauses their journey, comes back later</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Settings</div><div class="step-detail">Account → "Take a break"</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Paused</div><div class="step-detail">Day screen blurred + "Your journey is paused" overlay</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Resume</div><div class="step-detail">"Resume my journey" button on overlay or Settings</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Continue</div><div class="step-detail">Back to same day, all progress preserved</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">If user re-opens app while paused</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Welcome Back</div><div class="step-detail">Overlay: "You took a break, and that's okay"</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="step-name">Continue</div><div class="step-detail">"Continue my journey" → resumes</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 10: END OF CYCLE -->
+<!-- ============================================= -->
+<div class="section-title">10. End of Cycle</div>
+<div class="journey">
+  <div class="journey-desc">User completes all days — reflection, stats, and next steps</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Last Day Done</div><div class="step-detail">Confetti → advance triggers end</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Cycle Complete</div><div class="step-detail">"You did it, {name}" + stats</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Reflection</div><div class="step-detail">"What do you want to carry with you?" → saved to localStorage</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Stats</div><div class="step-detail">Days done / Songs played / Quotes read</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">Next steps</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Start New Cycle</div><div class="step-detail">Clears everything → back to Splash</div></div>
+      <div class="arrow">or</div>
+      <div class="step"><div class="step-name">Gift a Friend</div><div class="step-detail">→ Gift purchase flow</div></div>
+      <div class="arrow">or</div>
+      <div class="step"><div class="step-name">Share on WhatsApp</div><div class="step-detail">Pre-filled message about completing the cycle</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 11: SPOTIFY CONNECT -->
+<!-- ============================================= -->
+<div class="section-title">11. Spotify Connection</div>
+<div class="journey">
+  <div class="journey-desc">User connects Spotify for direct song links</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Settings</div><div class="step-detail">Music section → "Connect Spotify"</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Spotify Auth</div><div class="step-detail">OAuth 2.0 PKCE → authorize on Spotify</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Callback</div><div class="step-detail">Code exchange → tokens saved</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Connected</div><div class="step-detail">Shows Spotify name, daily songs link directly to tracks</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">Without Spotify connected</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Tap Song</div><div class="step-detail">Popup: "Connect" or "Open without connecting"</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="step-name">Search Fallback</div><div class="step-detail">Opens Spotify search with song + artist</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- JOURNEY 12: STRIPE PAYMENT REDIRECT -->
+<!-- ============================================= -->
+<div class="section-title">12. Stripe Payment (Technical Flow)</div>
+<div class="journey">
+  <div class="journey-desc">How Stripe payment works behind the scenes</div>
+  <div class="flow">
+    <div class="step"><div class="step-name">Select Plan</div><div class="step-detail">One Cycle or Gift</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Create Intent</div><div class="step-detail">POST /api/create-payment-intent → clientSecret</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Stripe Elements</div><div class="step-detail">Card form rendered by Stripe SDK</div></div>
+    <div class="arrow">→</div>
+    <div class="step payment"><div class="step-name">Confirm</div><div class="step-detail">stripe.confirmPayment() → redirect to /payment/success</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-name">Verify</div><div class="step-detail">retrievePaymentIntent() + POST /api/purchase/confirm</div></div>
+    <div class="arrow">→</div>
+    <div class="step highlight"><div class="step-name">Premium</div><div class="step-detail">localStorage premium=1, advance to day 4</div></div>
+  </div>
+  <div class="branch">
+    <div class="branch-label">Webhook backup (production)</div>
+    <div class="flow">
+      <div class="step"><div class="step-name">Stripe Webhook</div><div class="step-detail">POST /api/stripe/webhook → payment_intent.succeeded</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="step-name">DB Update</div><div class="step-detail">savePurchase() + updateAccountPlan()</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding:30px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  12 user journeys · Cycle app · April 2026
+</div>
+
+</body>
+</html>

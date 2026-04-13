@@ -4,7 +4,7 @@ import type { OnboardingData } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
 import { NOTIFICATION_CONTENT } from '../lib/constants'
 import { useFadeIn } from '../hooks/useFadeIn'
-import { ScreenShell, Card, SectionLabel, Toggle, PrimaryButton, GhostButton } from '../components/ui'
+import { ScreenShell, Card, SectionLabel, PrimaryButton, GhostButton } from '../components/ui'
 
 interface Props {
   data: OnboardingData
@@ -17,7 +17,6 @@ const NotificationSettings: React.FC<Props> = ({ data, onDone }) => {
   const [minute, setMinute] = useState(0)
   const [period, setPeriod] = useState<'AM' | 'PM'>('AM')
   const [notifyContent, setNotifyContent] = useState('surprise')
-  const [eveningReflection, setEveningReflection] = useState(false)
   const visible = useFadeIn()
 
   const vibe = resolveVibe(data.vibe)
@@ -35,7 +34,6 @@ const NotificationSettings: React.FC<Props> = ({ data, onDone }) => {
     localStorage.setItem('notify_enabled', '1')
     localStorage.setItem('notify_time', timeStr)
     localStorage.setItem('notify_content', notifyContent)
-    localStorage.setItem('notify_evening', eveningReflection ? '1' : '0')
     onDone()
   }
 
@@ -105,17 +103,6 @@ const NotificationSettings: React.FC<Props> = ({ data, onDone }) => {
           </div>
         </Card>
 
-        <Card cardBg={cardBg} cardBorder={cardBorder} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor, marginBottom: 2 }}>{t('notifications.eveningReflection')}</div>
-            <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 11, color: mutedColor }}>{t('notifications.offByDefault')}</div>
-          </div>
-          <Toggle value={eveningReflection} onChange={setEveningReflection} accent={vibe.accent} isDark={isDark} />
-        </Card>
-
-        <div className="info-banner text-center" style={{ background: `${vibe.accent}10`, border: `1px solid ${vibe.accent}20` }}>
-          <div className="mono-xs" style={{ color: mutedColor }}>{t('notifications.maxNotifications')}</div>
-        </div>
 
         <div className="spacer" />
         <PrimaryButton accent={vibe.accent} typo={typo} onClick={handleAllow}>{t('notifications.allow')}</PrimaryButton>

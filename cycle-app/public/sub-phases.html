@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Sub-Phase Awareness</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 48px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .section-desc { font-size: 13px; color: rgba(253,246,240,0.45); margin-bottom: 20px; line-height: 1.6; }
+  .timeline { display: flex; gap: 0; margin-bottom: 24px; }
+  .phase { flex: 1; padding: 14px 10px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
+  .phase:first-child { border-radius: 10px 0 0 10px; }
+  .phase:last-child { border-radius: 0 10px 10px 0; }
+  .phase-name { font-family: 'DM Mono', monospace; font-size: 8px; color: #C4614A; letter-spacing: 0.12em; margin-bottom: 4px; }
+  .phase-days { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); margin-bottom: 6px; }
+  .phase-tone { font-size: 11px; color: rgba(253,246,240,0.5); line-height: 1.4; }
+  .phase.active { background: rgba(196,97,74,0.08); border-color: rgba(196,97,74,0.3); }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .compare { display: flex; gap: 16px; overflow-x: auto; }
+  .compare-col { flex: 1; min-width: 280px; }
+  .compare-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); letter-spacing: 0.1em; margin-bottom: 8px; }
+  .mono { font-family: 'DM Mono', monospace; }
+</style>
+</head>
+<body>
+
+<h1>Sub-Phase Awareness</h1>
+<p class="subtitle">How treatment-specific phases change the emotional tone of daily content</p>
+
+<!-- ============================================= -->
+<!-- CURRENT STATE -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Current — Generic Phases (All Treatments)</div>
+  <div class="section-desc">Right now, we divide any cycle into 5 generic phases based on progress percentage. This works but misses the emotional reality of specific treatment milestones.</div>
+
+  <div class="timeline">
+    <div class="phase"><div class="phase-name">BEGINNING</div><div class="phase-days">Day 1</div><div class="phase-tone">Fresh start, hopeful</div></div>
+    <div class="phase"><div class="phase-name">EARLY</div><div class="phase-days">~20%</div><div class="phase-tone">Building momentum</div></div>
+    <div class="phase"><div class="phase-name">MIDDLE</div><div class="phase-days">~35-55%</div><div class="phase-tone">Grounding, patient</div></div>
+    <div class="phase"><div class="phase-name">LATE</div><div class="phase-days">~55-75%</div><div class="phase-tone">Calming, reassuring</div></div>
+    <div class="phase"><div class="phase-name">FINAL</div><div class="phase-days">~75%+</div><div class="phase-tone">Celebratory, tender</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- PROPOSED: IVF -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Proposed — IVF (18 days)</div>
+  <div class="section-desc">IVF has distinct medical milestones that create very different emotional experiences. A woman on day 2 (just started injections) feels completely different to day 10 (egg retrieval) vs day 15 (2-week wait).</div>
+
+  <div class="timeline">
+    <div class="phase active"><div class="phase-name">STIMULATION</div><div class="phase-days">Days 1-9</div><div class="phase-tone">Daily injections. Body changing. Brave, uncomfortable, determined.</div></div>
+    <div class="phase"><div class="phase-name">TRIGGER & RETRIEVAL</div><div class="phase-days">Days 10-11</div><div class="phase-tone">The big moment. Nervous, hopeful, physically sore.</div></div>
+    <div class="phase"><div class="phase-name">EMBRYO WAIT</div><div class="phase-days">Days 12-13</div><div class="phase-tone">Waiting for lab results. Anxious, out of control, need distraction.</div></div>
+    <div class="phase"><div class="phase-name">TRANSFER</div><div class="phase-days">Day 14</div><div class="phase-tone">Transfer day. Still, hopeful, sacred.</div></div>
+    <div class="phase"><div class="phase-name">TWO-WEEK WAIT</div><div class="phase-days">Days 15-18</div><div class="phase-tone">The hardest part. Every symptom means something. Gentle, distracting, validating.</div></div>
+  </div>
+
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-label">Day 3 — Stimulation phase</div>
+      <div class="card">
+        <div class="mono" style="font-size:9px; color:#C4614A; margin-bottom:8px">🔥 TODAY'S FIRE</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:18px; color:#FDF6F0; line-height:1.35; margin-bottom:6px">"Your body is doing extraordinary things right now, even when it doesn't feel like it."</div>
+        <div class="mono" style="font-size:10px; color:#C4614A">— affirmation would reference injections, bloating, physical courage</div>
+      </div>
+      <div class="card">
+        <div class="mono" style="font-size:9px; color:#C4614A; margin-bottom:8px">🍳 YOUR FUEL</div>
+        <div style="font-size:12px; color:rgba(253,246,240,0.5)">High-protein + hydration focus (reduces bloating during stims)</div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-label">Day 15 — Two-week wait</div>
+      <div class="card">
+        <div class="mono" style="font-size:9px; color:#C4614A; margin-bottom:8px">🔥 TODAY'S FIRE</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:18px; color:#FDF6F0; line-height:1.35; margin-bottom:6px">"You don't need to know the answer today. You just need to breathe through this moment."</div>
+        <div class="mono" style="font-size:10px; color:#C4614A">— affirmation would acknowledge the wait, uncertainty, need for patience</div>
+      </div>
+      <div class="card">
+        <div class="mono" style="font-size:9px; color:#C4614A; margin-bottom:8px">🍳 YOUR FUEL</div>
+        <div style="font-size:12px; color:rgba(253,246,240,0.5)">Comfort foods + anti-inflammatory focus (pineapple core, warm soups)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- PROPOSED: EGG FREEZING -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Proposed — Egg Freezing (14 days)</div>
+
+  <div class="timeline">
+    <div class="phase active"><div class="phase-name">PREP</div><div class="phase-days">Days 1-2</div><div class="phase-tone">Starting meds. Empowered choice, maybe nervous.</div></div>
+    <div class="phase"><div class="phase-name">STIMULATION</div><div class="phase-days">Days 3-10</div><div class="phase-tone">Daily injections. Bloating, fatigue. Focus on why she's doing this.</div></div>
+    <div class="phase"><div class="phase-name">MONITORING</div><div class="phase-days">Days 11-12</div><div class="phase-tone">Frequent scans. Almost there. Anticipation.</div></div>
+    <div class="phase"><div class="phase-name">RETRIEVAL & RECOVERY</div><div class="phase-days">Days 13-14</div><div class="phase-tone">It's done. Rest, pride, relief. Body needs care.</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- PROPOSED: FET -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Proposed — Frozen Embryo Transfer (18 days)</div>
+
+  <div class="timeline">
+    <div class="phase active"><div class="phase-name">LINING PREP</div><div class="phase-days">Days 1-10</div><div class="phase-tone">Taking estrogen, patches. Quieter than IVF stims. Waiting, preparing.</div></div>
+    <div class="phase"><div class="phase-name">PROGESTERONE</div><div class="phase-days">Days 11-13</div><div class="phase-tone">Started progesterone. Body prep intensifies. Transfer approaching.</div></div>
+    <div class="phase"><div class="phase-name">TRANSFER</div><div class="phase-days">Day 14</div><div class="phase-tone">The moment. Sacred, still, hopeful.</div></div>
+    <div class="phase"><div class="phase-name">TWO-WEEK WAIT</div><div class="phase-days">Days 15-18</div><div class="phase-tone">Same as IVF — the hardest emotional stretch.</div></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- IMPLEMENTATION -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">How to Implement</div>
+  <div class="section-desc">
+    Replace the generic <code>getCyclePhase(dayNumber, totalDays)</code> function with treatment-aware sub-phases:<br><br>
+    <code>getCyclePhase(dayNumber, totalDays, treatment)</code><br><br>
+    Each treatment type gets its own phase map with specific day ranges and emotional tones. These tones are passed to the AI prompt, which already accepts phase + tone context. No new UI needed — just richer, more specific AI-generated content.
+  </div>
+  <div class="card" style="font-family:'DM Mono',monospace; font-size:10px; color:rgba(253,246,240,0.5); line-height:1.8">
+    <span style="color:#C4614A">// Example: IVF sub-phases</span><br>
+    if (treatment === 'ivf') {<br>
+    &nbsp;&nbsp;if (day <= totalDays * 0.5) return { phase: 'stimulation', tone: 'brave, physical courage...' }<br>
+    &nbsp;&nbsp;if (day <= totalDays * 0.6) return { phase: 'retrieval', tone: 'nervous, hopeful...' }<br>
+    &nbsp;&nbsp;if (day <= totalDays * 0.75) return { phase: 'embryo-wait', tone: 'anxious, distraction...' }<br>
+    &nbsp;&nbsp;return { phase: 'two-week-wait', tone: 'gentle, validating...' }<br>
+    }
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  View at localhost:5000/sub-phases.html
+</div>
+
+</body>
+</html>

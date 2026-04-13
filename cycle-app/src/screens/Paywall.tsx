@@ -17,6 +17,15 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t) }, [])
 
+  // Enter key advances with current selection
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') { if (selected === 'free') onStartFree(); else onSelectPlan(selected) }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [selected, onStartFree, onSelectPlan])
+
   const planBtn = (active: boolean, extra?: React.CSSProperties): React.CSSProperties => ({
     borderRadius: 14, padding: '14px 16px', cursor: 'pointer', textAlign: 'left', width: '100%', transition: 'all 0.18s ease',
     boxShadow: active ? '0 0 0 3px rgba(196,97,74,0.1)' : 'none', ...extra,

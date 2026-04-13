@@ -60,7 +60,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay }) => {
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <SectionLabel color={vibe.accent}>{t('progress.stats')}</SectionLabel>
           <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            {[{ val: daysCompleted, label: t('progress.daysDone') }, { val: data.cycleDays, label: t('progress.totalDays') }].map((s, i) => (
+            {[{ val: dayNumber, label: t('progress.daysDone') }, { val: data.cycleDays, label: t('progress.totalDays') }].map((s, i) => (
               <div key={i} className="stat">
                 <div className="stat-value" style={{ fontFamily: typo.headingFont, fontSize: 30, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: vibe.accent }}>{s.val}</div>
                 <div className="stat-label" style={{ color: mutedColor }}>{s.label}</div>
@@ -102,6 +102,28 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay }) => {
                         </div>
                       </>
                     )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )
+        })()}
+        {/* Journal entries */}
+        {(() => {
+          const journals: Array<{ day: number; text: string }> = []
+          for (let d = 1; d <= data.cycleDays; d++) {
+            const text = localStorage.getItem(`cycle_content_${data.name}_${data.vibe}_day${d}_journal`) || localStorage.getItem(`cycle_day_${d}_journal`)
+            if (text && text.trim()) journals.push({ day: d, text })
+          }
+          if (journals.length === 0) return null
+          return (
+            <Card cardBg={cardBg} cardBorder={cardBorder}>
+              <SectionLabel color={vibe.accent}>&#9998; Journal</SectionLabel>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {journals.map((j, i) => (
+                  <div key={i} style={{ borderBottom: i < journals.length - 1 ? `1px solid ${cardBorder}` : 'none', paddingBottom: i < journals.length - 1 ? 12 : 0 }}>
+                    <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: textColor, lineHeight: 1.5 }}>{j.text}</div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 4, letterSpacing: '0.1em' }}>DAY {j.day}</div>
                   </div>
                 ))}
               </div>

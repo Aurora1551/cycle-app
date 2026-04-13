@@ -58,7 +58,10 @@ const en = {
       iui: 'IUI',
       'egg-freezing': 'Egg Freezing',
       'egg-donation': 'Egg Donation',
-      'embryo-transfer': 'Embryo Transfer (FET)',
+      icsi: 'ICSI',
+      'embryo-transfer': 'Embryo Transfer',
+      fet: 'Frozen Embryo Transfer (FET)',
+      'medicated-cycle': 'Medicated Cycle',
       surrogacy: 'Surrogacy',
       preparing: 'Preparing for a cycle',
       other: 'Other',
@@ -73,6 +76,7 @@ const en = {
       gratitude: 'Gratitude',
       meditation: 'Meditation',
       breathing: 'Breathing',
+      fuel: 'Your Fuel',
     },
 
     // Vibes
@@ -174,8 +178,8 @@ const en = {
 
     // Register Gate
     registerGate: {
-      heading: 'Save your progress',
-      subtext: 'Your free days are done! Create an account to keep your journal, quotes, and progress safe. Without an account, clearing your browser data will lose everything.',
+      heading: 'Ready to keep going?',
+      subtext: 'Save your progress and unlock the full journey.',
       createAccount: 'Create account →',
       continueAsGuest: 'Continue without saving',
       guestWarning: 'Your data may be lost if browser data is cleared',

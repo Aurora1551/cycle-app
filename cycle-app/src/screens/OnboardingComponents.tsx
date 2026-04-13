@@ -16,6 +16,7 @@ const ALL_COMPONENTS = [
   { id: 'affirmation', emoji: '🌟' },
   { id: 'gratitude', emoji: '🙏' },
   { id: 'breathing', emoji: '🌬️' },
+  { id: 'fuel', emoji: '🍳' },
 ]
 
 const A = '#C4614A', BG = '#FDF6F0', T = '#1C0F0C', M = '#9B7B74'
@@ -26,6 +27,13 @@ const OnboardingComponents: React.FC<Props> = ({ onBack, onContinue, initialValu
   const [visible, setVisible] = useState(false)
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t) }, [])
+
+  // Allow Enter key to advance
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Enter' && selected.length > 0) onContinue(selected) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [selected, onContinue])
 
   const toggle = (id: string) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 

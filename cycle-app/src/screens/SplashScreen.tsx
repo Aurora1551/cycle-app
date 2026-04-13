@@ -32,7 +32,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
 
   return (
     <div className="screen" style={{
-      background: '#0E0E0E', padding: '40px 32px 32px',
+      background: '#FFFBF0', padding: '40px 32px 32px',
       opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease',
       position: 'relative',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -42,17 +42,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
       <button onClick={() => setLangOpen(true)} style={{
         position: 'absolute', top: 16, right: 16,
         display: 'flex', alignItems: 'center', gap: 6,
-        background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+        background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)',
         borderRadius: 20, padding: '6px 12px', cursor: 'pointer',
       }}>
         <span style={{ fontSize: 16 }}>{currentLang.flag}</span>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: 'rgba(253,246,240,0.5)', letterSpacing: '0.1em' }}>{currentLang.code.toUpperCase()}</span>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: 'rgba(28,15,12,0.4)', letterSpacing: '0.1em' }}>{currentLang.code.toUpperCase()}</span>
       </button>
 
       {/* Vibe tagline at top */}
       <div style={{
         fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500,
-        color: 'rgba(253,246,240,0.4)', letterSpacing: '0.2em', textTransform: 'uppercase',
+        color: 'rgba(28,15,12,0.35)', letterSpacing: '0.2em', textTransform: 'uppercase',
         marginTop: 48, marginBottom: 40,
       }}>
         {vibeContent.splash.tagline}
@@ -61,8 +61,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
       {/* Orb */}
       <div style={{
         width: 80, height: 80, borderRadius: '50%',
-        background: 'radial-gradient(circle at 35% 35%, #E8A598, #C4614A)',
-        boxShadow: '0 12px 36px rgba(196,97,74,0.45)',
+        background: 'radial-gradient(circle at 35% 35%, #F5D690, #D4A030)',
+        boxShadow: '0 12px 36px rgba(212,160,48,0.35)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 32, marginBottom: 24, animation: 'float 3s ease-in-out infinite',
       }}>
@@ -72,7 +72,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
       {/* App name */}
       <h1 style={{
         fontFamily: "'Cormorant Garamond', serif", fontSize: 48, fontWeight: 700,
-        color: '#FDF6F0', letterSpacing: '-0.5px', marginBottom: 8, lineHeight: 1,
+        color: '#1C0F0C', letterSpacing: '-0.5px', marginBottom: 8, lineHeight: 1,
       }}>
         {t('appName')}
       </h1>
@@ -80,7 +80,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
       {/* Vibe subtitle */}
       <p style={{
         fontFamily: "'Karla', sans-serif", fontSize: 13, fontWeight: 300,
-        color: 'rgba(253,246,240,0.4)', letterSpacing: '0.02em', textAlign: 'center',
+        color: 'rgba(28,15,12,0.45)', letterSpacing: '0.02em', textAlign: 'center',
         lineHeight: 1.4,
       }}>
         {vibeContent.splash.subtitle}
@@ -94,22 +94,19 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
         {t('begin')}
       </button>
 
-      <div className="mono-xs" style={{ color: '#333', margin: '4px 0' }}>{t('or')}</div>
-
       <button onClick={onHaveAccount} className="btn-ghost" style={{
-        color: 'rgba(253,246,240,0.5)', border: '1px solid rgba(255,255,255,0.12)', width: '100%',
+        color: '#1C0F0C', border: '1.5px solid rgba(28,15,12,0.15)', width: '100%', marginBottom: 8,
       }}>
         {t('haveAccount')}
       </button>
 
-      {onGift && <>
-        <div className="mono-xs" style={{ color: '#333', margin: '4px 0' }}>{t('or')}</div>
+      {onGift && (
         <button onClick={onGift} className="btn-ghost" style={{
-          color: 'rgba(253,246,240,0.5)', border: '1px solid rgba(255,255,255,0.12)', width: '100%',
+          color: '#1C0F0C', border: '1.5px solid rgba(28,15,12,0.15)', width: '100%',
         }}>
           {t('giftToSomeone', 'Gift it to someone')}
         </button>
-      </>}
+      )}
 
       <LanguagePicker open={langOpen} onClose={() => setLangOpen(false)} />
     </div>

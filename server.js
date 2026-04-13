@@ -174,21 +174,99 @@ const LANGUAGE_NAMES = {
   en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese'
 }
 
-function getCyclePhase(dayNumber, totalDays) {
-  const progress = dayNumber / totalDays
-  if (progress <= 0.15) return { phase: 'beginning', tone: 'hopeful, energetic, fresh start energy. The user is just starting — content should feel like opening a new chapter. Be encouraging about the journey ahead without being naive about the difficulty.' }
-  if (progress <= 0.35) return { phase: 'early', tone: 'building momentum, settling in. The novelty has worn off but routine hasn\'t set in yet. Content should acknowledge that showing up repeatedly takes real effort. Be warm but honest.' }
-  if (progress <= 0.55) return { phase: 'middle', tone: 'grounding, patient, steady. This is the long middle — content should help the user stay present rather than constantly looking ahead. Focus on today, not the outcome. Deeper journal prompts, more reflective quotes.' }
-  if (progress <= 0.75) return { phase: 'late', tone: 'calming, reassuring, gentle. The user may be anxious about results or what comes next. Content should be soothing and validate any feelings of uncertainty. Avoid toxic positivity — acknowledge that waiting is hard.' }
-  return { phase: 'final', tone: 'celebratory but tender. The end is near — content should honour everything they\'ve been through. Reflective, meaningful, looking back with pride while staying open to whatever comes next.' }
+// Emotion-based sub-phases — NEVER reference medical milestones (retrieval, transfer, etc.)
+// because cycles can be extended or shortened. Describe how she might FEEL, not where she is medically.
+const TREATMENT_PHASES = {
+  // IVF / ICSI: body is working hard, injections, physical discomfort, then waiting
+  ivf: [
+    { until: 0.15, phase: 'beginning', tone: 'brave and new. She\'s just starting something that takes real courage. Her body is adjusting to a lot. Content should honour that first step and validate any nerves or discomfort. "Your body is learning something new."' },
+    { until: 0.40, phase: 'enduring', tone: 'steady and physical. Her body is doing hard work day after day. She may feel bloated, tired, emotional. Content should acknowledge the physical reality without dwelling on it. "You are showing up even when it\'s uncomfortable." Focus on small daily strength, not the finish line.' },
+    { until: 0.60, phase: 'deepening', tone: 'reflective and patient. She\'s been at this for a while. The routine may feel heavy. Content should help her stay present — today is enough. Deeper journal prompts. "You don\'t need to know what comes next. Just be here."' },
+    { until: 0.80, phase: 'waiting', tone: 'gentle and validating. She may be anxious, reading into every feeling. Content should soothe without false promises. "Whatever you\'re feeling right now is valid." Avoid toxic positivity. Acknowledge that uncertainty is the hardest part.' },
+    { until: 1.0, phase: 'closing', tone: 'tender and proud. The end of this chapter is near. Content should honour everything she\'s been through — every injection, every early morning, every hard day. "Whatever happens next, you did something extraordinary." Open-ended, not outcome-focused.' },
+  ],
+  icsi: null, // same as IVF
+  // IUI: gentler process, shorter, but still emotionally charged
+  iui: [
+    { until: 0.20, phase: 'beginning', tone: 'hopeful and gentle. A new cycle is beginning. Content should feel like a fresh page. "You chose to try again, and that takes strength."' },
+    { until: 0.50, phase: 'building', tone: 'patient and steady. Monitoring, adjusting, waiting for the right moment. Content should keep her grounded in the present. "Trust the process, even when it feels slow."' },
+    { until: 0.75, phase: 'waiting', tone: 'tender and honest. The wait after the procedure is emotionally heavy. Every sensation feels meaningful. "You don\'t have to be positive every second. Just be gentle with yourself."' },
+    { until: 1.0, phase: 'closing', tone: 'reflective and compassionate. Whatever the outcome, she showed up. "You gave this everything. That is never wasted."' },
+  ],
+  // Egg freezing: empowering choice, physical intensity, then relief
+  'egg-freezing': [
+    { until: 0.15, phase: 'beginning', tone: 'empowered and purposeful. She made a proactive choice about her future. Content should reinforce that agency. "This is you taking care of future you."' },
+    { until: 0.55, phase: 'enduring', tone: 'physically demanding but purposeful. Daily injections, monitoring, bloating. Content should acknowledge the discomfort while connecting it back to why she\'s doing this. "Your body is working hard. Honour it."' },
+    { until: 0.85, phase: 'almost-there', tone: 'anticipatory and encouraging. The end is approaching. She may feel anxious or excited. "You\'re almost through this. Breathe."' },
+    { until: 1.0, phase: 'closing', tone: 'proud and relieved. It\'s done or nearly done. Content should celebrate her strength and the gift she gave her future self. "You did something brave. Rest now."' },
+  ],
+  // Egg donation: similar to egg freezing but for someone else
+  'egg-donation': null, // same as egg-freezing
+  // FET: less physically intense, but emotionally charged with hope
+  fet: [
+    { until: 0.30, phase: 'preparing', tone: 'quiet and hopeful. Her body is being gently prepared. Content should feel calm and anticipatory. "Your body knows what to do. Trust it."' },
+    { until: 0.55, phase: 'building', tone: 'steady and present. She\'s in the middle of preparation. Content should help her stay grounded rather than jumping ahead. "Today is enough."' },
+    { until: 0.75, phase: 'waiting', tone: 'the hardest emotional stretch. Uncertainty is at its peak. Content should validate without promising. "Whatever you\'re feeling right now — it\'s okay. All of it."' },
+    { until: 1.0, phase: 'closing', tone: 'tender and open. The cycle is ending. Content should honour the courage of hope. "You trusted the process. That takes extraordinary strength."' },
+  ],
+  // Embryo transfer: short, focused, high emotional stakes
+  'embryo-transfer': null, // same as FET
+  // Medicated cycle: variable, generally moderate intensity
+  'medicated-cycle': [
+    { until: 0.25, phase: 'beginning', tone: 'settling in. New medications, new routine. "Your body is adjusting. Give it grace."' },
+    { until: 0.55, phase: 'steady', tone: 'routine building. Content should acknowledge the daily discipline. "Showing up every day is its own kind of strength."' },
+    { until: 0.80, phase: 'waiting', tone: 'patient and gentle. "The hardest part is the not knowing. You don\'t have to be okay with it — just breathe through it."' },
+    { until: 1.0, phase: 'closing', tone: 'reflective. "However this chapter ends, you showed up for every page."' },
+  ],
+  // Surrogacy: intended parent\'s emotional journey — hope, trust, loss of control
+  surrogacy: [
+    { until: 0.20, phase: 'beginning', tone: 'hopeful and trusting. She\'s entrusting her dream to someone else. Content should validate the mix of hope and vulnerability. "Letting go of control is its own kind of courage."' },
+    { until: 0.50, phase: 'middle', tone: 'patient and connected. The journey is happening but she\'s not in the driver\'s seat. Content should help her feel connected to the process. "You are part of this, even from a distance."' },
+    { until: 0.80, phase: 'waiting', tone: 'tender and hopeful. "Trust is not passive. It takes enormous strength to believe when you can\'t see."' },
+    { until: 1.0, phase: 'closing', tone: 'grateful and proud. "This journey asked you to trust in ways most people never have to. You did."' },
+  ],
+  // Preparing: pre-cycle, getting ready mentally and physically
+  preparing: [
+    { until: 0.30, phase: 'beginning', tone: 'anticipatory and grounding. She\'s getting ready for something big. "This quiet time matters. You are building your foundation."' },
+    { until: 0.65, phase: 'building', tone: 'steady and purposeful. "Every small step now is setting you up. You\'re already on your way."' },
+    { until: 1.0, phase: 'ready', tone: 'confident and calm. "You\'ve done the preparation. You are as ready as you need to be."' },
+  ],
 }
 
-function buildUserPrompt({ name, treatment, dayNumber, totalDays, vibe, genres, language }) {
+function getCyclePhase(dayNumber, totalDays, treatment) {
+  const progress = dayNumber / totalDays
+  // Look up treatment-specific phases
+  let phases = TREATMENT_PHASES[treatment]
+  // Some treatments share phases with others
+  if (phases === null) {
+    if (treatment === 'icsi') phases = TREATMENT_PHASES.ivf
+    else if (treatment === 'egg-donation') phases = TREATMENT_PHASES['egg-freezing']
+    else if (treatment === 'embryo-transfer') phases = TREATMENT_PHASES.fet
+  }
+  // If we have treatment-specific phases, use them
+  if (phases) {
+    for (const p of phases) {
+      if (progress <= p.until) return { phase: p.phase, tone: p.tone }
+    }
+    return { phase: phases[phases.length - 1].phase, tone: phases[phases.length - 1].tone }
+  }
+  // Generic fallback for unknown treatments
+  if (progress <= 0.15) return { phase: 'beginning', tone: 'hopeful, energetic, fresh start energy. She\'s just starting — content should feel like opening a new chapter. Be encouraging without being naive about the difficulty.' }
+  if (progress <= 0.35) return { phase: 'early', tone: 'building momentum, settling in. Showing up repeatedly takes real effort. Be warm but honest.' }
+  if (progress <= 0.55) return { phase: 'middle', tone: 'grounding, patient, steady. Help the user stay present rather than looking ahead. Focus on today, not the outcome.' }
+  if (progress <= 0.75) return { phase: 'late', tone: 'calming, reassuring, gentle. She may be anxious about what comes next. Soothe and validate without toxic positivity.' }
+  return { phase: 'final', tone: 'celebratory but tender. Honour everything she\'s been through. Reflective, meaningful, open to whatever comes next.' }
+}
+
+function buildUserPrompt({ name, treatment, dayNumber, totalDays, vibe, genres, language, dietaryPrefs }) {
   const lang = LANGUAGE_NAMES[language] || 'English'
   const langInstruction = language && language !== 'en'
     ? `\n\nIMPORTANT: Generate ALL content in ${lang}. The quote, affirmation, journal prompt, gratitude prompt, breathing lines, and song recommendation should all be in ${lang}. For song recommendations, prefer songs in ${lang} or that are popular in ${lang}-speaking countries, but you may also suggest well-known English songs if they fit the vibe.`
     : ''
-  const { phase, tone: phaseTone } = getCyclePhase(dayNumber, totalDays)
+  const dietaryNote = dietaryPrefs && dietaryPrefs.length > 0 && !dietaryPrefs.includes('none')
+    ? `IMPORTANT dietary restrictions: ${dietaryPrefs.join(', ')}. NEVER suggest foods that conflict with these. `
+    : ''
+  const { phase, tone: phaseTone } = getCyclePhase(dayNumber, totalDays, treatment)
   return `Generate today's content for ${name} who is on Day ${dayNumber} of ${totalDays} of their ${treatment} cycle. Their vibe is ${vibe}. Their music preferences are ${genres.join(', ')}.
 
 CYCLE PHASE: ${phase} (day ${dayNumber}/${totalDays}). Emotional tone for this phase: ${phaseTone}
@@ -202,8 +280,9 @@ Generate:
 6) A breathing exercise opening line using her name, warm and specific to her day.
 7) A breathing exercise closing line using her name, different from the opening.
 8) A friend note — a short warm personal message (2-3 sentences) written as if from her closest person, using her name and referencing Day ${dayNumber}. Match the vibe tone exactly.
+9) 2-3 high-protein food suggestions — easy, inspiring meals or snacks. For each item provide: name, a single food emoji, and approximate protein per serving (e.g. "~20g"). ${dietaryNote}Vary across the cycle. Frame as inspiration, not medical advice.
 
-Return the response as a JSON object with keys: quote, quote_author, song_title, song_artist, song_spotify_search, affirmation, journal_prompt, gratitude_prompt, breathing_opening, breathing_closing, friend_note.
+Return the response as a JSON object with keys: quote, quote_author, song_title, song_artist, song_spotify_search, affirmation, journal_prompt, gratitude_prompt, breathing_opening, breathing_closing, friend_note, fuel_items (array of objects with name, emoji, protein).
 
 Return ONLY the JSON object, no markdown fences, no other text.${langInstruction}`
 }
@@ -622,7 +701,7 @@ app.post('/api/purchase/confirm', (req, res) => {
 // --- Content generation endpoint ---
 
 app.post('/api/generate-day', async (req, res) => {
-  const { name, treatment, dayNumber, totalDays, vibe, genres, userId, cycleId, language } = req.body
+  const { name, treatment, dayNumber, totalDays, vibe, genres, userId, cycleId, language, dietaryPrefs } = req.body
   const uid = userId || name // fallback user identifier
   const cid = cycleId || 'cycle_1'
 
@@ -645,7 +724,7 @@ app.post('/api/generate-day', async (req, res) => {
         system: getSystemPrompt(vibe),
         messages: [{
           role: 'user',
-          content: buildUserPrompt({ name, treatment, dayNumber, totalDays, vibe, genres, language }),
+          content: buildUserPrompt({ name, treatment, dayNumber, totalDays, vibe, genres, language, dietaryPrefs }),
         }],
       })
 
@@ -668,6 +747,7 @@ app.post('/api/generate-day', async (req, res) => {
         breathingOpening: raw.breathing_opening || raw.breathingOpening,
         breathingClosing: raw.breathing_closing || raw.breathingClosing,
         friendNote: raw.friend_note || raw.friendNote || null,
+        fuelItems: raw.fuel_items || raw.fuelItems || null,
       }
 
       // Save to SQLite
@@ -828,7 +908,8 @@ app.get('/api/admin/stats', (_, res) => {
   const favorites = db.prepare('SELECT COUNT(*) as count FROM favorites').get().count
   const completions = db.prepare('SELECT COUNT(*) as count FROM day_completions').get().count
   const events = db.prepare('SELECT COUNT(*) as count FROM events').get().count
-  res.json({ profiles, accounts, content, journals, moods, favorites, completions, events })
+  const spotifyTaps = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'spotify_tap'").get().count
+  res.json({ profiles, accounts, content, journals, moods, favorites, completions, events, spotifyTaps })
 })
 
 // --- Spotify integration ---

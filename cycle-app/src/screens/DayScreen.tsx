@@ -41,41 +41,71 @@ function getBestVoice(): SpeechSynthesisVoice | null {
   return voices.find(v => v.lang.startsWith('en')) || null
 }
 
+// Track whether speech has been unlocked by user gesture
+let speechUnlocked = false
+
 // Unlock speech synthesis on user gesture (mobile browsers block without gesture)
 function unlockSpeech() {
   if (!('speechSynthesis' in window)) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance('')
-  u.volume = 0
+  // Speak a single space to unlock the audio context
+  const u = new SpeechSynthesisUtterance(' ')
+  u.volume = 0.01
+  u.rate = 10
   window.speechSynthesis.speak(u)
+  speechUnlocked = true
+  // Force load voices
+  window.speechSynthesis.getVoices()
 }
 
 function speak(text: string): Promise<void> {
   return new Promise(resolve => {
-    if (!('speechSynthesis' in window)) { resolve(); return }
-    // Cancel any pending speech first
-    window.speechSynthesis.cancel()
-    const doSpeak = () => {
-      const u = new SpeechSynthesisUtterance(text)
-      u.rate = 0.72
-      u.pitch = 0.85
-      u.volume = 0.85
-      const voice = getBestVoice()
-      if (voice) u.voice = voice
-      u.onend = () => resolve()
-      u.onerror = () => resolve()
-      // Timeout fallback in case onend never fires
-      const fallback = setTimeout(() => resolve(), text.length * 120 + 3000)
-      u.onend = () => { clearTimeout(fallback); resolve() }
-      u.onerror = () => { clearTimeout(fallback); resolve() }
-      window.speechSynthesis.speak(u)
+    if (!('speechSynthesis' in window)) { console.warn('[Speech] Not supported'); resolve(); return }
+    if (!text || !text.trim()) { resolve(); return }
+
+    // Ensure voices are loaded
+    const voices = window.speechSynthesis.getVoices()
+    if (voices.length === 0) {
+      // Try loading voices and retry
+      console.log('[Speech] No voices yet, waiting...')
+      const onVoices = () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', onVoices)
+        voicesLoaded = true
+        doSpeak()
+      }
+      window.speechSynthesis.addEventListener('voiceschanged', onVoices)
+      // Fallback if event never fires
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener('voiceschanged', onVoices)
+        voicesLoaded = true
+        doSpeak()
+      }, 1000)
+      return
     }
-    if (!voicesLoaded && window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => { voicesLoaded = true; doSpeak() }
-      setTimeout(() => { voicesLoaded = true; doSpeak() }, 500)
-    } else {
-      doSpeak()
+
+    function doSpeak() {
+      // Cancel anything queued, then speak after a tick
+      window.speechSynthesis.cancel()
+      setTimeout(() => {
+        const u = new SpeechSynthesisUtterance(text)
+        u.rate = 0.75
+        u.pitch = 0.85
+        u.volume = 1.0
+        const voice = getBestVoice()
+        if (voice) {
+          u.voice = voice
+          console.log('[Speech] Using voice:', voice.name)
+        } else {
+          console.warn('[Speech] No suitable voice found, using default')
+        }
+        const fallback = setTimeout(() => { console.warn('[Speech] Timeout fallback'); resolve() }, text.length * 150 + 5000)
+        u.onend = () => { clearTimeout(fallback); console.log('[Speech] Done'); resolve() }
+        u.onerror = (e) => { clearTimeout(fallback); console.error('[Speech] Error:', e); resolve() }
+        window.speechSynthesis.speak(u)
+        console.log('[Speech] Speaking:', text.substring(0, 40) + '...')
+      }, 200)
     }
+
+    doSpeak()
   })
 }
 
@@ -110,7 +140,7 @@ function createChime(): { play: () => void; ctx: AudioContext } | null {
 }
 
 // --- Audio: Warm ambient pad ---
-function createAmbientPad(): { start: () => void; swell: () => void; fadeOut: () => Promise<void>; kill: () => void } | null {
+function createAmbientPad(): { start: () => void; swell: () => void; duck: () => void; unduck: () => void; fadeOut: () => Promise<void>; kill: () => void } | null {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
     const master = ctx.createGain()
@@ -162,6 +192,14 @@ function createAmbientPad(): { start: () => void; swell: () => void; fadeOut: ()
         setTimeout(() => {
           master.gain.setTargetAtTime(0.08, ctx.currentTime, 2.0)
         }, 7000)
+      },
+      duck() {
+        // Lower volume to let speech be heard
+        master.gain.setTargetAtTime(0.02, ctx.currentTime, 0.3)
+      },
+      unduck() {
+        // Restore volume after speech
+        master.gain.setTargetAtTime(0.10, ctx.currentTime, 0.5)
       },
       fadeOut() {
         return new Promise<void>(resolve => {
@@ -246,9 +284,15 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
 
     // Speak opening phrase after chime settles, then transition to breathing
     const run = async () => {
-      await new Promise(r => setTimeout(r, 2000))
+      await new Promise(r => setTimeout(r, 2500))
       if (stoppedRef.current) return
-      await speak(displayOpening.replace(/\n/g, '. '))
+      // Duck ambient pad so voice is clearly heard
+      padRef.current?.duck()
+      const textToSpeak = displayOpening.replace(/\n/g, '. ')
+      console.log('[Meditation] About to speak:', textToSpeak)
+      await speak(textToSpeak)
+      console.log('[Meditation] Speech done, transitioning to breathing')
+      padRef.current?.unduck()
       if (stoppedRef.current) return
       await new Promise(r => setTimeout(r, 800))
       if (stoppedRef.current) return
@@ -284,6 +328,7 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
             const closingSequence = async () => {
               await new Promise(r => setTimeout(r, 1000))
               if (stoppedRef.current) return
+              padRef.current?.duck()
               await speak(displayClosing.replace(/\n/g, '. '))
               if (stoppedRef.current) return
               await new Promise(r => setTimeout(r, 800))
@@ -312,21 +357,19 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
   if (stage === 'opening') {
     return (
       <div className="flex-col" style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: '32px 12px', minHeight: 240, opacity: openingFade, transition: 'opacity 1.5s ease' }}>
-        <div style={{
-          width: 80, height: 80, borderRadius: '50%',
+        <div onClick={stopMoment} style={{
+          width: 100, height: 100, borderRadius: '50%',
           background: `radial-gradient(circle at 40% 40%, ${vibe.accent}60, ${vibe.accent}20)`,
           boxShadow: `0 0 40px ${vibe.accent}30, 0 0 80px ${vibe.accent}15`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          animation: 'float 3s ease-in-out infinite',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+          animation: 'float 3s ease-in-out infinite', cursor: 'pointer',
         }}>
-          <div style={{ fontSize: 28, opacity: 0.8 }}>&#10024;</div>
+          <div style={{ fontSize: 22, opacity: 0.8 }}>&#10024;</div>
+          <div style={{ fontFamily: typo.bodyFont, fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>tap to end</div>
         </div>
         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 18, color: vibe.accent, textAlign: 'center', lineHeight: 1.6, maxWidth: 260, whiteSpace: 'pre-line' }}>
           {displayOpening}
         </div>
-        <button onClick={stopMoment} style={{ background: `${vibe.accent}15`, border: `1.5px solid ${vibe.accent}30`, borderRadius: 24, padding: '10px 28px', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 600, color: vibe.accent, marginTop: 8 }}>
-          End
-        </button>
       </div>
     )
   }
@@ -392,37 +435,33 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
           transform: `scale(${circleScale})`,
           transition: `transform ${phase.duration}s ease-in-out`,
         }} />
-        {/* Main orb */}
-        <div style={{
+        {/* Main orb — tap anywhere to end */}
+        <div onClick={stopMoment} style={{
           width: 120, height: 120, borderRadius: '50%',
           background: `radial-gradient(circle at 40% 40%, ${vibe.accent}80, ${vibe.accent}30)`,
           boxShadow: `0 0 ${circleScale > 1.2 ? 50 : 25}px ${vibe.accent}40`,
           transform: `scale(${circleScale})`,
           transition: `transform ${phase.duration}s ease-in-out, box-shadow ${phase.duration}s ease-in-out`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+          cursor: 'pointer',
         }}>
-          <div style={{ fontSize: 32, opacity: 0.7 }}>&#10024;</div>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.2 }}>
+            {phase.label}
+          </div>
+          <div style={{ fontFamily: typo.bodyFont, fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontWeight: 600 }}>
+            tap to end
+          </div>
         </div>
       </div>
 
-      {/* Text cue — no countdown numbers */}
-      <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 16, color: vibe.accent, textAlign: 'center', opacity: 0.85 }}>
-        {phase.label}
-      </div>
-
       {/* Subtle progress bar */}
-      <div style={{ width: '60%', height: 2, background: `${vibe.accent}15`, borderRadius: 1, overflow: 'hidden' }}>
+      <div style={{ width: '60%', height: 2, background: `${vibe.accent}15`, borderRadius: 1, overflow: 'hidden', marginTop: 8 }}>
         <div style={{
           width: `${overallProgress * 100}%`, height: '100%',
           background: vibe.accent, borderRadius: 1,
           transition: 'width 0.1s linear',
         }} />
       </div>
-
-      {/* Minimal stop */}
-      <button onClick={stopMoment} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: vibe.muted, marginTop: 4 }}>
-        &#10005; end
-      </button>
     </div>
   )
 }
@@ -434,6 +473,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
   const [error, setError] = useState<string | null>(null)
   const [journalText, setJournalText] = useState('')
   const [journalSaved, setJournalSaved] = useState(false)
+  const [fuelIdx, setFuelIdx] = useState(0)
+  const [fuelDismissKey, setFuelDismissKey] = useState(0) // bump to force re-render after dismiss
   const [favorites, setFavorites] = useState<Array<{ type: string; text: string; author?: string; day: number }>>(() => {
     try { return JSON.parse(localStorage.getItem('cycle_favorites') || '[]') } catch { return [] }
   })
@@ -480,6 +521,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     setJournalText(localStorage.getItem(`cycle_day_${dayNumber}_journal`) || '')
     setMeditationStarted(false)
     setJournalSaved(false)
+    setFuelIdx(0)
     setMood(localStorage.getItem(`cycle_mood_day${dayNumber}`))
     // Scroll to top of screen
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -531,7 +573,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     try {
       const res = await fetch('/api/generate-day', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: data.name, treatment: TREATMENT_LABELS[data.treatment] || data.treatment, dayNumber, totalDays: data.cycleDays, vibe: data.vibe, genres: data.genres, userId: data.name, language: localStorage.getItem('cycle_language') || 'en' }),
+        body: JSON.stringify({ name: data.name, treatment: TREATMENT_LABELS[data.treatment] || data.treatment, dayNumber, totalDays: data.cycleDays, vibe: data.vibe, genres: data.genres, userId: data.name, language: localStorage.getItem('cycle_language') || 'en', dietaryPrefs: (() => { try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] } })() }),
       })
       const body = await res.json()
       if (!res.ok || body.error) {
@@ -585,15 +627,10 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     spawnConfetti()
     track('day_marked_done', { day_number: dayNumber })
     fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, completed: true }) }).catch(() => {})
-    onDayComplete()
     // Auto-advance to next day after celebration
     setTimeout(() => {
       setShowCelebration(false)
-      if (dayNumber < data.cycleDays) {
-        onGoToDay?.(dayNumber + 1)
-      } else {
-        onEndOfCycle?.()
-      }
+      onDayComplete()
     }, 1800)
   }
 
@@ -663,8 +700,11 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       return (
         <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
           {vibeLabel(vibeContent.labels.quote)}
-          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: typo.headingWeight, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8 }}>"{content?.quote}"</div>
-          <div className="mono-sm" style={{ color: vibe.accent }}>— {content?.quoteAuthor}</div>
+          <div style={{ position: 'relative', padding: '0 8px' }}>
+            <div style={{ fontFamily: typo.headingFont, fontSize: 48, color: `${vibe.accent}18`, lineHeight: 0.5, position: 'absolute', top: 4, left: -4 }}>"</div>
+            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8, paddingLeft: 20 }}>{content?.quote}</div>
+          </div>
+          <div className="mono-sm" style={{ color: vibe.accent, paddingLeft: 28 }}>— {content?.quoteAuthor}</div>
           {saveShareRow('quote', content?.quote || '', content?.quoteAuthor)}
         </Card>
       )
@@ -674,6 +714,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         if (spotifyConnected && spotifyTrack) {
           e.preventDefault()
           track('spotify_track_opened', { song: content?.songTitle || '', artist: content?.songArtist || '' })
+          fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, event: 'spotify_tap', data: JSON.stringify({ song: content?.songTitle, artist: content?.songArtist, day: dayNumber }) }) }).catch(() => {})
           const appLink = spotifyTrack.trackUri
           const webLink = spotifyTrack.trackUrl
           const start = Date.now()
@@ -703,12 +744,74 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       )
     }
     if (component === 'affirmation') return (
-      <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
-        {vibeLabel(vibeContent.labels.affirmation)}
-        <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 18, fontWeight: typo.headingWeight, color: vibe.accent, lineHeight: 1.4, textAlign: 'center', padding: '8px 0' }}>{content?.affirmation}</div>
+      <div key={component} style={{ background: `linear-gradient(135deg, ${vibe.accent}0A 0%, ${vibe.accent}04 100%)`, border: `1px solid ${vibe.accent}18`, borderRadius: 14, padding: '20px 16px', textAlign: 'center' }}>
+        {vibeLabel({ emoji: vibeContent.labels.affirmation.emoji, text: 'SAY THIS TO YOURSELF' })}
+        <div style={{ fontFamily: typo.headingFont, fontWeight: 700, fontSize: 22, color: vibe.accent, lineHeight: 1.35, padding: '8px 4px' }}>{content?.affirmation}</div>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: `${vibe.accent}50`, marginTop: 6, letterSpacing: '0.1em' }}>BREATHE. REPEAT.</div>
         {saveShareRow('affirmation', content?.affirmation || '')}
-      </Card>
+      </div>
     )
+    if (component === 'fuel') {
+      const FALLBACK_FUEL = [
+        [{ name: 'Greek yoghurt with almonds & honey', emoji: '🥜', protein: '~20g' }, { name: 'Salmon with sweet potato', emoji: '🐟', protein: '~30g' }, { name: 'Avocado & egg toast', emoji: '🥑', protein: '~15g' }],
+        [{ name: 'Chicken & quinoa bowl', emoji: '🍗', protein: '~35g' }, { name: 'Hummus with veggie sticks', emoji: '🥕', protein: '~8g' }, { name: 'Overnight oats with chia seeds', emoji: '🥣', protein: '~18g' }],
+        [{ name: 'Lentil soup with crusty bread', emoji: '🍲', protein: '~18g' }, { name: 'Cottage cheese with berries', emoji: '🫐', protein: '~14g' }, { name: 'Edamame & rice bowl', emoji: '🍚', protein: '~22g' }],
+        [{ name: 'Turkey & avocado wrap', emoji: '🌯', protein: '~28g' }, { name: 'Handful of almonds & banana', emoji: '🍌', protein: '~7g' }, { name: 'Bean & cheese quesadilla', emoji: '🧀', protein: '~20g' }],
+      ]
+      // Dismissed foods — stored in localStorage, used to filter future suggestions
+      const getDismissed = (): string[] => { try { return JSON.parse(localStorage.getItem('cycle_fuel_dismissed') || '[]') } catch { return [] } }
+      const dismissFood = (name: string) => {
+        const current = getDismissed()
+        if (!current.includes(name)) {
+          const next = [...current, name]
+          localStorage.setItem('cycle_fuel_dismissed', JSON.stringify(next))
+        }
+        track('fuel_item_dismissed', { food: name, day_number: dayNumber })
+      }
+      const dismissed = getDismissed()
+      const aiFuel = content?.fuelItems
+      const allFuel = aiFuel && fuelIdx === 0 ? aiFuel : FALLBACK_FUEL[fuelIdx % FALLBACK_FUEL.length]
+      // Filter out dismissed items
+      const currentFuel = allFuel.filter((item: any) => !dismissed.some(d => item.name.toLowerCase().includes(d.toLowerCase()) || d.toLowerCase().includes(item.name.toLowerCase())))
+      const dietPrefs: string[] = (() => { try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] } })()
+      const hasDietPrefs = dietPrefs.length > 0 && !dietPrefs.includes('none')
+      // If all items dismissed for this set, auto-advance
+      if (currentFuel.length === 0) {
+        return (
+          <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
+            {vibeLabel(vibeContent.labels.fuel)}
+            <div style={{ textAlign: 'center', padding: '12px 0' }}>
+              <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, marginBottom: 8 }}>No suggestions left for this set</div>
+              <button onClick={() => setFuelIdx(prev => prev + 1)} style={{ background: vibe.accent, color: 'white', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont }}>Show more ideas</button>
+            </div>
+          </Card>
+        )
+      }
+      return (
+        <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
+          {vibeLabel(vibeContent.labels.fuel)}
+          <div style={{ fontFamily: typo.bodyFont, fontWeight: 300, fontSize: 12, color: mutedColor, marginBottom: 12 }}>Protein-rich ideas for today</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {currentFuel.map((item: any, i: number) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: 10 }}>
+                <div style={{ fontSize: 22 }}>{item.emoji}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
+                </div>
+                <button onClick={() => { dismissFood(item.name); setFuelDismissKey(k => k + 1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: mutedColor, padding: '4px', opacity: 0.4, lineHeight: 1 }} title="Not for me">
+                  &#10005;
+                </button>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, opacity: 0.5, lineHeight: 1.5, marginTop: 10 }}>
+            For inspiration only · follow your clinic's guidance
+            {hasDietPrefs && <span> · {dietPrefs.join(', ')}</span>}
+          </div>
+        </Card>
+      )
+    }
     if (component === 'journal') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.journal)}
@@ -721,8 +824,10 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     )
     if (component === 'gratitude') return (
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
-        {vibeLabel(vibeContent.labels.gratitude)}
-        <div style={{ fontSize: 18, color: textColor, fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, lineHeight: 1.4, borderLeft: `2px solid ${vibe.accent}40`, paddingLeft: 14 }}>{content?.gratitudePrompt}</div>
+        {vibeLabel({ emoji: vibeContent.labels.gratitude.emoji, text: 'PAUSE & REFLECT' })}
+        <div style={{ fontSize: 18, color: isDark ? 'rgba(253,246,240,0.7)' : 'rgba(28,15,12,0.6)', fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 400, lineHeight: 1.5, padding: '4px 0' }}>{content?.gratitudePrompt}</div>
+        <div style={{ borderBottom: `1px dashed ${vibe.accent}25`, marginTop: 14, paddingBottom: 20 }} />
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.05em', opacity: 0.6 }}>sit with this for a moment</div>
       </Card>
     )
     if (component === 'meditation' || component === 'breathing') return (
@@ -822,12 +927,11 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                 </div>
               )}
             </div>
-            {/* Right side: clickable dots grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, alignSelf: 'center' }}>
+            {/* Right side: clickable day circles */}
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(7, data.cycleDays)}, 1fr)`, gap: 4, alignSelf: 'center', maxWidth: 160 }}>
               {Array.from({ length: data.cycleDays }, (_, i) => i + 1).map(d => {
                 const isDone = completedDays.has(d)
                 const isViewing = d === dayNumber
-                const dotSize = isViewing ? 10 : 8
                 return (
                   <button
                     key={d}
@@ -836,22 +940,16 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                       onGoToDay?.(d)
                     }}
                     style={{
-                      width: 18, height: 18, borderRadius: '50%', padding: 0,
-                      background: 'transparent',
-                      border: 'none',
-                      boxShadow: 'none',
+                      width: 20, height: 20, borderRadius: '50%', padding: 0,
+                      background: isDone ? vibe.accent : isViewing ? `${vibe.accent}30` : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                      border: isViewing ? `1.5px solid ${vibe.accent}` : 'none',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer',
                       margin: 'auto',
+                      transition: 'all 0.2s',
                     }}
                   >
-                    <div style={{
-                      width: dotSize, height: dotSize, borderRadius: '50%',
-                      background: isDone ? vibe.accent : `${mutedColor}25`,
-                      border: isViewing && !isDone ? `1.5px solid ${mutedColor}50` : 'none',
-                      opacity: isDone ? 1 : 0.35,
-                      transition: 'all 0.3s',
-                    }} />
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, fontWeight: 500, color: isDone ? 'white' : isViewing ? vibe.accent : mutedColor, lineHeight: 1 }}>{d}</span>
                   </button>
                 )
               })}
@@ -889,7 +987,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         </div>
       ) : (
         <div className="flex-col gap-12" style={{ padding: '0 18px 140px', flex: 1 }}>
-          {sortedComponents.map(renderComponent)}
+          {sortedComponents.filter(c => c !== 'fuel').map(renderComponent)}
           {/* Friend note card */}
           <Card cardBg={cardBg} cardBorder={cardBorder}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
@@ -907,6 +1005,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             </div>
             {saveShareRow('friendNote', content?.friendNote || vibeContent.friendNote.text.replace('[name]', data.name).replace('[X]', String(dayNumber)))}
           </Card>
+          {/* Fuel — always last */}
+          {sortedComponents.includes('fuel') && renderComponent('fuel')}
         </div>
       )}
       {/* Spotify connect popup */}
@@ -928,6 +1028,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             <button onClick={() => {
               setShowSpotifyPopup(false)
               track('song_played', { day_number: dayNumber })
+              fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, event: 'spotify_tap', data: JSON.stringify({ song: content?.songTitle, artist: content?.songArtist, day: dayNumber }) }) }).catch(() => {})
               window.open(spotifySearchUrl, '_blank')
             }} style={{
               width: '100%', background: 'transparent', border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,

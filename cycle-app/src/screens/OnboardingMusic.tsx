@@ -22,6 +22,13 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t) }, [])
 
+  // Allow Enter key to advance
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Enter' && selected.length > 0) onContinue(selected) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [selected, onContinue])
+
   const { bg, accent, text, muted } = vibeTheme
   const extraGenres = ALL_EXTRA_GENRES.filter(g => !defaultGenres.includes(g))
   const toggle = (genre: string) => setSelected(prev => prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre])

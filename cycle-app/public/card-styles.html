@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Card Differentiation & Nutrition</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 56px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .section-desc { font-size: 13px; color: rgba(253,246,240,0.45); margin-bottom: 20px; line-height: 1.6; }
+  .phone { width: 340px; min-height: 200px; background: #1C0F0C; border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); padding: 20px 18px; margin-bottom: 12px; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .phones { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 12px; flex-wrap: wrap; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .label { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .label-text { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; }
+  .save-row { display: flex; justify-content: flex-end; gap: 14px; margin-top: 10px; align-items: center; }
+  .save-row svg { opacity: 0.4; }
+  .save-row span { font-size: 14px; color: rgba(232,165,152,0.35); }
+  .option-tag { display: inline-block; padding: 4px 10px; border-radius: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .note { font-size: 12px; color: rgba(253,246,240,0.3); font-style: italic; margin-top: 8px; line-height: 1.5; }
+  .vote { display: inline-flex; gap: 8px; margin-top: 10px; }
+  .vote button { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(253,246,240,0.5); padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: 'Karla', sans-serif; }
+  .vote button:hover { border-color: #C4614A; color: #C4614A; }
+</style>
+</head>
+<body>
+
+<h1>Card Differentiation & Nutrition</h1>
+<p class="subtitle">How to make quote, affirmation, and gratitude feel distinct — plus a new nutrition component</p>
+
+<!-- ========================================== -->
+<!-- PART 1: THE PROBLEM -->
+<!-- ========================================== -->
+<div class="section">
+  <div class="section-title">The Problem — Current State</div>
+  <p class="section-desc">Right now, quote, affirmation, and gratitude all render as italic text in a card. The only differences are size (22 vs 18 vs 18) and color. Scrolling through them feels like reading three similar sentences.</p>
+
+  <div class="phones">
+    <div>
+      <div class="phone-label">Current — all look similar</div>
+      <div class="phone">
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🔥</span><span class="label-text">TODAY'S FIRE</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:20px; color:#FDF6F0; line-height:1.35; margin-bottom:8px">"She was powerful not because she wasn't scared but because she went on."</div>
+          <div class="mono" style="font-size:11px; color:#C4614A">— Atticus</div>
+        </div>
+        <div class="card">
+          <div class="label"><span style="font-size:13px">💪</span><span class="label-text">YOUR POWER</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:17px; color:#C4614A; line-height:1.4; text-align:center; padding:8px 0">I am stronger than the uncertainty I feel today.</div>
+        </div>
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🙏</span><span class="label-text">TODAY'S GRATITUDE</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:17px; color:#FDF6F0; line-height:1.4; border-left:2px solid rgba(196,97,74,0.4); padding-left:14px">What is one thing your body did for you today that you're grateful for?</div>
+        </div>
+        <div class="note">↑ Three cards in a row that feel like the same thing</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PART 2: PROPOSED DIFFERENTIATION -->
+<!-- ========================================== -->
+<div class="section">
+  <div class="section-title">Proposed — Make Each Card Feel Different</div>
+  <p class="section-desc">Each card type should have its own visual personality. The quote is someone else's words (literary). The affirmation is YOUR declaration (personal, bold). The gratitude is a question to sit with (reflective, open).</p>
+
+  <div class="phones">
+    <!-- OPTION A -->
+    <div>
+      <div class="phone-label">Option A — Subtle structural differences</div>
+      <div class="phone">
+        <!-- Quote: large, italic, with quotation marks and author — literary feel -->
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🔥</span><span class="label-text">TODAY'S FIRE</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:22px; color:#FDF6F0; line-height:1.35; margin-bottom:8px">"She was powerful not because she wasn't scared but because she went on."</div>
+          <div class="mono" style="font-size:11px; color:#C4614A">— Atticus</div>
+          <div class="save-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>➤</span>
+          </div>
+        </div>
+
+        <!-- Affirmation: centered, accent bg tint, larger text, feels like a mantra -->
+        <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.15); border-radius:14px; padding:20px 16px; margin-bottom:12px; text-align:center">
+          <div class="label" style="justify-content:center"><span style="font-size:13px">💪</span><span class="label-text">YOUR POWER</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:20px; color:#C4614A; line-height:1.4; padding:4px 8px">I am stronger than the uncertainty I feel today.</div>
+          <div class="save-row" style="justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>➤</span>
+          </div>
+        </div>
+
+        <!-- Gratitude: left-aligned, question mark emphasis, more space, feels like a journal prompt -->
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🙏</span><span class="label-text">TODAY'S GRATITUDE</span></div>
+          <div style="font-family:'Karla',sans-serif; font-weight:300; font-size:16px; color:rgba(253,246,240,0.7); line-height:1.5; padding:4px 0">What is one thing your body did for you today that you're grateful for?</div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+
+    <!-- OPTION B -->
+    <div>
+      <div class="phone-label">Option B — Stronger visual contrast</div>
+      <div class="phone">
+        <!-- Quote: with decorative open/close quote marks -->
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🔥</span><span class="label-text">TODAY'S FIRE</span></div>
+          <div style="position:relative; padding:0 8px">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:48px; color:rgba(196,97,74,0.15); line-height:0.5; position:absolute; top:4px; left:-4px">"</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:22px; color:#FDF6F0; line-height:1.35; margin-bottom:8px; padding-left:20px">She was powerful not because she wasn't scared but because she went on.</div>
+          </div>
+          <div class="mono" style="font-size:11px; color:#C4614A; padding-left:28px">— Atticus</div>
+          <div class="save-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>➤</span>
+          </div>
+        </div>
+
+        <!-- Affirmation: mirror-style — say it to yourself -->
+        <div style="background:linear-gradient(135deg, rgba(196,97,74,0.08) 0%, rgba(196,97,74,0.03) 100%); border:1px solid rgba(196,97,74,0.12); border-radius:14px; padding:20px 16px; margin-bottom:12px; text-align:center">
+          <div class="label" style="justify-content:center"><span style="font-size:13px">💪</span><span class="label-text">SAY THIS TO YOURSELF</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-weight:700; font-size:22px; color:#C4614A; line-height:1.35; padding:8px 4px; letter-spacing:0.01em">I am stronger than the uncertainty I feel today.</div>
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:rgba(196,97,74,0.5); margin-top:6px; letter-spacing:0.1em">BREATHE. REPEAT.</div>
+          <div class="save-row" style="justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>➤</span>
+          </div>
+        </div>
+
+        <!-- Gratitude: handwritten/personal feel with a subtle dotted underline for answer space -->
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🙏</span><span class="label-text">PAUSE & REFLECT</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; font-size:18px; color:rgba(253,246,240,0.65); line-height:1.5; padding:4px 0">What is one thing your body did for you today that you're grateful for?</div>
+          <div style="border-bottom:1px dashed rgba(196,97,74,0.2); margin-top:14px; padding-bottom:20px"></div>
+          <div style="font-family:'DM Mono',monospace; font-size:9px; color:rgba(253,246,240,0.2); margin-top:6px; letter-spacing:0.05em">sit with this for a moment</div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+
+    <!-- OPTION C -->
+    <div>
+      <div class="phone-label">Option C — Each has a distinct container</div>
+      <div class="phone">
+        <!-- Quote: classic card, unchanged -->
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🔥</span><span class="label-text">TODAY'S FIRE</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:22px; color:#FDF6F0; line-height:1.35; margin-bottom:8px">"She was powerful not because she wasn't scared but because she went on."</div>
+          <div class="mono" style="font-size:11px; color:#C4614A">— Atticus</div>
+          <div class="save-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>➤</span>
+          </div>
+        </div>
+
+        <!-- Affirmation: no card border, just floating text with accent glow -->
+        <div style="padding:16px 8px; margin-bottom:12px; text-align:center">
+          <div class="label" style="justify-content:center"><span style="font-size:13px">💪</span><span class="label-text">YOUR POWER</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:22px; color:#C4614A; line-height:1.35; padding:8px 0; text-shadow:0 0 30px rgba(196,97,74,0.2)">I am stronger than the uncertainty I feel today.</div>
+          <div class="save-row" style="justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(232,165,152,0.4)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>➤</span>
+          </div>
+        </div>
+
+        <!-- Gratitude: left accent bar, lighter weight, question-like -->
+        <div style="border-left:3px solid rgba(196,97,74,0.3); padding:12px 16px; margin-bottom:12px; margin-left:4px">
+          <div class="label"><span style="font-size:13px">🙏</span><span class="label-text">PAUSE & REFLECT</span></div>
+          <div style="font-family:'Karla',sans-serif; font-weight:300; font-size:16px; color:rgba(253,246,240,0.6); line-height:1.6">What is one thing your body did for you today that you're grateful for?</div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PART 3: NUTRITION / FUEL COMPONENT -->
+<!-- ========================================== -->
+<div class="section">
+  <div class="section-title">New Component — Your Fuel (Nutrition)</div>
+  <p class="section-desc">
+    High-protein nutrition is critical during fertility treatment. This component provides daily food inspiration — not medical advice.
+    <br><br>
+    <strong>Key design decisions:</strong><br>
+    • Frame as "inspiration" not prescription — "try this" not "eat this"<br>
+    • No calorie counts, no portion sizes (not a diet app)<br>
+    • Rotate through options so it stays fresh<br>
+    • Show 2-3 simple food ideas per day with protein callout<br>
+    • Include a small disclaimer<br>
+    • Dietary preferences collected during onboarding (or in settings)
+  </p>
+
+  <div class="phones">
+    <!-- OPTION A: Simple list -->
+    <div>
+      <div class="phone-label">Option A — Simple daily suggestions</div>
+      <div class="phone">
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🍳</span><span class="label-text">YOUR FUEL</span></div>
+          <div style="font-family:'Karla',sans-serif; font-weight:300; font-size:12px; color:rgba(253,246,240,0.4); margin-bottom:12px">Protein-rich ideas for today</div>
+
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:10px">
+              <div style="font-size:22px">🥑</div>
+              <div style="flex:1">
+                <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:13px; color:#FDF6F0">Avocado & egg toast</div>
+                <div style="font-family:'DM Mono',monospace; font-size:9px; color:rgba(196,97,74,0.7); margin-top:2px">~15g PROTEIN</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:10px">
+              <div style="font-size:22px">🥜</div>
+              <div style="flex:1">
+                <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:13px; color:#FDF6F0">Greek yoghurt with almonds & honey</div>
+                <div style="font-family:'DM Mono',monospace; font-size:9px; color:rgba(196,97,74,0.7); margin-top:2px">~20g PROTEIN</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:10px">
+              <div style="font-size:22px">🐟</div>
+              <div style="flex:1">
+                <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:13px; color:#FDF6F0">Salmon with sweet potato</div>
+                <div style="font-family:'DM Mono',monospace; font-size:9px; color:rgba(196,97,74,0.7); margin-top:2px">~30g PROTEIN</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(253,246,240,0.2); margin-top:12px; line-height:1.5">For inspiration only · always follow your clinic's guidance</div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+
+    <!-- OPTION B: Single hero suggestion -->
+    <div>
+      <div class="phone-label">Option B — Single hero idea + tip</div>
+      <div class="phone">
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🍳</span><span class="label-text">YOUR FUEL</span></div>
+
+          <div style="text-align:center; padding:8px 0">
+            <div style="font-size:40px; margin-bottom:8px">🥣</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:20px; color:#FDF6F0; line-height:1.3; margin-bottom:4px">Overnight oats with chia seeds & berries</div>
+            <div style="font-family:'DM Mono',monospace; font-size:10px; color:#C4614A; letter-spacing:0.1em; margin-top:6px">~18g PROTEIN</div>
+          </div>
+
+          <div style="background:rgba(196,97,74,0.06); border-radius:10px; padding:10px 12px; margin-top:12px">
+            <div style="font-family:'Karla',sans-serif; font-size:12px; color:rgba(253,246,240,0.5); line-height:1.5">
+              <span style="color:#C4614A; font-weight:600">Why protein matters:</span> During stimulation, your body is working overtime. Protein helps reduce bloating and supports egg development.
+            </div>
+          </div>
+
+          <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(253,246,240,0.2); margin-top:10px; line-height:1.5">For inspiration only · always follow your clinic's guidance</div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+
+    <!-- OPTION C: Compact with swap -->
+    <div>
+      <div class="phone-label">Option C — Compact with "not for me" swap</div>
+      <div class="phone">
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🍳</span><span class="label-text">YOUR FUEL</span></div>
+
+          <div style="display:flex; gap:10px; margin-bottom:10px">
+            <div style="flex:1; background:rgba(255,255,255,0.03); border-radius:10px; padding:12px; text-align:center">
+              <div style="font-size:24px; margin-bottom:6px">🥚</div>
+              <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:11px; color:#FDF6F0; line-height:1.3">Boiled eggs with avocado</div>
+              <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(196,97,74,0.7); margin-top:4px">~14g</div>
+            </div>
+            <div style="flex:1; background:rgba(255,255,255,0.03); border-radius:10px; padding:12px; text-align:center">
+              <div style="font-size:24px; margin-bottom:6px">🥩</div>
+              <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:11px; color:#FDF6F0; line-height:1.3">Chicken & quinoa bowl</div>
+              <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(196,97,74,0.7); margin-top:4px">~35g</div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(253,246,240,0.2); line-height:1.5">For inspiration only</div>
+            <button style="background:none; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:4px 10px; font-family:'DM Mono',monospace; font-size:9px; color:rgba(253,246,240,0.35); cursor:pointer">↻ not for me</button>
+          </div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+
+    <!-- OPTION D: Meal of the day + snack -->
+    <div>
+      <div class="phone-label">Option D — Meal + snack pair</div>
+      <div class="phone">
+        <div class="card">
+          <div class="label"><span style="font-size:13px">🍳</span><span class="label-text">YOUR FUEL</span></div>
+
+          <div style="margin-bottom:14px">
+            <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(253,246,240,0.3); letter-spacing:0.1em; margin-bottom:6px">MEAL IDEA</div>
+            <div style="display:flex; align-items:center; gap:10px">
+              <div style="font-size:28px">🍝</div>
+              <div>
+                <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:14px; color:#FDF6F0">Lentil bolognese</div>
+                <div style="font-family:'Karla',sans-serif; font-weight:300; font-size:11px; color:rgba(253,246,240,0.4)">Rich in iron & folate too</div>
+              </div>
+              <div style="margin-left:auto; font-family:'DM Mono',monospace; font-size:10px; color:#C4614A; font-weight:500">~22g</div>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:12px">
+            <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(253,246,240,0.3); letter-spacing:0.1em; margin-bottom:6px">QUICK SNACK</div>
+            <div style="display:flex; align-items:center; gap:10px">
+              <div style="font-size:28px">🥜</div>
+              <div>
+                <div style="font-family:'Karla',sans-serif; font-weight:600; font-size:14px; color:#FDF6F0">Handful of almonds + a banana</div>
+                <div style="font-family:'Karla',sans-serif; font-weight:300; font-size:11px; color:rgba(253,246,240,0.4)">Easy, no prep needed</div>
+              </div>
+              <div style="margin-left:auto; font-family:'DM Mono',monospace; font-size:10px; color:#C4614A; font-weight:500">~7g</div>
+            </div>
+          </div>
+
+          <div style="font-family:'DM Mono',monospace; font-size:8px; color:rgba(253,246,240,0.2); margin-top:12px; line-height:1.5">For inspiration only · always follow your clinic's guidance</div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.style.borderColor='#C4614A';this.style.color='#C4614A'">👍 This</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PART 4: DIETARY SAFETY -->
+<!-- ========================================== -->
+<div class="section">
+  <div class="section-title">Dietary Preferences — How to Handle</div>
+  <p class="section-desc">
+    We need to be sensitive to dietary needs without making the onboarding feel clinical. Here's the approach:
+  </p>
+
+  <div class="phones">
+    <div>
+      <div class="phone-label">Onboarding step (optional) or Settings</div>
+      <div class="phone">
+        <div style="font-family:'DM Mono',monospace; font-size:10px; color:#C4614A; letter-spacing:0.15em; margin-bottom:8px">ANY DIETARY PREFERENCES?</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:#FDF6F0; line-height:1.2; margin-bottom:4px">What should we keep in mind?</div>
+        <div style="font-family:'Karla',sans-serif; font-size:12px; color:rgba(253,246,240,0.4); margin-bottom:16px">So we can suggest foods you'll actually enjoy. Skip if you'd rather not say.</div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px">
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🌱 Vegetarian</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🌿 Vegan</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🐟 Pescatarian</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid #C4614A; background:rgba(196,97,74,0.08); font-size:12px; color:#C4614A; cursor:pointer">🥛 Dairy-free</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🌾 Gluten-free</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🥜 Nut allergy</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🥚 Egg allergy</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🦐 Shellfish allergy</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🫘 Soy-free</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🕌 Halal</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">✡ Kosher</div>
+          <div style="padding:8px 14px; border-radius:20px; border:1.5px solid rgba(196,97,74,0.15); font-size:12px; color:rgba(253,246,240,0.6); cursor:pointer">🍖 No restrictions</div>
+        </div>
+
+        <div style="background:#C4614A; color:white; border-radius:14px; padding:14px; font-weight:700; font-size:14px; text-align:center; cursor:pointer">Continue</div>
+        <div style="font-size:12px; color:rgba(253,246,240,0.3); text-align:center; margin-top:10px; cursor:pointer">Skip for now</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="phone-label">How preferences affect the AI prompt</div>
+      <div class="phone" style="font-family:'DM Mono',monospace; font-size:11px; color:rgba(253,246,240,0.5); line-height:1.8">
+        <div style="color:#C4614A; margin-bottom:8px">What we send to Claude:</div>
+        <div style="background:rgba(255,255,255,0.03); border-radius:8px; padding:12px; font-size:10px; line-height:1.6">
+          "Suggest 2-3 high-protein food ideas for someone going through IVF stimulation (day 5 of 18).
+          <br><br>
+          <span style="color:#C4614A">Dietary needs: dairy-free</span>
+          <br><br>
+          Keep it warm and encouraging, not clinical. Include approximate protein per serving. Use common, easy-to-find ingredients. Never suggest anything that conflicts with their dietary needs."
+        </div>
+        <div style="margin-top:16px; color:rgba(253,246,240,0.3); font-size:9px; line-height:1.6">
+          • AI generates fresh suggestions each day<br>
+          • Dietary restrictions passed as hard constraints<br>
+          • Treatment type informs what nutrients matter most<br>
+          • Phase-aware (stimulation vs. transfer vs. recovery)<br>
+          • If no preferences set → general high-protein suggestions
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  View at localhost:5000/card-styles.html
+</div>
+
+</body>
+</html>

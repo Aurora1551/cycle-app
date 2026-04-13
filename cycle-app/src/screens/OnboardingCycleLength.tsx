@@ -6,16 +6,38 @@ interface Props {
   onBack: () => void
   onContinue: (days: number) => void
   initialValue?: number
+  treatment?: string
+}
+
+const TREATMENT_DEFAULTS: Record<string, number> = {
+  ivf: 18,
+  iui: 28,
+  'egg-freezing': 14,
+  'egg-donation': 14,
+  icsi: 18,
+  'embryo-transfer': 18,
+  fet: 18,
+  'medicated-cycle': 21,
+  surrogacy: 28,
+  preparing: 14,
 }
 
 const A = '#C4614A', BG = '#FDF6F0', T = '#1C0F0C', M = '#9B7B74'
 
-const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialValue }) => {
+const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialValue, treatment }) => {
   const { t } = useTranslation()
-  const [days, setDays] = useState(initialValue || 14)
+  const defaultDays = initialValue || (treatment ? TREATMENT_DEFAULTS[treatment] : undefined) || 14
+  const [days, setDays] = useState(defaultDays)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t) }, [])
+
+  // Allow Enter key to advance
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Enter') onContinue(days) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [days, onContinue])
 
   const counterBtn: React.CSSProperties = {
     width: 48, height: 56, background: 'none', border: 'none',
