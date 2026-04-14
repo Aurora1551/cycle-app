@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BackButton } from '../components/ui'
 
 interface Props {
   onBack: () => void
@@ -70,7 +71,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
         <div className="progress-fill" style={{ width: '33%', background: 'linear-gradient(90deg, #C4614A, #D4956A)' }} />
       </div>
 
-      <button onClick={onBack} className="btn-back" style={{ color: M }}>{t('back')}</button>
+      <BackButton onClick={onBack} color={M} />
 
       <div style={{ padding: '16px 24px 32px', display: 'flex', flexDirection: 'column', flex: 1, gap: 10, overflowY: 'auto' }}>
         <div className="step-label" style={{ color: A }}>{t('stepOf', { step: 1 }).replace('6', '3')}</div>

@@ -132,10 +132,17 @@ export const GhostButton: React.FC<GhostButtonProps> = ({ color, borderColor, ty
 interface BackButtonProps {
   onClick: () => void
   color: string
+  label?: string
 }
 
-export const BackButton: React.FC<BackButtonProps> = ({ onClick, color }) => (
-  <button onClick={onClick} className="btn-back" style={{ color }}>
-    ← back
+export const BackButton: React.FC<BackButtonProps> = ({ onClick, color, label = 'Back' }) => (
+  <button onClick={onClick} style={{
+    background: 'none', border: 'none', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', gap: 4,
+    padding: '14px 20px 6px', minHeight: 44,
+    fontFamily: "'Karla', sans-serif", fontSize: 13, fontWeight: 500, color,
+    transition: 'color 0.2s',
+  }}>
+    <span style={{ fontSize: 16, lineHeight: 1 }}>‹</span> {label}
   </button>
 )

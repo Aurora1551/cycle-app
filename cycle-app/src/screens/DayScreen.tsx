@@ -838,8 +838,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
-                <button onClick={() => { dismissFood(item.name); setFuelDismissKey(k => k + 1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: mutedColor, padding: '4px', opacity: 0.4, lineHeight: 1 }} title="Not for me">
-                  &#10005;
+                <button onClick={() => { dismissFood(item.name); setFuelDismissKey(k => k + 1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, padding: '4px 6px', opacity: 0.5, letterSpacing: '0.05em' }} title="Show me another">
+                  swap
                 </button>
               </div>
             ))}

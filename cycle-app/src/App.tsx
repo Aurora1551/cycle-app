@@ -42,7 +42,7 @@ type Screen =
   | 'gift-redeem'
 
 const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-step2', 'onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow', 'payment', 'payment-success']
-const NAV_SCREENS: Screen[] = ['day', 'progress']
+const NAV_SCREENS: Screen[] = ['day', 'progress', 'settings']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
   if (screen === 'splash') return '#FFFBF0'
@@ -343,6 +343,7 @@ function App() {
           {([
             { id: 'day' as Screen, label: t('nav.today'), icon: '☀' },
             { id: 'progress' as Screen, label: t('nav.progress'), icon: '○' },
+            { id: 'settings' as Screen, label: 'Settings', icon: '⚙' },
           ]).map(tab => {
             const isActive = screen === tab.id
             const color = isActive ? navAccent : navMuted

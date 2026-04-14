@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { VibeKey } from '../types'
 import { VIBES } from '../types'
+import { BackButton } from '../components/ui'
 
 interface Props {
   onBack: () => void
@@ -60,7 +61,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
         <div className="progress-fill" style={{ width: '66%', background: `linear-gradient(90deg, ${accent}, ${accent}bb)`, transition: 'width 0.5s ease, background 0.5s ease' }} />
       </div>
 
-      <button onClick={() => { onPreview(null); onBack() }} className="btn-back" style={{ color: muted, transition: 'color 0.5s ease' }}>{t('back')}</button>
+      <BackButton onClick={() => { onPreview(null); onBack() }} color={muted} />
 
       <div style={{ padding: '16px 24px 32px', display: 'flex', flexDirection: 'column', flex: 1, gap: 10, overflowY: 'auto' }}>
         <div className="step-label" style={{ color: accent, transition: 'color 0.5s ease' }}>{t('stepOf', { step: 2 }).replace('6', '3')}</div>
