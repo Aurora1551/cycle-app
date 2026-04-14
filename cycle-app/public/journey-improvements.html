@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Journey Tab Improvements</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 56px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .section-desc { font-size: 13px; color: rgba(253,246,240,0.45); margin-bottom: 20px; line-height: 1.6; }
+  .phones { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.35); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; max-width: 240px; }
+  .phone { width: 240px; min-height: 480px; background: #1C0F0C; border-radius: 26px; border: 2px solid rgba(255,255,255,0.08); padding: 16px 14px; position: relative; overflow: hidden; }
+  .notch { width: 50px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 0 auto 10px; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .serif { font-family: 'Cormorant Garamond', serif; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .arrow { color: #C4614A; font-size: 20px; flex-shrink: 0; align-self: center; margin-top: 100px; }
+  .nav { display: flex; justify-content: space-around; padding: 8px 0 4px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto; font-size: 9px; position: absolute; bottom: 0; left: 0; right: 0; background: #1C0F0C; border-radius: 0 0 24px 24px; }
+  .nav span { color: rgba(253,246,240,0.3); padding: 4px 8px; }
+  .nav .active { color: #C4614A; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px; font-size: 9px; }
+  .vote { display: inline-flex; gap: 8px; margin-top: 8px; }
+  .vote button { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(253,246,240,0.5); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; }
+  .vote button:hover { border-color: #C4614A; color: #C4614A; }
+</style>
+</head>
+<body>
+
+<h1>Journey Tab Improvements</h1>
+<p class="subtitle">Current state vs proposed — making the Journey tab feel like a scrapbook, not a dashboard</p>
+
+<!-- ============================================= -->
+<!-- CURRENT STATE -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Current State</div>
+  <div class="section-desc">The Journey tab has: day grid, 2 stats (day/total), saved items, journal entries. It's functional but doesn't feel rewarding or personal.</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Current Journey tab</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3); letter-spacing:0.15em; margin-bottom:3px">JOURNEY</div>
+        <div class="serif" style="font-size:20px; font-weight:700; color:#FDF6F0; margin-bottom:12px">Your journey</div>
+
+        <!-- Day grid -->
+        <div class="card">
+          <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:8px">DAY BY DAY</div>
+          <div style="display:flex; gap:4px; margin-bottom:4px">
+            <div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3); width:14px">W1</div>
+            <div style="flex:1; height:22px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:white">1</span></div>
+            <div style="flex:1; height:22px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:white">2</span></div>
+            <div style="flex:1; height:22px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:white">3</span></div>
+            <div style="flex:1; height:22px; border-radius:50%; background:rgba(196,97,74,0.3); border:2px solid #C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:#C4614A">4</span></div>
+            <div style="flex:1; height:22px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">5</span></div>
+            <div style="flex:1; height:22px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">6</span></div>
+            <div style="flex:1; height:22px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">7</span></div>
+          </div>
+          <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.2); margin-top:4px">Tap any day to jump to it</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card">
+          <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:6px">STATS</div>
+          <div style="display:flex; justify-content:space-around; text-align:center">
+            <div><div class="serif" style="font-size:26px; font-weight:700; font-style:italic; color:#C4614A">4</div><div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">DAYS DONE</div></div>
+            <div><div class="serif" style="font-size:26px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">TOTAL</div></div>
+          </div>
+        </div>
+
+        <!-- Empty saved -->
+        <div style="text-align:center; padding:16px 0; color:rgba(253,246,240,0.15); font-size:10px">
+          (saved items / journal only show if data exists)
+        </div>
+
+        <div class="nav"><span>☀ Today</span><span class="active">◈ Journey</span><span>⚙ Settings</span></div>
+      </div>
+    </div>
+
+    <div style="align-self:center; padding:0 8px">
+      <div style="font-size:11px; color:rgba(253,246,240,0.3); text-align:center; max-width:120px; line-height:1.6">
+        <strong style="color:#C4614A">Issues:</strong><br>
+        No streak<br>
+        No empty states<br>
+        No milestones<br>
+        No emotional warmth<br>
+        Stats are basic<br>
+        No CTA to journal
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- IMPROVEMENT 1: STREAK + EMOTIONAL STATS -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Improvement 1 — Streak + Richer Stats</div>
+  <div class="section-desc">Replace the bland "4 / 18" stats with an emotional streak counter and richer engagement metrics.</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Proposed — Streak hero + engagement stats</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3); letter-spacing:0.15em; margin-bottom:3px">JOURNEY</div>
+        <div class="serif" style="font-size:20px; font-weight:700; color:#FDF6F0; margin-bottom:12px">Your journey</div>
+
+        <!-- Streak hero -->
+        <div style="background:linear-gradient(135deg, rgba(196,97,74,0.12) 0%, rgba(196,97,74,0.04) 100%); border:1px solid rgba(196,97,74,0.2); border-radius:14px; padding:16px; margin-bottom:10px; text-align:center">
+          <div style="font-size:10px; color:rgba(253,246,240,0.4); margin-bottom:4px">🌱 Current streak</div>
+          <div class="serif" style="font-size:36px; font-weight:700; font-style:italic; color:#C4614A; line-height:1">4</div>
+          <div class="serif" style="font-size:14px; font-style:italic; color:rgba(253,246,240,0.5); margin-top:2px">days of showing up</div>
+          <!-- Progress ring -->
+          <div style="margin-top:10px; display:flex; justify-content:center; gap:12px">
+            <div style="text-align:center"><div class="serif" style="font-size:18px; font-weight:700; color:#C4614A">4</div><div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">DAY</div></div>
+            <div style="width:1px; background:rgba(255,255,255,0.06)"></div>
+            <div style="text-align:center"><div class="serif" style="font-size:18px; font-weight:700; color:#C4614A">18</div><div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">TOTAL</div></div>
+            <div style="width:1px; background:rgba(255,255,255,0.06)"></div>
+            <div style="text-align:center"><div class="serif" style="font-size:18px; font-weight:700; color:#C4614A">2</div><div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">SAVED</div></div>
+            <div style="width:1px; background:rgba(255,255,255,0.06)"></div>
+            <div style="text-align:center"><div class="serif" style="font-size:18px; font-weight:700; color:#C4614A">1</div><div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">JOURNAL</div></div>
+          </div>
+        </div>
+
+        <!-- Compact day grid -->
+        <div class="card">
+          <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:6px">DAY BY DAY</div>
+          <div style="display:flex; gap:3px; flex-wrap:wrap">
+            <div style="width:22px; height:22px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:white">1</span></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:white">2</span></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:white">3</span></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:rgba(196,97,74,0.3); border:1.5px solid #C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:6px; color:#C4614A">4</span></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.05)"></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.05)"></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.05)"></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.05)"></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.05)"></div>
+          </div>
+        </div>
+
+        <div class="nav"><span>☀ Today</span><span class="active">◈ Journey</span><span>⚙ Settings</span></div>
+      </div>
+    </div>
+    <div class="vote"><button>👍 Implement</button></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- IMPROVEMENT 2: EMPTY STATES -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Improvement 2 — Warm Empty States</div>
+  <div class="section-desc">When there's nothing saved or journaled yet, show encouraging messages instead of blank space.</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Current — sections vanish if empty</div>
+      <div class="phone" style="min-height:200px">
+        <div class="notch"></div>
+        <div style="padding:30px 0; text-align:center; color:rgba(253,246,240,0.15); font-size:11px">
+          (nothing renders — blank space)
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="phone-wrap">
+      <div class="phone-label">Proposed — warm empty states</div>
+      <div class="phone" style="min-height:200px">
+        <div class="notch"></div>
+        <!-- Empty saved -->
+        <div class="card" style="text-align:center; padding:16px">
+          <div style="font-size:18px; margin-bottom:6px; opacity:0.4">♡</div>
+          <div class="serif" style="font-style:italic; font-size:14px; color:rgba(253,246,240,0.4); line-height:1.4">Nothing saved yet</div>
+          <div style="font-size:10px; color:rgba(253,246,240,0.25); margin-top:4px">Tap the heart on any quote or affirmation that moves you</div>
+        </div>
+        <!-- Empty journal -->
+        <div class="card" style="text-align:center; padding:16px">
+          <div style="font-size:18px; margin-bottom:6px; opacity:0.4">✍</div>
+          <div class="serif" style="font-style:italic; font-size:14px; color:rgba(253,246,240,0.4); line-height:1.4">Your story starts here</div>
+          <div style="font-size:10px; color:rgba(253,246,240,0.25); margin-top:4px">Today's journal prompt is waiting on the Today tab</div>
+        </div>
+      </div>
+    </div>
+    <div class="vote"><button>👍 Implement</button></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- IMPROVEMENT 3: MILESTONES -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Improvement 3 — Micro-Milestones</div>
+  <div class="section-desc">Small achievements that celebrate showing up. Not gamification — recognition.</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Milestone badges</div>
+      <div class="phone" style="min-height:280px">
+        <div class="notch"></div>
+        <div class="card">
+          <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:10px">MILESTONES</div>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <!-- Earned -->
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.15); border-radius:10px">
+              <div style="font-size:20px">🌱</div>
+              <div style="flex:1">
+                <div style="font-size:11px; font-weight:600; color:#FDF6F0">First step</div>
+                <div style="font-size:9px; color:rgba(253,246,240,0.4)">Completed Day 1</div>
+              </div>
+              <div class="mono" style="font-size:8px; color:#7BD4A0">✓</div>
+            </div>
+            <!-- Earned -->
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.15); border-radius:10px">
+              <div style="font-size:20px">📖</div>
+              <div style="flex:1">
+                <div style="font-size:11px; font-weight:600; color:#FDF6F0">First words</div>
+                <div style="font-size:9px; color:rgba(253,246,240,0.4)">Wrote your first journal entry</div>
+              </div>
+              <div class="mono" style="font-size:8px; color:#7BD4A0">✓</div>
+            </div>
+            <!-- Not yet earned -->
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:10px; opacity:0.5">
+              <div style="font-size:20px">🔥</div>
+              <div style="flex:1">
+                <div style="font-size:11px; font-weight:600; color:#FDF6F0">One week strong</div>
+                <div style="font-size:9px; color:rgba(253,246,240,0.3)">7 consecutive days</div>
+              </div>
+              <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.2)">3 more</div>
+            </div>
+            <!-- Not yet earned -->
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:10px; opacity:0.5">
+              <div style="font-size:20px">💛</div>
+              <div style="flex:1">
+                <div style="font-size:11px; font-weight:600; color:#FDF6F0">Collector</div>
+                <div style="font-size:9px; color:rgba(253,246,240,0.3)">Saved 5 quotes or affirmations</div>
+              </div>
+              <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.2)">3 more</div>
+            </div>
+            <!-- Not yet earned -->
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:10px; opacity:0.5">
+              <div style="font-size:20px">✨</div>
+              <div style="flex:1">
+                <div style="font-size:11px; font-weight:600; color:#FDF6F0">Full cycle</div>
+                <div style="font-size:9px; color:rgba(253,246,240,0.3)">Completed every day</div>
+              </div>
+              <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.2)">14 more</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone-label">Possible milestones</div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px; width:220px; font-size:11px; color:rgba(253,246,240,0.5); line-height:2">
+        <div style="color:#C4614A; font-weight:600; margin-bottom:4px">Earned by action:</div>
+        🌱 First step — Day 1 done<br>
+        📖 First words — wrote journal<br>
+        ♡ First save — hearted something<br>
+        🎵 First tune — tapped Spotify<br>
+        🧘 First breath — did meditation<br>
+        🍳 Nourished — viewed fuel card<br>
+        <br>
+        <div style="color:#C4614A; font-weight:600; margin-bottom:4px">Earned by consistency:</div>
+        🔥 One week — 7 days<br>
+        💪 Halfway — 50% complete<br>
+        ✨ Full cycle — every day done<br>
+        💛 Collector — 5 saves<br>
+        📝 Storyteller — 5 journal entries<br>
+        🌟 Sharer — shared a quote
+      </div>
+    </div>
+    <div class="vote"><button>👍 Implement</button></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- IMPROVEMENT 4: LOG TODAY CTA -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Improvement 4 — "Log Today" CTA</div>
+  <div class="section-desc">A gentle prompt to go back to Today and write in the journal, if they haven't today.</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Sticky CTA at bottom of Journey tab</div>
+      <div class="phone" style="min-height:200px">
+        <div class="notch"></div>
+        <div style="padding:40px 0; text-align:center; color:rgba(253,246,240,0.2); font-size:10px">(content above)</div>
+        <!-- CTA -->
+        <div style="background:linear-gradient(135deg, rgba(196,97,74,0.1) 0%, rgba(196,97,74,0.04) 100%); border:1px solid rgba(196,97,74,0.15); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px">
+          <div style="font-size:16px">✍</div>
+          <div style="flex:1">
+            <div style="font-size:11px; font-weight:600; color:#FDF6F0">Today's journal is waiting</div>
+            <div style="font-size:9px; color:rgba(253,246,240,0.4)">You haven't written yet today</div>
+          </div>
+          <div style="background:#C4614A; color:white; border-radius:8px; padding:6px 12px; font-size:10px; font-weight:700">Go →</div>
+        </div>
+        <div style="font-size:8px; color:rgba(253,246,240,0.15); text-align:center; margin-top:6px">Only shows if no journal entry for current day</div>
+      </div>
+    </div>
+    <div class="vote"><button>👍 Implement</button></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- IMPROVEMENT 5: CYCLE STORY -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Improvement 5 — Cycle Story (End Summary)</div>
+  <div class="section-desc">At end of cycle, the Journey tab shows a narrative summary of the entire cycle.</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Cycle Story — appears after completion</div>
+      <div class="phone" style="min-height:350px">
+        <div class="notch"></div>
+        <div class="card" style="border-color:rgba(196,97,74,0.2); background:rgba(196,97,74,0.04)">
+          <div class="mono" style="font-size:8px; color:#C4614A; letter-spacing:0.12em; margin-bottom:8px">YOUR CYCLE STORY</div>
+          <div class="serif" style="font-style:italic; font-size:14px; color:#FDF6F0; line-height:1.5; margin-bottom:10px">
+            You showed up 18 out of 18 days. You saved 4 quotes that moved you. You journaled 6 times. You breathed through 12 moments.
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; margin-top:4px">
+            <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3); margin-bottom:6px">MOST-SAVED QUOTE</div>
+            <div class="serif" style="font-style:italic; font-size:13px; color:rgba(253,246,240,0.6); line-height:1.4">"She was powerful not because she wasn't scared but because she went on."</div>
+            <div class="mono" style="font-size:8px; color:#C4614A; margin-top:4px">— Atticus</div>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; margin-top:10px">
+            <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3); margin-bottom:6px">YOUR REFLECTION</div>
+            <div class="serif" style="font-style:italic; font-size:13px; color:rgba(253,246,240,0.6); line-height:1.4">"That even on the hardest days, I showed up."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="vote"><button>👍 Implement</button></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- FULL PROPOSED LAYOUT -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Full Proposed Layout — All Improvements Combined</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Complete Journey tab (scrolling)</div>
+      <div class="phone" style="min-height:700px">
+        <div class="notch"></div>
+        <div class="mono" style="font-size:8px; color:rgba(253,246,240,0.3); letter-spacing:0.15em; margin-bottom:3px">JOURNEY</div>
+        <div class="serif" style="font-size:20px; font-weight:700; color:#FDF6F0; margin-bottom:10px">Your journey</div>
+
+        <!-- 1. Streak hero -->
+        <div style="background:linear-gradient(135deg, rgba(196,97,74,0.12) 0%, rgba(196,97,74,0.04) 100%); border:1px solid rgba(196,97,74,0.2); border-radius:12px; padding:14px; margin-bottom:8px; text-align:center">
+          <div style="font-size:9px; color:rgba(253,246,240,0.4); margin-bottom:2px">🌱 Current streak</div>
+          <div class="serif" style="font-size:32px; font-weight:700; font-style:italic; color:#C4614A; line-height:1">4</div>
+          <div class="serif" style="font-size:12px; font-style:italic; color:rgba(253,246,240,0.5)">days of showing up</div>
+          <div style="margin-top:8px; display:flex; justify-content:center; gap:10px">
+            <div style="text-align:center"><div class="serif" style="font-size:16px; font-weight:700; color:#C4614A">4</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">DAY</div></div>
+            <div style="text-align:center"><div class="serif" style="font-size:16px; font-weight:700; color:#C4614A">18</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">TOTAL</div></div>
+            <div style="text-align:center"><div class="serif" style="font-size:16px; font-weight:700; color:#C4614A">2</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">SAVED</div></div>
+            <div style="text-align:center"><div class="serif" style="font-size:16px; font-weight:700; color:#C4614A">1</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">JOURNAL</div></div>
+          </div>
+        </div>
+
+        <!-- 2. Day grid (compact) -->
+        <div class="card" style="padding:10px 12px">
+          <div style="display:flex; gap:3px; flex-wrap:wrap">
+            <div style="width:20px; height:20px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:white">1</span></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:white">2</span></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:white">3</span></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:rgba(196,97,74,0.3); border:1.5px solid #C4614A"></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.04)"></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.04)"></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.04)"></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.04)"></div>
+            <div style="width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.04)"></div>
+          </div>
+        </div>
+
+        <!-- 3. Milestones (compact) -->
+        <div class="card" style="padding:10px 12px">
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.1em; margin-bottom:6px">MILESTONES</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap">
+            <div class="badge" style="background:rgba(196,97,74,0.1); border:1px solid rgba(196,97,74,0.2); color:#C4614A">🌱 First step</div>
+            <div class="badge" style="background:rgba(196,97,74,0.1); border:1px solid rgba(196,97,74,0.2); color:#C4614A">📖 First words</div>
+            <div class="badge" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:rgba(253,246,240,0.25)">🔥 One week</div>
+            <div class="badge" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:rgba(253,246,240,0.25)">💛 Collector</div>
+          </div>
+        </div>
+
+        <!-- 4. Saved (or empty state) -->
+        <div class="card" style="text-align:center; padding:12px">
+          <div style="font-size:14px; margin-bottom:4px; opacity:0.3">♡</div>
+          <div style="font-size:10px; color:rgba(253,246,240,0.3)">Tap the heart on any quote that moves you</div>
+        </div>
+
+        <!-- 5. Journal CTA -->
+        <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.12); border-radius:10px; padding:10px; display:flex; align-items:center; gap:8px">
+          <div style="font-size:14px">✍</div>
+          <div style="flex:1; font-size:10px; color:rgba(253,246,240,0.5)">Today's journal is waiting</div>
+          <div style="background:#C4614A; color:white; border-radius:6px; padding:4px 10px; font-size:9px; font-weight:700">Go →</div>
+        </div>
+
+        <div class="nav"><span>☀ Today</span><span class="active">◈ Journey</span><span>⚙ Settings</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  View at localhost:5000/journey-improvements.html
+</div>
+
+</body>
+</html>
