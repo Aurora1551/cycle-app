@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Register Gate Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 1000px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .section { margin-bottom: 48px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid rgba(196,97,74,0.2); padding-bottom: 8px; }
+  .section-desc { font-size: 13px; color: rgba(253,246,240,0.45); margin-bottom: 20px; line-height: 1.6; }
+  .phones { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px; }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.35); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; max-width: 220px; }
+  .phone { width: 220px; min-height: 420px; background: #FDF6F0; border-radius: 24px; border: 2px solid rgba(196,97,74,0.15); padding: 18px 16px; position: relative; }
+  .notch { width: 50px; height: 3px; background: rgba(0,0,0,0.06); border-radius: 2px; margin: 0 auto 12px; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .btn { border-radius: 12px; padding: 13px 16px; font-size: 12px; font-weight: 700; text-align: center; width: 100%; cursor: default; }
+  .vote { display: inline-flex; gap: 8px; margin-top: 10px; }
+  .vote button { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(253,246,240,0.5); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: 'Karla', sans-serif; }
+  .vote button:hover { border-color: #C4614A; color: #C4614A; }
+  .vote button.selected { border-color: #C4614A; color: #C4614A; background: rgba(196,97,74,0.08); }
+</style>
+</head>
+<body>
+
+<h1>Register Gate — Better Wording</h1>
+<p class="subtitle">After Day 3, the user needs to understand: (1) they've used their free days, (2) they can create an account to save progress, (3) they need to pay to continue past Day 3</p>
+
+<!-- ============================================= -->
+<!-- THE PROBLEM -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Current — The Problem</div>
+  <div class="section-desc">
+    "Continue without saving" is misleading — it doesn't tell them they're stuck on Day 3. And it conflates two things: creating an account (saving) and paying (unlocking). A user might want to create an account without paying yet.
+  </div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label">Current</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:20px">
+          <div style="font-size:32px; margin-bottom:10px">🌟</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:#1C0F0C; margin-bottom:8px">Ready to keep going?</div>
+          <div style="font-size:12px; color:#9B7B74; margin-bottom:24px; line-height:1.5; padding:0 8px">Save your progress and unlock the full journey.</div>
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:10px">Create account →</div>
+          <div style="font-size:12px; color:#9B7B74; cursor:pointer">Continue without saving</div>
+          <div style="font-size:9px; color:rgba(155,123,116,0.4); margin-top:6px">Your data may be lost if browser data is cleared</div>
+        </div>
+        <div style="margin-top:20px; background:rgba(220,38,38,0.06); border:1px solid rgba(220,38,38,0.15); border-radius:10px; padding:10px; font-size:10px; color:#DC2626; line-height:1.5; text-align:center">
+          <strong>Issues:</strong><br>
+          • Doesn't mention Day 3 limit<br>
+          • "Continue without saving" = back to Day 3 loop<br>
+          • No option to create account without paying
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- OPTIONS -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">Proposed Options</div>
+
+  <div class="phones">
+    <!-- OPTION A: Two clear paths -->
+    <div class="phone-wrap">
+      <div class="phone-label">Option A — Two clear paths</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:16px">
+          <div style="font-size:28px; margin-bottom:8px">🌟</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:#1C0F0C; margin-bottom:6px">You've completed 3 free days</div>
+          <div style="font-size:12px; color:#9B7B74; margin-bottom:20px; line-height:1.5; padding:0 4px">Create an account to save your progress. Unlock the full journey when you're ready.</div>
+
+          <!-- Create account (doesn't require payment) -->
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:8px">Create account — it's free</div>
+
+          <!-- Unlock (payment) -->
+          <div class="btn" style="background:#1C0F0C; color:#FDF6F0; margin-bottom:12px; border:2px solid #C4614A">Unlock full journey — £9.99</div>
+
+          <!-- Stay on Day 3 -->
+          <div style="font-size:11px; color:#9B7B74; line-height:1.5; padding:0 8px; margin-bottom:6px">
+            You can revisit Days 1–3 anytime.
+          </div>
+          <div style="font-size:11px; color:#9B7B74; cursor:pointer; text-decoration:underline; text-decoration-color:rgba(155,123,116,0.3)">
+            Stay on my free days for now
+          </div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.classList.toggle('selected')">👍 This one</button></div>
+    </div>
+
+    <!-- OPTION B: Softer, emotionally led -->
+    <div class="phone-wrap">
+      <div class="phone-label">Option B — Emotional, soft</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:16px">
+          <div style="font-size:28px; margin-bottom:8px">💛</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#1C0F0C; line-height:1.2; margin-bottom:8px">These 3 days were just the beginning</div>
+          <div style="font-size:12px; color:#9B7B74; margin-bottom:4px; line-height:1.5; padding:0 4px">There are <strong style="color:#1C0F0C">15 more days</strong> of quotes, music, journaling, and breathing waiting for you.</div>
+
+          <div style="margin:16px 0; padding:12px; background:rgba(196,97,74,0.04); border:1px solid rgba(196,97,74,0.12); border-radius:10px; text-align:left">
+            <div style="font-size:11px; color:#1C0F0C; font-weight:600; margin-bottom:6px">What you'll unlock:</div>
+            <div style="font-size:11px; color:#9B7B74; line-height:1.8">
+              ✓ 15 more personalised days<br>
+              ✓ Save your journal & favourites<br>
+              ✓ Protein-rich daily food ideas<br>
+              ✓ Your progress, always safe
+            </div>
+          </div>
+
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:8px">Unlock my full journey — £9.99</div>
+          <div class="btn" style="background:transparent; border:1.5px solid rgba(196,97,74,0.2); color:#1C0F0C; margin-bottom:10px">Create a free account first</div>
+          <div style="font-size:10px; color:rgba(155,123,116,0.5)">
+            Or stay on Days 1–3 for now
+          </div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.classList.toggle('selected')">👍 This one</button></div>
+    </div>
+
+    <!-- OPTION C: Minimal, clear hierarchy -->
+    <div class="phone-wrap">
+      <div class="phone-label">Option C — Minimal, clear</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:20px">
+          <div style="font-size:28px; margin-bottom:10px">🌟</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:#1C0F0C; margin-bottom:8px">Your free days are complete</div>
+          <div style="font-size:12px; color:#9B7B74; margin-bottom:20px; line-height:1.5">You showed up for 3 days. That's already something to be proud of.</div>
+
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:10px">Continue my journey — £9.99</div>
+
+          <div style="border-top:1px solid rgba(196,97,74,0.1); padding-top:12px; margin-top:4px">
+            <div style="font-size:11px; color:#1C0F0C; font-weight:600; margin-bottom:4px">Not ready to pay?</div>
+            <div style="font-size:11px; color:#9B7B74; margin-bottom:8px; line-height:1.4">Create a free account to save your progress. You can upgrade any time.</div>
+            <div class="btn" style="background:transparent; border:1.5px solid rgba(196,97,74,0.2); color:#1C0F0C; font-size:11px; padding:10px">Create free account</div>
+          </div>
+
+          <div style="font-size:10px; color:rgba(155,123,116,0.4); margin-top:12px">
+            Or keep browsing Days 1–3
+          </div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.classList.toggle('selected')">👍 This one</button></div>
+    </div>
+
+    <!-- OPTION D: Card-based choices -->
+    <div class="phone-wrap">
+      <div class="phone-label">Option D — Card choices</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="text-align:center; padding-top:12px">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#1C0F0C; margin-bottom:4px">What would you like to do?</div>
+          <div style="font-size:11px; color:#9B7B74; margin-bottom:14px">You've experienced 3 free days</div>
+
+          <!-- Card 1: Unlock -->
+          <div style="border:2px solid #C4614A; border-radius:14px; padding:14px; margin-bottom:8px; background:rgba(196,97,74,0.03); text-align:left; cursor:pointer">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+              <div style="font-size:13px; font-weight:700; color:#1C0F0C">Unlock full journey</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#C4614A">£9.99</div>
+            </div>
+            <div style="font-size:10px; color:#9B7B74; line-height:1.4">All remaining days, journal, favourites, and more</div>
+          </div>
+
+          <!-- Card 2: Create account -->
+          <div style="border:1.5px solid rgba(196,97,74,0.15); border-radius:14px; padding:14px; margin-bottom:8px; text-align:left; cursor:pointer">
+            <div style="font-size:13px; font-weight:700; color:#1C0F0C; margin-bottom:4px">Create a free account</div>
+            <div style="font-size:10px; color:#9B7B74; line-height:1.4">Save your progress from Days 1–3. Upgrade whenever you're ready.</div>
+          </div>
+
+          <!-- Card 3: Stay -->
+          <div style="border:1px dashed rgba(155,123,116,0.2); border-radius:14px; padding:12px; text-align:left; cursor:pointer">
+            <div style="font-size:12px; color:#9B7B74">Keep browsing my free days</div>
+            <div style="font-size:9px; color:rgba(155,123,116,0.4); margin-top:2px">You can revisit Days 1–3 anytime</div>
+          </div>
+        </div>
+      </div>
+      <div class="vote"><button onclick="this.classList.toggle('selected')">👍 This one</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- KEY DIFFERENCES -->
+<!-- ============================================= -->
+<div class="section">
+  <div class="section-title">What Changes in Each Option</div>
+  <div class="section-desc" style="line-height:2">
+    <strong>All options now clearly communicate:</strong><br>
+    ✓ You've used your 3 free days<br>
+    ✓ You can create an account for free (just to save progress)<br>
+    ✓ Paying unlocks the full journey (Days 4+)<br>
+    ✓ You can stay and browse Days 1–3 without doing anything<br><br>
+
+    <strong>Option A</strong> — Direct, no-nonsense. Two equal buttons. Best if you want to keep it simple.<br>
+    <strong>Option B</strong> — Most emotional. Leads with what they'll get. Shows value before asking for money. Best for conversion.<br>
+    <strong>Option C</strong> — Clean hierarchy. Pay is primary, free account is secondary. Best if you want to push payment.<br>
+    <strong>Option D</strong> — Card-based, lets them feel in control. Three equal choices. Best if you want a premium, app-like feel.<br><br>
+
+    <strong>My recommendation: Option B</strong> — it honours their 3 days ("just the beginning"), shows concrete value, and separates account creation from payment clearly.
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  View at localhost:5000/register-gate-options.html
+</div>
+
+</body>
+</html>

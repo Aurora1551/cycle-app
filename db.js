@@ -121,6 +121,27 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS api_costs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service TEXT NOT NULL,
+    model TEXT,
+    input_tokens INTEGER DEFAULT 0,
+    output_tokens INTEGER DEFAULT 0,
+    estimated_cost_usd REAL DEFAULT 0,
+    user_id TEXT,
+    metadata TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS push_subscriptions (
+    user_id TEXT PRIMARY KEY,
+    endpoint TEXT NOT NULL,
+    keys_p256dh TEXT NOT NULL,
+    keys_auth TEXT NOT NULL,
+    notify_time TEXT DEFAULT '08:00',
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS purchases (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     user_id TEXT NOT NULL,
@@ -382,6 +403,27 @@ function saveMood(userId, dayNumber, mood) {
   }
 }
 
+function savePushSubscription(userId, endpoint, keysP256dh, keysAuth, notifyTime) {
+  db.prepare(`INSERT INTO push_subscriptions (user_id, endpoint, keys_p256dh, keys_auth, notify_time)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET endpoint=?, keys_p256dh=?, keys_auth=?, notify_time=?`
+  ).run(userId, endpoint, keysP256dh, keysAuth, notifyTime || '08:00', endpoint, keysP256dh, keysAuth, notifyTime || '08:00')
+}
+
+function deletePushSubscription(userId) {
+  db.prepare('DELETE FROM push_subscriptions WHERE user_id = ?').run(userId)
+}
+
+function getPushSubscriptionsDueAt(time) {
+  return db.prepare('SELECT * FROM push_subscriptions WHERE notify_time = ?').all(time)
+}
+
+function logApiCost(service, model, inputTokens, outputTokens, estimatedCostUsd, userId, metadata) {
+  db.prepare(`INSERT INTO api_costs (service, model, input_tokens, output_tokens, estimated_cost_usd, user_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    service, model, inputTokens || 0, outputTokens || 0, estimatedCostUsd || 0, userId || null, metadata ? JSON.stringify(metadata) : null
+  )
+}
+
 module.exports = {
   db,
   saveProfile,
@@ -403,4 +445,8 @@ module.exports = {
   saveFavorite,
   saveDayCompletion,
   logEvent,
+  logApiCost,
+  savePushSubscription,
+  deletePushSubscription,
+  getPushSubscriptionsDueAt,
 }

@@ -5,6 +5,7 @@ import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
 import { NOTIFICATION_CONTENT } from '../lib/constants'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, Card, SectionLabel, PrimaryButton, GhostButton } from '../components/ui'
+import { subscribeToPush, registerServiceWorker } from '../lib/push'
 
 interface Props {
   data: OnboardingData
@@ -28,12 +29,28 @@ const NotificationSettings: React.FC<Props> = ({ data, onDone }) => {
     return hour === 12 ? 12 : hour + 12
   }
 
-  const handleAllow = () => {
+  const handleAllow = async () => {
     const h24 = to24h()
     const timeStr = `${String(h24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
     localStorage.setItem('notify_enabled', '1')
     localStorage.setItem('notify_time', timeStr)
     localStorage.setItem('notify_content', notifyContent)
+
+    // Register service worker and subscribe to push
+    await registerServiceWorker()
+    await subscribeToPush(data.name)
+
+    // Save the notify time to the server subscription
+    fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: data.name,
+        subscription: null, // Already saved by subscribeToPush
+        notifyTime: timeStr,
+      }),
+    }).catch(() => {})
+
     onDone()
   }
 

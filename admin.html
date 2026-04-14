@@ -40,13 +40,21 @@
 <div class="header-row">
   <div>
     <h1>Cycle Admin</h1>
-    <div class="subtitle">Full database overview</div>
+    <div class="subtitle">Analytics & data · <span id="last-updated"></span></div>
   </div>
-  <button class="refresh-btn" onclick="loadAll()">Refresh</button>
+  <div style="display:flex; gap:8px; margin-left:auto">
+    <button class="refresh-btn" onclick="sendTestPush()" title="Send test notification">🔔 Test Push</button>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
 </div>
 
+<!-- Funnel + costs at the top (most important) -->
+<div id="funnel" style="margin-bottom:24px"></div>
+
+<!-- Quick stats row -->
 <div class="stats" id="stats"></div>
 
+<!-- Data tabs -->
 <div class="tabs">
   <button class="tab active" data-tab="profiles">Profiles</button>
   <button class="tab" data-tab="accounts">Accounts</button>
@@ -116,7 +124,7 @@ function timeAgo(ts) {
 const MOOD_EMOJI = { great: '😍', good: '😊', okay: '😐', tough: '😔', hard: '😢' }
 
 async function loadAll() {
-  const [stats, profiles, accounts, content, journals, moods, favorites, completions, events] = await Promise.all([
+  const [stats, profiles, accounts, content, journals, moods, favorites, completions, events, funnel] = await Promise.all([
     fetch('/api/admin/stats').then(r => r.json()),
     fetch('/api/admin/profiles').then(r => r.json()),
     fetch('/api/admin/accounts').then(r => r.json()),
@@ -126,7 +134,10 @@ async function loadAll() {
     fetch('/api/admin/favorites').then(r => r.json()),
     fetch('/api/admin/completions').then(r => r.json()),
     fetch('/api/admin/events').then(r => r.json()),
+    fetch('/api/admin/funnel').then(r => r.json()).catch(() => null),
   ])
+
+  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString()
 
   document.getElementById('stats').innerHTML = `
     <div class="stat-card"><div class="num">${stats.profiles}</div><div class="label">Profiles</div></div>
@@ -139,6 +150,130 @@ async function loadAll() {
     <div class="stat-card"><div class="num">${stats.events}</div><div class="label">Events</div></div>
     <div class="stat-card"><div class="num">${stats.spotifyTaps}</div><div class="label">Spotify Taps</div></div>
   `
+
+  // Funnel
+  if (funnel && !funnel.error) {
+    const f = funnel.funnel, c = funnel.conversion, e = funnel.engagement, r = funnel.retention, g = funnel.gifting
+    const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '—'
+    document.getElementById('funnel').innerHTML = `
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+        <!-- Acquisition Funnel -->
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; font-weight:500;">Acquisition Funnel</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${[
+              { label: 'Profiles created', val: f.profilesCreated, bar: 100 },
+              { label: 'Completed Day 1', val: f.completedDay1, bar: f.profilesCreated ? f.completedDay1/f.profilesCreated*100 : 0 },
+              { label: 'Completed Day 2', val: f.completedDay2, bar: f.profilesCreated ? f.completedDay2/f.profilesCreated*100 : 0 },
+              { label: 'Completed Day 3', val: f.completedDay3, bar: f.profilesCreated ? f.completedDay3/f.profilesCreated*100 : 0 },
+              { label: 'Created account', val: f.accountsCreated, bar: f.profilesCreated ? f.accountsCreated/f.profilesCreated*100 : 0 },
+              { label: 'Paid', val: f.paidUsers, bar: f.profilesCreated ? f.paidUsers/f.profilesCreated*100 : 0 },
+              { label: 'Reached Day 4+', val: f.completedDay4Plus, bar: f.profilesCreated ? f.completedDay4Plus/f.profilesCreated*100 : 0 },
+              { label: 'Completed full cycle', val: f.fullCycleUsers, bar: f.profilesCreated ? f.fullCycleUsers/f.profilesCreated*100 : 0 },
+            ].map(r => `
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">
+                  <span style="color:#ccc;">${r.label}</span>
+                  <span style="color:#fff; font-weight:600;">${r.val}</span>
+                </div>
+                <div style="height:4px; background:#2a2a2a; border-radius:2px; overflow:hidden;">
+                  <div style="height:100%; width:${Math.max(r.bar, 1)}%; background:linear-gradient(90deg, #C4614A, #E8A598); border-radius:2px;"></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Conversion Gaps -->
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; font-weight:500;">Conversion Gaps</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Guests without account</div><div style="font-size:10px; color:#666;">Did 3 days but never registered</div></div>
+              <div style="font-size:20px; font-weight:700; color:#F5C842;">${c.guestsNoAccount}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Registered but not paid</div><div style="font-size:10px; color:#666;">Created account, never upgraded</div></div>
+              <div style="font-size:20px; font-weight:700; color:#F5C842;">${c.registeredNotPaid}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Paywall views → payment</div><div style="font-size:10px; color:#666;">Conversion rate</div></div>
+              <div style="font-size:16px; font-weight:700; color:#7BD4A0;">${pct(c.paymentCompleted, c.paywallViews)}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Day 3 → Day 4 conversion</div><div style="font-size:10px; color:#666;">Free trial → paid</div></div>
+              <div style="font-size:16px; font-weight:700; color:#7BD4A0;">${pct(f.completedDay4Plus, f.completedDay3)}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engagement -->
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; font-weight:500;">Engagement</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.avgDaysPerUser}</div><div style="font-size:9px; color:#666; margin-top:2px;">Avg days/user</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.totalJournals}</div><div style="font-size:9px; color:#666; margin-top:2px;">Journal entries</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.totalFavorites}</div><div style="font-size:9px; color:#666; margin-top:2px;">Items saved</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.quotesShared}</div><div style="font-size:9px; color:#666; margin-top:2px;">Quotes shared</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.meditationsStarted}</div><div style="font-size:9px; color:#666; margin-top:2px;">Meditations</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.spotifyTaps}</div><div style="font-size:9px; color:#666; margin-top:2px;">Spotify taps</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.fuelDismissals}</div><div style="font-size:9px; color:#666; margin-top:2px;">Fuel dismissed</div></div>
+            <div style="text-align:center; padding:10px; background:#222; border-radius:8px;"><div style="font-size:22px; font-weight:700; color:#C4614A;">${e.spotifyConnections}</div><div style="font-size:9px; color:#666; margin-top:2px;">Spotify linked</div></div>
+          </div>
+        </div>
+
+        <!-- API Costs -->
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; font-weight:500;">API Costs</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Total API calls</div><div style="font-size:10px; color:#666;">Claude content generation</div></div>
+              <div style="font-size:18px; font-weight:700; color:#C4614A;">${funnel.costs.totalApiCalls}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Total cost</div><div style="font-size:10px; color:#666;">Estimated from token usage</div></div>
+              <div style="font-size:18px; font-weight:700; color:#F5C842;">$${funnel.costs.totalCostUsd}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Today's cost</div></div>
+              <div style="font-size:18px; font-weight:700; color:#F5C842;">$${funnel.costs.todayCostUsd}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Cost per user</div><div style="font-size:10px; color:#666;">Total cost ÷ total profiles</div></div>
+              <div style="font-size:18px; font-weight:700; color:#7BD4A0;">$${funnel.costs.costPerUser}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <div><div style="font-size:12px; color:#e0e0e0;">Tokens used</div><div style="font-size:10px; color:#666;">Input / Output</div></div>
+              <div style="font-size:12px; font-weight:600; color:#ccc;">${(funnel.costs.totalInputTokens/1000).toFixed(1)}k / ${(funnel.costs.totalOutputTokens/1000).toFixed(1)}k</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Retention & Gifting -->
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; font-weight:500;">Retention & Gifting</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <span style="font-size:12px; color:#ccc;">Journeys paused</span>
+              <span style="font-size:18px; font-weight:700; color:#F5C842;">${r.journeysPaused}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <span style="font-size:12px; color:#ccc;">Journeys resumed</span>
+              <span style="font-size:18px; font-weight:700; color:#7BD4A0;">${r.journeysResumed}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <span style="font-size:12px; color:#ccc;">Gifts purchased</span>
+              <span style="font-size:18px; font-weight:700; color:#C4614A;">${g.giftsPurchased}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#222; border-radius:8px;">
+              <span style="font-size:12px; color:#ccc;">Gifts redeemed</span>
+              <span style="font-size:18px; font-weight:700; color:#7BD4A0;">${g.giftsRedeemed}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+  }
 
   document.getElementById('profiles').innerHTML = renderTable(profiles, [
     { key: 'name', label: 'Name' },
@@ -204,6 +339,22 @@ async function loadAll() {
     { key: 'data', label: 'Data', wrap: true, render: v => { try { const d = JSON.parse(v); return esc(JSON.stringify(d)) } catch { return esc(v) } } },
     { key: 'created_at', label: 'Time', render: timeAgo },
   ])
+}
+
+async function sendTestPush() {
+  const userId = prompt('Send test push to which user? (enter name)')
+  if (!userId) return
+  try {
+    const res = await fetch('/api/push/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    })
+    const data = await res.json()
+    alert(data.success ? `Push sent to ${userId}!` : `Failed: ${data.error}`)
+  } catch (err) {
+    alert('Failed to send push: ' + err.message)
+  }
 }
 
 loadAll()

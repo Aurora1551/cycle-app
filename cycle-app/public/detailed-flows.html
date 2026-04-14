@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Detailed Flow Screenshots</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 40px; }
+  .journey { margin-bottom: 56px; }
+  .journey-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .journey-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; color: #C4614A; line-height: 1; }
+  .journey-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #FDF6F0; }
+  .journey-desc { font-size: 12px; color: rgba(253,246,240,0.4); margin-bottom: 16px; line-height: 1.5; }
+  .screens { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+  .screen-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .screen-label { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(253,246,240,0.35); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; max-width: 185px; }
+  .phone { width: 185px; min-height: 340px; border-radius: 22px; border: 2px solid rgba(255,255,255,0.08); padding: 14px 12px; position: relative; overflow: hidden; }
+  .phone.light { background: #FDF6F0; border-color: rgba(196,97,74,0.15); }
+  .phone.dark { background: #1C0F0C; }
+  .phone.yellow { background: #FFFBF0; border-color: rgba(212,160,48,0.2); }
+  .arrow { color: #C4614A; font-size: 18px; flex-shrink: 0; align-self: center; margin-top: 70px; }
+  .notch { width: 50px; height: 3px; border-radius: 2px; margin: 0 auto 8px; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .btn { border-radius: 12px; padding: 11px 14px; font-size: 11px; font-weight: 700; text-align: center; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: #C4614A; color: white; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; margin: 0 auto 4px; }
+  .section-break { border-top: 1px solid rgba(196,97,74,0.15); margin: 48px auto; max-width: 600px; }
+  .nav-bar { display: flex; justify-content: space-around; padding: 6px 0 2px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: auto; font-size: 8px; }
+  .nav-bar span { color: rgba(253,246,240,0.3); }
+  .nav-bar .active { color: #C4614A; }
+</style>
+</head>
+<body>
+
+<h1>Detailed User Flows</h1>
+<p class="subtitle">Screen-by-screen for free trial, paywall free trial, login, and end of cycle</p>
+
+<!-- ============================================= -->
+<!-- FLOW 1: ONBOARDING → FREE TRIAL → 3 DAYS -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">1</div><div class="journey-title">New User → Free Trial (3 Days)</div></div>
+  <div class="journey-desc">User completes onboarding and clicks "Start free (3 days)" on the Summary screen</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="step-num">1</div>
+      <div class="screen-label">Summary</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:12px">
+          <div style="font-size:28px; margin-bottom:6px">🔥</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:3px">Ready, Sarah</div>
+          <div style="font-size:10px; color:#9B7B74; margin-bottom:16px">IVF · 18 days · Fierce vibe</div>
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:8px; border:2px solid #C4614A">⟵ Start free (3 days)</div>
+          <div class="btn" style="background:#1C0F0C; color:#FDF6F0; border:2px solid #C4614A">Unlock full journey — £9.99</div>
+          <div style="font-size:8px; color:#C4614A; margin-top:10px">↑ Taps "Start free"</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">2</div>
+      <div class="screen-label">Notification Time</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em; margin-bottom:4px">NOTIFICATIONS</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#FDF6F0; margin-bottom:8px">When should we remind you?</div>
+        <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:16px 0">
+          <div style="font-family:'DM Mono',monospace; font-size:22px; font-weight:700; color:#FDF6F0; background:rgba(255,255,255,0.06); border:1.5px solid rgba(196,97,74,0.4); border-radius:8px; padding:4px 10px">8</div>
+          <span style="font-size:18px; font-weight:700; color:#FDF6F0">:</span>
+          <div style="font-family:'DM Mono',monospace; font-size:22px; font-weight:700; color:#FDF6F0; background:rgba(255,255,255,0.06); border:1.5px solid rgba(196,97,74,0.4); border-radius:8px; padding:4px 10px">00</div>
+          <div style="background:#C4614A; border-radius:6px; padding:4px 8px; font-size:9px; font-weight:600; color:white; margin-left:4px">AM</div>
+        </div>
+        <div class="btn" style="background:#C4614A; color:white; margin-top:16px">Allow notifications</div>
+        <div style="font-size:10px; color:rgba(253,246,240,0.3); text-align:center; margin-top:6px">Not now</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">3</div>
+      <div class="screen-label">Day 1</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; margin-bottom:6px">
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em">DAY BY DAY, FIRE BY FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; font-style:italic; color:#FDF6F0; margin:4px 0">She's Got This</div>
+        </div>
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0; line-height:1">1</div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">OF 18 DAYS</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px">
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(196,97,74,0.3); border:1px solid #C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:#C4614A">1</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:rgba(253,246,240,0.3)">2</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:rgba(253,246,240,0.3)">3</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div><div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div><div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div><div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:3px">🔥 TODAY'S FIRE</div><div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:12px; color:#FDF6F0; line-height:1.3">"She believed she could..."</div></div>
+        <div style="display:flex; gap:6px; margin-top:4px">
+          <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid rgba(196,97,74,0.3); display:flex; align-items:center; justify-content:center; color:rgba(196,97,74,0.3); font-size:12px">‹</div>
+          <div style="flex:1; height:30px; border-radius:10px; background:#C4614A; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:10px">Done ✓</div>
+          <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid #C4614A; display:flex; align-items:center; justify-content:center; color:#C4614A; font-size:12px">›</div>
+        </div>
+        <div class="nav-bar"><span class="active">Today</span><span>Journey</span><span>Settings</span></div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">4</div>
+      <div class="screen-label">Day 2 (after Done)</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div class="card" style="margin-top:30px">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0; line-height:1">2</div>
+              <div class="mono" style="font-size:7px; color:#C4614A; margin-top:3px">🌱 1 day of loving yourself</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px">
+              <div style="width:12px; height:12px; border-radius:50%; background:#C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:white">1</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(196,97,74,0.3); border:1px solid #C4614A; display:flex; align-items:center; justify-content:center"><span class="mono" style="font-size:5px; color:#C4614A">2</span></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div><div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div><div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div><div style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:9px; color:rgba(253,246,240,0.3); text-align:center">Day 1 dot is now filled ↑</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">5</div>
+      <div class="screen-label">Day 3 · Last free day</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div class="card" style="margin-top:30px">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0; line-height:1">3</div>
+              <div class="mono" style="font-size:7px; color:#C4614A; margin-top:3px">🌱 2 days of loving yourself</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:4px">
+          <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid rgba(196,97,74,0.3); font-size:12px; display:flex; align-items:center; justify-content:center; color:rgba(196,97,74,0.3)">‹</div>
+          <div style="flex:1; height:30px; border-radius:10px; background:#C4614A; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:10px">Done ✓</div>
+          <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid #C4614A; font-size:12px; display:flex; align-items:center; justify-content:center; color:#C4614A">›</div>
+        </div>
+        <div style="font-size:9px; color:#C4614A; text-align:center; margin-top:6px">Taps Done → confetti → Register Gate</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">6</div>
+      <div class="screen-label">Register Gate</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:20px">
+          <div style="font-size:28px; margin-bottom:8px">🌟</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:700; color:#1C0F0C; margin-bottom:6px">Ready to keep going?</div>
+          <div style="font-size:11px; color:#9B7B74; margin-bottom:20px; line-height:1.5; padding:0 8px">Save your progress and unlock the full journey.</div>
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:10px">Create account →</div>
+          <div style="font-size:11px; color:#9B7B74">Continue without saving</div>
+          <div class="mono" style="font-size:8px; color:rgba(155,123,116,0.4); margin-top:4px">Your data may be lost if browser data is cleared</div>
+        </div>
+        <div style="margin-top:16px; padding:8px; background:rgba(196,97,74,0.04); border:1px solid rgba(196,97,74,0.1); border-radius:8px">
+          <div style="font-size:9px; color:#9B7B74; text-align:center; line-height:1.5"><strong style="color:#C4614A">"Continue without saving"</strong> → loops back to Day 3. Guest sees this gate again next time they mark Done.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- FLOW 2: PAYWALL → FREE TRIAL OPTION -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">2</div><div class="journey-title">Paywall → Chooses "Free Trial" Instead of Paying</div></div>
+  <div class="journey-desc">User reaches the paywall (either from Summary "Unlock" or after Day 3 registration) but picks the free trial option instead of paying £9.99</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="step-num">1</div>
+      <div class="screen-label">Paywall · Selects "Free Trial"</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="margin-top:4px">
+          <div style="font-size:10px; color:#9B7B74; margin-bottom:4px">← Back</div>
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em; margin-bottom:3px">UNLOCK YOUR CYCLE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#1C0F0C; margin-bottom:8px">Choose your plan</div>
+
+          <!-- Free (selected) -->
+          <div style="border:2px solid #C4614A; border-radius:10px; padding:9px; margin-bottom:5px; background:rgba(196,97,74,0.04)">
+            <div style="display:flex; justify-content:space-between; align-items:baseline">
+              <span style="font-size:11px; font-weight:600; color:#1C0F0C">Free trial</span>
+              <span style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#9B7B74">£0</span>
+            </div>
+            <div style="font-size:9px; color:#9B7B74">3 days to try it out</div>
+          </div>
+
+          <!-- One Cycle (dimmed) -->
+          <div style="border:1.5px solid rgba(196,97,74,0.15); border-radius:10px; padding:9px; margin-bottom:5px; opacity:0.5">
+            <div style="display:flex; justify-content:space-between; align-items:baseline">
+              <span style="font-size:11px; color:#1C0F0C">One Cycle</span>
+              <span style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#E8A598">£9.99</span>
+            </div>
+          </div>
+
+          <!-- Gift (dimmed) -->
+          <div style="border:1.5px solid rgba(196,97,74,0.15); border-radius:10px; padding:9px; margin-bottom:8px; opacity:0.5">
+            <div style="display:flex; justify-content:space-between; align-items:baseline">
+              <span style="font-size:11px; color:#1C0F0C">Gift a Cycle</span>
+              <span style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:#C4614A">£9.99</span>
+            </div>
+          </div>
+
+          <div class="btn" style="background:#C4614A; color:white">Start free trial</div>
+          <div style="font-size:8px; color:#C4614A; text-align:center; margin-top:6px">↑ Taps this</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">2</div>
+      <div class="screen-label">Day 1 · Clean Slate</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; margin-top:12px">
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em">DAY BY DAY, FIRE BY FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; font-style:italic; color:#FDF6F0; margin:4px 0">She's Got This</div>
+        </div>
+        <div class="card" style="margin-top:8px">
+          <div>
+            <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0; line-height:1">1</div>
+            <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">OF 18 DAYS</div>
+          </div>
+        </div>
+        <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.12); border-radius:8px; padding:8px; text-align:center; margin-top:8px">
+          <div style="font-size:9px; color:#C4614A; line-height:1.4">Starts fresh from Day 1<br>Previous done markers cleared<br>3 free days, then paywall again</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">3</div>
+      <div class="screen-label">Day 2</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; padding-top:40px; font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0">2</div>
+        <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3); text-align:center">Fresh content for Day 2</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">4</div>
+      <div class="screen-label">Day 3 · Done → Gate again</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; padding-top:40px; font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0">3</div>
+        <div style="font-size:9px; color:#C4614A; text-align:center; margin-top:12px">Done → confetti → Register Gate<br>(same as Flow 1, step 6)</div>
+        <div style="font-size:9px; color:rgba(253,246,240,0.3); text-align:center; margin-top:8px">Must register + pay to reach Day 4</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- FLOW 3: LOGIN (HAVE AN ACCOUNT) -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">3</div><div class="journey-title">Landing Page → "I Have an Account" → Login</div></div>
+  <div class="journey-desc">Returning user clicks "I have an account" on the splash screen</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="step-num">1</div>
+      <div class="screen-label">Splash</div>
+      <div class="phone yellow">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:24px">
+          <div style="width:50px; height:50px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #F5D690, #D4A030); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 8px 24px rgba(212,160,48,0.3)">🌸</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:700; color:#1C0F0C; line-height:1; margin-bottom:6px">Cycle</div>
+          <div style="font-size:11px; color:rgba(28,15,12,0.4)">Daily strength for your journey</div>
+        </div>
+        <div style="margin-top:auto; padding-top:40px">
+          <div class="btn" style="background:#C4614A; color:white; margin-bottom:8px">Begin your journey</div>
+          <div class="btn" style="background:transparent; color:#1C0F0C; border:1.5px solid rgba(28,15,12,0.15); margin-bottom:8px">⟵ I have an account</div>
+          <div class="btn" style="background:transparent; color:#1C0F0C; border:1.5px solid rgba(28,15,12,0.15)">Gift it to someone</div>
+        </div>
+        <div style="font-size:8px; color:#C4614A; text-align:center; margin-top:8px">↑ Taps "I have an account"</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">2</div>
+      <div class="screen-label">Login</div>
+      <div class="phone" style="background:#0E0E0E">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="margin-top:8px">
+          <div style="font-size:10px; color:rgba(253,246,240,0.3); margin-bottom:6px">← Back</div>
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em; margin-bottom:3px">WELCOME BACK</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#FDF6F0; margin-bottom:12px">Log in</div>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <div style="background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px">
+              <div style="font-size:9px; color:rgba(253,246,240,0.35); margin-bottom:2px">Email</div>
+              <div style="font-size:12px; color:#FDF6F0">sarah@email.com</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px">
+              <div style="font-size:9px; color:rgba(253,246,240,0.35); margin-bottom:2px">Password</div>
+              <div style="font-size:12px; color:#FDF6F0">••••••••</div>
+            </div>
+          </div>
+          <div class="btn" style="background:#C4614A; color:white; margin-top:12px">Log in</div>
+          <div style="font-size:10px; color:rgba(253,246,240,0.35); text-align:center; margin-top:10px">Don't have an account? <span style="color:#C4614A">Sign up</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">3</div>
+      <div class="screen-label">Restored · Last Day</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; margin-top:12px">
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em">DAY BY DAY, FIRE BY FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; font-style:italic; color:#FDF6F0; margin:4px 0">She's Got This</div>
+        </div>
+        <div class="card" style="margin-top:8px">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0; line-height:1">12</div>
+              <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">OF 18 DAYS</div>
+              <div class="mono" style="font-size:7px; color:#C4614A; margin-top:3px">🌱 11 days of loving yourself</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px">
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:rgba(196,97,74,0.3); border:1px solid #C4614A"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+              <div style="width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+            </div>
+          </div>
+        </div>
+        <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(196,97,74,0.12); border-radius:8px; padding:8px; text-align:center; margin-top:6px">
+          <div style="font-size:9px; color:#C4614A; line-height:1.4">Restored to last day (12)<br>All progress preserved<br>11 days marked done</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- FLOW 4: END OF CYCLE (EXPANDED) -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">4</div><div class="journey-title">End of Cycle → Review, Share, or Start Again</div></div>
+  <div class="journey-desc">User marks the final day as done. They can review their completed cycle, share, gift, or start a new one.</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="step-num">1</div>
+      <div class="screen-label">Last Day · Confetti</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; padding-top:30px">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:900; color:#FDF6F0">18</div>
+          <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">FINAL DAY</div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:20px">
+          <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid rgba(196,97,74,0.3); display:flex; align-items:center; justify-content:center; color:rgba(196,97,74,0.3); font-size:12px">‹</div>
+          <div style="flex:1; height:30px; border-radius:10px; background:rgba(196,97,74,0.2); border:1.5px solid rgba(196,97,74,0.4); display:flex; align-items:center; justify-content:center; gap:4px; font-size:13px; color:#C4614A">✨ ✓ ✨</div>
+          <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid #C4614A; display:flex; align-items:center; justify-content:center; color:#C4614A; font-size:12px">›</div>
+        </div>
+        <div style="font-size:9px; color:#C4614A; text-align:center; margin-top:8px">🎉 Confetti → auto-transition</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">2</div>
+      <div class="screen-label">Cycle Complete + Reflection</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; padding-top:8px">
+          <div style="width:44px; height:44px; border-radius:50%; background:radial-gradient(circle at 35% 35%, rgba(196,97,74,0.8), rgba(196,97,74,0.3)); margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:18px">🔥</div>
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em; margin-bottom:3px">CYCLE COMPLETE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#FDF6F0; line-height:1.2">You did it,<br><span style="color:#C4614A">Sarah.</span></div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:13px; color:#C4614A; margin-top:4px">18 days of showing up for yourself.</div>
+        </div>
+        <div class="card" style="margin-top:8px">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:3px">💌 BEFORE YOU GO</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700; font-size:11px; color:#FDF6F0; line-height:1.3; margin-bottom:5px">What do you want to carry with you?</div>
+          <div style="background:rgba(196,97,74,0.06); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px; font-size:9px; color:rgba(253,246,240,0.5); min-height:24px">That I showed up every single day...</div>
+        </div>
+        <div class="card">
+          <div style="display:flex; justify-content:space-around; text-align:center">
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">DAYS</div></div>
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">SONGS</div></div>
+            <div><div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; font-style:italic; color:#C4614A">18</div><div class="mono" style="font-size:6px; color:rgba(253,246,240,0.3)">QUOTES</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <div class="screen-wrap">
+      <div class="step-num">3</div>
+      <div class="screen-label">Next Steps</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="padding-top:6px; display:flex; flex-direction:column; gap:7px">
+          <div class="btn" style="background:#C4614A; color:white">Start a new cycle</div>
+          <div class="btn" style="background:transparent; border:1.5px solid rgba(196,97,74,0.4); color:#C4614A">Review my completed cycle</div>
+          <div class="btn" style="background:transparent; border:1.5px solid rgba(196,97,74,0.3); color:rgba(196,97,74,0.7)">Gift a cycle to a friend</div>
+          <div class="btn" style="background:#25D366; color:white">Share on WhatsApp</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Review completed cycle — with persistent prompt -->
+    <div class="screen-wrap">
+      <div class="step-num">4a</div>
+      <div class="screen-label">Review my cycle (persistent prompt at top)</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="margin-top:4px">
+          <!-- Persistent prompt banner at top -->
+          <div style="background:linear-gradient(135deg, rgba(196,97,74,0.12) 0%, rgba(196,97,74,0.04) 100%); border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:10px; margin-bottom:8px; display:flex; align-items:center; gap:8px">
+            <div style="font-size:14px">🌱</div>
+            <div style="flex:1">
+              <div style="font-size:10px; font-weight:600; color:#FDF6F0">Ready for a new cycle?</div>
+              <div style="font-size:8px; color:rgba(253,246,240,0.4); margin-top:1px">Your completed cycle is saved</div>
+            </div>
+            <div style="background:#C4614A; color:white; border-radius:8px; padding:5px 10px; font-size:9px; font-weight:700">Start →</div>
+          </div>
+
+          <div style="text-align:center; margin-bottom:6px">
+            <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3); letter-spacing:0.12em">COMPLETED CYCLE · IVF · 18 DAYS</div>
+          </div>
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              <div>
+                <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">REVIEWING DAY</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:900; color:#FDF6F0; line-height:1">5</div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px">
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:rgba(196,97,74,0.3); border:1px solid #C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:3px">🔥 DAY 5 QUOTE</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11px; color:#FDF6F0; line-height:1.3">"She was not fragile like a flower..."</div>
+          </div>
+          <div style="font-size:8px; color:rgba(253,246,240,0.3); text-align:center; margin-top:4px">Browse any day · read-only<br>Prompt stays at top on every day</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-break"></div>
+
+<!-- ============================================= -->
+<!-- FLOW 5: FREE USER → UPGRADE PROMPTS -->
+<!-- ============================================= -->
+<div class="journey">
+  <div class="journey-header"><div class="journey-num">5</div><div class="journey-title">Free User — How They Upgrade Later</div></div>
+  <div class="journey-desc">A user chose "Keep browsing my free days" at the register gate. Where do they see upgrade options?</div>
+  <div class="screens">
+    <div class="screen-wrap">
+      <div class="step-num">1</div>
+      <div class="screen-label">Register Gate · Chooses "Keep browsing"</div>
+      <div class="phone light">
+        <div class="notch" style="background:rgba(0,0,0,0.06)"></div>
+        <div style="text-align:center; padding-top:12px">
+          <div style="font-size:28px; margin-bottom:6px">🌟</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:#1C0F0C; margin-bottom:6px">You've completed 3 free days</div>
+        </div>
+        <!-- Cards -->
+        <div style="margin-top:8px">
+          <div style="border:1px dashed rgba(155,123,116,0.25); border-radius:12px; padding:10px; text-align:left; background:rgba(196,97,74,0.03); border-color:#C4614A">
+            <div style="font-size:11px; color:#1C0F0C">Keep browsing my free days ←</div>
+            <div style="font-size:9px; color:rgba(155,123,116,0.5); margin-top:2px">Selected this</div>
+          </div>
+        </div>
+        <div style="font-size:8px; color:#C4614A; text-align:center; margin-top:8px">→ Goes back to Day 3</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+
+    <!-- Option A: Banner on day screen -->
+    <div class="screen-wrap">
+      <div class="step-num">2a</div>
+      <div class="screen-label">Option A · Soft banner on Day screen</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center; margin-top:6px; margin-bottom:6px">
+          <div class="mono" style="font-size:7px; color:#C4614A; letter-spacing:0.12em">DAY BY DAY, FIRE BY FIRE</div>
+        </div>
+        <!-- Upgrade prompt — clean, minimal -->
+        <div style="background:rgba(196,97,74,0.08); border:1px solid rgba(196,97,74,0.15); border-radius:10px; padding:10px 12px; margin-bottom:8px; text-align:center">
+          <div style="font-size:11px; color:rgba(253,246,240,0.6); margin-bottom:6px">15 more days are waiting for you</div>
+          <div style="background:#C4614A; color:white; border-radius:8px; padding:8px 16px; font-size:11px; font-weight:700; display:inline-block">Unlock full journey — £9.99</div>
+        </div>
+        <div class="card">
+          <div class="mono" style="font-size:7px; color:#C4614A; margin-bottom:3px">🔥 TODAY'S FIRE</div>
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11px; color:#FDF6F0; line-height:1.3">"She believed she could..."</div>
+        </div>
+        <div class="card" style="opacity:0.5">
+          <div style="height:20px"></div>
+        </div>
+        <div style="font-size:8px; color:rgba(253,246,240,0.25); text-align:center; margin-top:6px">Same pattern as 4a review prompt<br>Persistent · tapping → goes to Paywall</div>
+      </div>
+    </div>
+
+    <!-- Option B: Locked day 4 preview -->
+    <div class="screen-wrap">
+      <div class="step-num">2b</div>
+      <div class="screen-label">Option B · Locked Day 4 preview</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="margin-top:8px">
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              <div>
+                <div class="mono" style="font-size:7px; color:rgba(253,246,240,0.3)">YOU'RE ON DAY</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:900; color:#FDF6F0; line-height:1">3</div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px">
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:#C4614A"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.06); position:relative; display:flex; align-items:center; justify-content:center"><span style="font-size:6px">🔒</span></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+                <div style="width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.06)"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Blurred day 4 preview -->
+          <div style="position:relative">
+            <div style="filter:blur(3px); opacity:0.3">
+              <div class="card"><div class="mono" style="font-size:7px; color:#C4614A">🔥 DAY 4</div><div style="font-size:10px; color:#FDF6F0">Tomorrow's quote awaits...</div></div>
+            </div>
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center">
+              <div style="background:#C4614A; color:white; border-radius:10px; padding:8px 16px; font-size:10px; font-weight:700; box-shadow:0 4px 12px rgba(196,97,74,0.4)">Unlock — £9.99</div>
+            </div>
+          </div>
+          <div style="font-size:8px; color:rgba(253,246,240,0.25); text-align:center; margin-top:6px">Day 4+ shown blurred with unlock overlay<br>Tap anywhere → Paywall</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option C: Tap → arrow triggers gate -->
+    <div class="screen-wrap">
+      <div class="step-num">2c</div>
+      <div class="screen-label">Option C · → arrow triggers paywall</div>
+      <div class="phone dark">
+        <div class="notch" style="background:rgba(255,255,255,0.1)"></div>
+        <div style="margin-top:40px; text-align:center">
+          <div style="font-size:9px; color:rgba(253,246,240,0.3); margin-bottom:12px">Currently implemented:<br>Tapping → or any day > 3 goes to Paywall</div>
+          <div style="display:flex; gap:6px; padding:0 8px">
+            <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid rgba(196,97,74,0.3); display:flex; align-items:center; justify-content:center; color:rgba(196,97,74,0.3); font-size:12px">‹</div>
+            <div style="flex:1; height:30px; border-radius:10px; background:rgba(196,97,74,0.15); border:1.5px solid rgba(196,97,74,0.3); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:#C4614A">Done ✓</div>
+            <div style="width:26px; height:26px; border-radius:50%; border:1.5px solid #C4614A; display:flex; align-items:center; justify-content:center; color:#C4614A; font-size:12px; background:rgba(196,97,74,0.1)">›</div>
+          </div>
+          <div style="font-size:8px; color:#C4614A; margin-top:6px">→ arrow → Paywall</div>
+          <div style="margin-top:16px; font-size:9px; color:rgba(253,246,240,0.3); line-height:1.5">Also: Settings → Your Plan<br>shows "Unlock — £9.99"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="screen-wrap">
+      <div class="screen-label" style="max-width:220px; margin-top:70px">
+        <div style="background:rgba(196,97,74,0.08); border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:12px; text-align:left; font-size:10px; color:rgba(253,246,240,0.5); line-height:1.6">
+          <div style="color:#C4614A; font-weight:600; margin-bottom:4px">Recommendation</div>
+          Use <strong>A + C together</strong>:<br>
+          • Persistent prompt at top of Day screen (same pattern as cycle review)<br>
+          • → arrow and locked days trigger paywall<br>
+          • Settings → Account → Your Plan shows upgrade<br><br>
+          3 organic touchpoints, none aggressive. Same UI pattern across review + upgrade.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding:30px 0; color:rgba(253,246,240,0.12); font-family:'DM Mono',monospace; font-size:10px;">
+  5 detailed flows · Cycle app · April 2026<br>
+  View at localhost:5000/detailed-flows.html
+</div>
+
+</body>
+</html>

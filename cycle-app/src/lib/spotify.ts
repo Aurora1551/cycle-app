@@ -20,9 +20,12 @@ const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string || ''
 const SPOTIFY_REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string || `${window.location.origin}/auth/spotify/callback`
 const SPOTIFY_SCOPES = 'user-read-private user-read-email user-modify-playback-state streaming'
 
-// Log warnings at module load
+// Debug: log what we got
+console.log('[Spotify] Client ID:', SPOTIFY_CLIENT_ID ? SPOTIFY_CLIENT_ID.substring(0, 8) + '...' : 'EMPTY')
+console.log('[Spotify] Configured:', !!SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_ID !== 'your-spotify-client-id')
+
 if (!SPOTIFY_CLIENT_ID || SPOTIFY_CLIENT_ID === 'your-spotify-client-id') {
-  console.warn('[Spotify] VITE_SPOTIFY_CLIENT_ID is not set or is still the placeholder value. Spotify integration will be disabled. See lib/spotify.ts for setup instructions.')
+  console.warn('[Spotify] VITE_SPOTIFY_CLIENT_ID is not set or is still the placeholder value. Spotify integration will be disabled.')
 }
 
 // --- PKCE helpers ---

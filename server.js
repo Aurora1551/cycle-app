@@ -3,7 +3,8 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const bcrypt = require('bcryptjs')
-const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan, saveMood, saveFavorite, saveDayCompletion, logEvent } = require('./db')
+const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan, saveMood, saveFavorite, saveDayCompletion, logEvent, logApiCost, savePushSubscription, deletePushSubscription, getPushSubscriptionsDueAt } = require('./db')
+const webpush = require('web-push')
 
 const app = express()
 app.use(cors({ origin: '*' }))
@@ -69,6 +70,117 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req,
 })
 
 app.use(express.json())
+
+// --- Web Push setup ---
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY
+const VAPID_EMAIL = process.env.VAPID_EMAIL || 'mailto:cycle@example.com'
+
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+  console.log('[OK] Web Push (VAPID) configured')
+} else {
+  console.warn('[WARNING] VAPID keys not set. Push notifications will not work.')
+}
+
+// Push subscribe
+app.post('/api/push/subscribe', (req, res) => {
+  const { userId, subscription } = req.body
+  if (!userId || !subscription?.endpoint || !subscription?.keys) {
+    return res.status(400).json({ error: 'Missing userId or subscription' })
+  }
+  const notifyTime = req.body.notifyTime || '08:00'
+  try {
+    savePushSubscription(userId, subscription.endpoint, subscription.keys.p256dh, subscription.keys.auth, notifyTime)
+    console.log(`[Push] Subscription saved for ${userId}`)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[Push] Save failed:', err.message)
+    res.status(500).json({ error: 'Failed to save subscription' })
+  }
+})
+
+// Push unsubscribe
+app.post('/api/push/unsubscribe', (req, res) => {
+  const { userId } = req.body
+  if (!userId) return res.status(400).json({ error: 'Missing userId' })
+  deletePushSubscription(userId)
+  res.json({ success: true })
+})
+
+// Send test push notification
+app.post('/api/push/test', async (req, res) => {
+  const { userId } = req.body
+  if (!VAPID_PUBLIC_KEY) return res.status(500).json({ error: 'Push not configured' })
+
+  const sub = db.prepare('SELECT * FROM push_subscriptions WHERE user_id = ?').get(userId)
+  if (!sub) return res.status(404).json({ error: 'No subscription found for this user' })
+
+  try {
+    await webpush.sendNotification(
+      { endpoint: sub.endpoint, keys: { p256dh: sub.keys_p256dh, auth: sub.keys_auth } },
+      JSON.stringify({
+        title: 'Cycle',
+        body: 'Your daily content is ready. Open the app to see today\'s quote, song, and more.',
+        tag: 'cycle-daily',
+        url: '/',
+      })
+    )
+    console.log(`[Push] Test notification sent to ${userId}`)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[Push] Send failed:', err.message)
+    if (err.statusCode === 410) {
+      deletePushSubscription(userId)
+      return res.status(410).json({ error: 'Subscription expired — user needs to re-subscribe' })
+    }
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// Cron-style endpoint: send notifications to all users due at a given time
+// Call this every minute from a cron job: curl -X POST http://localhost:3001/api/push/send-due
+app.post('/api/push/send-due', async (req, res) => {
+  if (!VAPID_PUBLIC_KEY) return res.status(500).json({ error: 'Push not configured' })
+
+  const now = new Date()
+  const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+
+  const subs = getPushSubscriptionsDueAt(time)
+  if (subs.length === 0) return res.json({ sent: 0, time })
+
+  let sent = 0
+  const messages = [
+    'Your daily content is ready. A quote, a song, and a moment just for you.',
+    'Good morning. Today\'s strength is waiting for you.',
+    'A new day, a new moment of courage. Open the app.',
+    'Your daily dose of love is here. You\'ve got this.',
+  ]
+  const body = messages[Math.floor(Math.random() * messages.length)]
+
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(
+        { endpoint: sub.endpoint, keys: { p256dh: sub.keys_p256dh, auth: sub.keys_auth } },
+        JSON.stringify({ title: 'Cycle', body, tag: 'cycle-daily', url: '/' })
+      )
+      sent++
+    } catch (err) {
+      if (err.statusCode === 410) {
+        deletePushSubscription(sub.user_id)
+        console.log(`[Push] Removed expired subscription for ${sub.user_id}`)
+      }
+    }
+  }
+
+  console.log(`[Push] Sent ${sent}/${subs.length} notifications at ${time}`)
+  res.json({ sent, total: subs.length, time })
+})
+
+// VAPID public key for frontend
+app.get('/api/push/vapid-key', (_, res) => {
+  res.json({ publicKey: VAPID_PUBLIC_KEY || '' })
+})
 
 // --- Validate Anthropic SDK + API key at startup ---
 let Anthropic
@@ -728,6 +840,13 @@ app.post('/api/generate-day', async (req, res) => {
         }],
       })
 
+      // Log API cost — Sonnet: $3/M input, $15/M output
+      const inputTokens = message.usage?.input_tokens || 0
+      const outputTokens = message.usage?.output_tokens || 0
+      const costUsd = (inputTokens * 3 / 1000000) + (outputTokens * 15 / 1000000)
+      logApiCost('anthropic', 'claude-sonnet-4', inputTokens, outputTokens, costUsd, uid, { dayNumber, vibe })
+      console.log(`[API] Tokens: ${inputTokens} in / ${outputTokens} out — $${costUsd.toFixed(4)}`)
+
       const text = message.content[0].text.trim()
       const jsonMatch = text.match(/\{[\s\S]*\}/)
       if (!jsonMatch) throw new Error('No JSON found in Claude response')
@@ -910,6 +1029,125 @@ app.get('/api/admin/stats', (_, res) => {
   const events = db.prepare('SELECT COUNT(*) as count FROM events').get().count
   const spotifyTaps = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'spotify_tap'").get().count
   res.json({ profiles, accounts, content, journals, moods, favorites, completions, events, spotifyTaps })
+})
+
+// Conversion funnel stats
+app.get('/api/admin/funnel', (_, res) => {
+  try {
+    // 1. Total profiles created (started onboarding)
+    const profilesCreated = db.prepare('SELECT COUNT(*) as count FROM profiles').get().count
+
+    // 2. Accounts created (registered)
+    const accountsCreated = db.prepare('SELECT COUNT(*) as count FROM accounts').get().count
+
+    // 3. Paid users (have a plan that isn't null/free)
+    const paidUsers = db.prepare("SELECT COUNT(*) as count FROM accounts WHERE plan IS NOT NULL AND plan != '' AND plan != 'free'").get().count
+
+    // 4. Users who completed day 1, 2, 3
+    const completedDay1 = db.prepare("SELECT COUNT(DISTINCT user_id) as count FROM day_completions WHERE day_number = 1").get().count
+    const completedDay2 = db.prepare("SELECT COUNT(DISTINCT user_id) as count FROM day_completions WHERE day_number = 2").get().count
+    const completedDay3 = db.prepare("SELECT COUNT(DISTINCT user_id) as count FROM day_completions WHERE day_number = 3").get().count
+
+    // 5. Users who completed day 4+ (converted past free trial)
+    const completedDay4Plus = db.prepare("SELECT COUNT(DISTINCT user_id) as count FROM day_completions WHERE day_number >= 4").get().count
+
+    // 6. Users who completed their full cycle (completed day = their total days)
+    const fullCycleUsers = db.prepare(`
+      SELECT COUNT(DISTINCT dc.user_id) as count
+      FROM day_completions dc
+      JOIN profiles p ON dc.user_id = p.name
+      WHERE dc.day_number = p.cycle_days
+    `).get().count
+
+    // 7. Users who completed multiple cycles (have events for journey_resumed or new cycles)
+    const multiCycleHint = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'journey_resumed'").get().count
+
+    // 8. Guests who never registered (profiles without matching accounts)
+    const guestsNoAccount = Math.max(0, profilesCreated - accountsCreated)
+
+    // 9. Registered but never paid
+    const registeredNotPaid = Math.max(0, accountsCreated - paidUsers)
+
+    // 10. Event-based metrics
+    const paywallViews = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'paywall_viewed'").get().count
+    const planSelections = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'plan_selected'").get().count
+    const paymentCompleted = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'payment_completed' OR event = 'payment_succeeded'").get().count
+    const giftsPurchased = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'gift_sent'").get().count
+    const giftsRedeemed = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'gift_redeemed'").get().count
+    const journeysPaused = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'journey_paused'").get().count
+    const journeysResumed = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'journey_resumed'").get().count
+    const spotifyConnections = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'spotify_connected'").get().count
+    const spotifyTaps = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'spotify_tap'").get().count
+    const meditationsStarted = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'meditation_started'").get().count
+    const meditationsCompleted = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'breathing_completed'").get().count
+    const fuelDismissals = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'fuel_item_dismissed'").get().count
+    const quotesShared = db.prepare("SELECT COUNT(*) as count FROM events WHERE event = 'quote_shared'").get().count
+
+    // 11. Content engagement
+    const totalJournals = db.prepare('SELECT COUNT(*) as count FROM journal_entries').get().count
+    const totalFavorites = db.prepare('SELECT COUNT(*) as count FROM favorites').get().count
+
+    // 12. Average days completed per user
+    const avgDays = db.prepare("SELECT AVG(days) as avg FROM (SELECT user_id, COUNT(*) as days FROM day_completions GROUP BY user_id)").get()
+
+    // 13. API costs
+    const totalApiCalls = db.prepare('SELECT COUNT(*) as count FROM api_costs').get().count
+    const totalInputTokens = db.prepare('SELECT COALESCE(SUM(input_tokens), 0) as sum FROM api_costs').get().sum
+    const totalOutputTokens = db.prepare('SELECT COALESCE(SUM(output_tokens), 0) as sum FROM api_costs').get().sum
+    const totalCostUsd = db.prepare('SELECT COALESCE(SUM(estimated_cost_usd), 0) as sum FROM api_costs').get().sum
+    const todayCostUsd = db.prepare("SELECT COALESCE(SUM(estimated_cost_usd), 0) as sum FROM api_costs WHERE date(created_at) = date('now')").get().sum
+    const costPerUser = profilesCreated > 0 ? totalCostUsd / profilesCreated : 0
+
+    res.json({
+      funnel: {
+        profilesCreated,
+        completedDay1,
+        completedDay2,
+        completedDay3,
+        accountsCreated,
+        paidUsers,
+        completedDay4Plus,
+        fullCycleUsers,
+      },
+      conversion: {
+        guestsNoAccount,
+        registeredNotPaid,
+        paywallViews,
+        planSelections,
+        paymentCompleted,
+      },
+      engagement: {
+        avgDaysPerUser: avgDays?.avg ? Math.round(avgDays.avg * 10) / 10 : 0,
+        totalJournals,
+        totalFavorites,
+        meditationsStarted,
+        meditationsCompleted,
+        spotifyConnections,
+        spotifyTaps,
+        quotesShared,
+        fuelDismissals,
+      },
+      retention: {
+        journeysPaused,
+        journeysResumed,
+        multiCycleHint,
+      },
+      gifting: {
+        giftsPurchased,
+        giftsRedeemed,
+      },
+      costs: {
+        totalApiCalls,
+        totalInputTokens,
+        totalOutputTokens,
+        totalCostUsd: Math.round(totalCostUsd * 10000) / 10000,
+        todayCostUsd: Math.round(todayCostUsd * 10000) / 10000,
+        costPerUser: Math.round(costPerUser * 10000) / 10000,
+      },
+    })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // --- Spotify integration ---

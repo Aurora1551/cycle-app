@@ -290,7 +290,25 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
       padRef.current?.duck()
       const textToSpeak = displayOpening.replace(/\n/g, '. ')
       console.log('[Meditation] About to speak:', textToSpeak)
-      await speak(textToSpeak)
+      console.log('[Meditation] speechSynthesis available:', 'speechSynthesis' in window)
+      console.log('[Meditation] voices:', window.speechSynthesis?.getVoices()?.length)
+      // Test: try speaking directly without the wrapper to rule out speak() issues
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+        const testU = new SpeechSynthesisUtterance(textToSpeak)
+        testU.rate = 0.75
+        testU.pitch = 0.85
+        testU.volume = 1.0
+        const v = window.speechSynthesis.getVoices()
+        console.log('[Meditation] Available voices:', v.map(x => x.name).join(', '))
+        if (v.length > 0) testU.voice = v.find(x => x.lang.startsWith('en')) || v[0]
+        window.speechSynthesis.speak(testU)
+        console.log('[Meditation] Direct speak fired')
+        await new Promise(r => { testU.onend = r; testU.onerror = () => { console.error('[Meditation] Speech error'); r(undefined) }; setTimeout(r, textToSpeak.length * 150 + 5000) })
+      } else {
+        console.error('[Meditation] No speechSynthesis — this browser does not support it')
+        await new Promise(r => setTimeout(r, 2000))
+      }
       console.log('[Meditation] Speech done, transitioning to breathing')
       padRef.current?.unduck()
       if (stoppedRef.current) return
@@ -752,27 +770,48 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       </div>
     )
     if (component === 'fuel') {
-      const FALLBACK_FUEL = [
-        [{ name: 'Greek yoghurt with almonds & honey', emoji: '🥜', protein: '~20g' }, { name: 'Salmon with sweet potato', emoji: '🐟', protein: '~30g' }, { name: 'Avocado & egg toast', emoji: '🥑', protein: '~15g' }],
-        [{ name: 'Chicken & quinoa bowl', emoji: '🍗', protein: '~35g' }, { name: 'Hummus with veggie sticks', emoji: '🥕', protein: '~8g' }, { name: 'Overnight oats with chia seeds', emoji: '🥣', protein: '~18g' }],
-        [{ name: 'Lentil soup with crusty bread', emoji: '🍲', protein: '~18g' }, { name: 'Cottage cheese with berries', emoji: '🫐', protein: '~14g' }, { name: 'Edamame & rice bowl', emoji: '🍚', protein: '~22g' }],
-        [{ name: 'Turkey & avocado wrap', emoji: '🌯', protein: '~28g' }, { name: 'Handful of almonds & banana', emoji: '🍌', protein: '~7g' }, { name: 'Bean & cheese quesadilla', emoji: '🧀', protein: '~20g' }],
+      const ALL_FUEL_ITEMS = [
+        { name: 'Greek yoghurt with almonds & honey', emoji: '🥜', protein: '~20g' },
+        { name: 'Salmon with sweet potato', emoji: '🐟', protein: '~30g' },
+        { name: 'Avocado & egg toast', emoji: '🥑', protein: '~15g' },
+        { name: 'Chicken & quinoa bowl', emoji: '🍗', protein: '~35g' },
+        { name: 'Hummus with veggie sticks', emoji: '🥕', protein: '~8g' },
+        { name: 'Overnight oats with chia seeds', emoji: '🥣', protein: '~18g' },
+        { name: 'Lentil soup with crusty bread', emoji: '🍲', protein: '~18g' },
+        { name: 'Cottage cheese with berries', emoji: '🫐', protein: '~14g' },
+        { name: 'Edamame & rice bowl', emoji: '🍚', protein: '~22g' },
+        { name: 'Turkey & avocado wrap', emoji: '🌯', protein: '~28g' },
+        { name: 'Handful of almonds & banana', emoji: '🍌', protein: '~7g' },
+        { name: 'Bean & cheese quesadilla', emoji: '🧀', protein: '~20g' },
+        { name: 'Scrambled eggs on sourdough', emoji: '🍳', protein: '~18g' },
+        { name: 'Tuna & avocado salad', emoji: '🥗', protein: '~25g' },
+        { name: 'Peanut butter smoothie', emoji: '🥤', protein: '~15g' },
+        { name: 'Tofu stir-fry with vegetables', emoji: '🥦', protein: '~20g' },
+        { name: 'Black bean tacos', emoji: '🌮', protein: '~16g' },
+        { name: 'Shakshuka with bread', emoji: '🍅', protein: '~18g' },
       ]
       // Dismissed foods — stored in localStorage, used to filter future suggestions
       const getDismissed = (): string[] => { try { return JSON.parse(localStorage.getItem('cycle_fuel_dismissed') || '[]') } catch { return [] } }
       const dismissFood = (name: string) => {
         const current = getDismissed()
         if (!current.includes(name)) {
-          const next = [...current, name]
-          localStorage.setItem('cycle_fuel_dismissed', JSON.stringify(next))
+          localStorage.setItem('cycle_fuel_dismissed', JSON.stringify([...current, name]))
         }
+        setFuelDismissKey(k => k + 1)
         track('fuel_item_dismissed', { food: name, day_number: dayNumber })
       }
       const dismissed = getDismissed()
       const aiFuel = content?.fuelItems
-      const allFuel = aiFuel && fuelIdx === 0 ? aiFuel : FALLBACK_FUEL[fuelIdx % FALLBACK_FUEL.length]
-      // Filter out dismissed items
-      const currentFuel = allFuel.filter((item: any) => !dismissed.some(d => item.name.toLowerCase().includes(d.toLowerCase()) || d.toLowerCase().includes(item.name.toLowerCase())))
+      // Filter out dismissed from all available items
+      const available = ALL_FUEL_ITEMS.filter(item => !dismissed.some(d => item.name.toLowerCase() === d.toLowerCase()))
+      // Pick 3 items: AI items first (if not dismissed), then fill from available pool
+      const aiFiltered = aiFuel ? aiFuel.filter((item: any) => !dismissed.some((d: string) => item.name.toLowerCase() === d.toLowerCase())) : []
+      const startIdx = (fuelIdx * 3) % Math.max(available.length, 1)
+      const poolItems = available.slice(startIdx, startIdx + 3)
+      const extraNeeded = 3 - (aiFiltered.length > 0 && fuelIdx === 0 ? aiFiltered.length : poolItems.length)
+      const currentFuel = fuelIdx === 0 && aiFiltered.length > 0
+        ? [...aiFiltered, ...available.filter(a => !aiFiltered.some((ai: any) => ai.name === a.name)).slice(0, Math.max(0, 3 - aiFiltered.length))].slice(0, 3)
+        : [...poolItems, ...available.filter(a => !poolItems.includes(a)).slice(0, Math.max(0, extraNeeded))].slice(0, 3)
       const dietPrefs: string[] = (() => { try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] } })()
       const hasDietPrefs = dietPrefs.length > 0 && !dietPrefs.includes('none')
       // If all items dismissed for this set, auto-advance
@@ -932,11 +971,12 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
               {Array.from({ length: data.cycleDays }, (_, i) => i + 1).map(d => {
                 const isDone = completedDays.has(d)
                 const isViewing = d === dayNumber
+                const isLocked = !isPremium && d > 3
                 return (
                   <button
                     key={d}
                     onClick={() => {
-                      if (!isPremium && d > 3) { onUnlock?.(); return }
+                      if (isLocked) { onUnlock?.(); return }
                       onGoToDay?.(d)
                     }}
                     style={{
@@ -947,9 +987,14 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                       cursor: 'pointer',
                       margin: 'auto',
                       transition: 'all 0.2s',
+                      opacity: isLocked ? 0.4 : 1,
                     }}
                   >
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, fontWeight: 500, color: isDone ? 'white' : isViewing ? vibe.accent : mutedColor, lineHeight: 1 }}>{d}</span>
+                    {isLocked ? (
+                      <span style={{ fontSize: 8 }}>🔒</span>
+                    ) : (
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, fontWeight: 500, color: isDone ? 'white' : isViewing ? vibe.accent : mutedColor, lineHeight: 1 }}>{d}</span>
+                    )}
                   </button>
                 )
               })}

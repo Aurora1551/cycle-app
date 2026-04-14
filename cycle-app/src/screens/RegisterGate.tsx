@@ -6,46 +6,60 @@ import { ScreenShell } from '../components/ui'
 interface Props {
   onCreateAccount: () => void
   onContinueGuest: () => void
+  onUnlock?: () => void
+  cycleDays?: number
 }
 
-const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest }) => {
+const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnlock, cycleDays = 18 }) => {
   const { t } = useTranslation()
   const visible = useFadeIn()
 
-  const bg = '#0E0E0E'
-  const accent = '#C4614A'
-  const textColor = '#FDF6F0'
-  const mutedColor = 'rgba(253,246,240,0.45)'
-
-  const handleContinueGuest = () => {
-    onContinueGuest()
-  }
+  const remainingDays = Math.max(0, cycleDays - 3)
 
   return (
-    <ScreenShell bg={bg} visible={visible}>
-      <div className="content" style={{ gap: 16, textAlign: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-        <div style={{ fontSize: 48, marginBottom: 8 }}>🔒</div>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 700, color: textColor, lineHeight: 1.1, margin: 0 }}>
-          {t('registerGate.heading')}
+    <ScreenShell bg="#FDF6F0" visible={visible}>
+      <div className="content" style={{ gap: 12, textAlign: 'center', padding: '40px 24px 32px' }}>
+        <div style={{ fontSize: 36, marginBottom: 4 }}>🌟</div>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 700, color: '#1C0F0C', lineHeight: 1.1, margin: 0 }}>
+          You've completed 3 free days
         </h1>
-        <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: mutedColor, lineHeight: 1.6, margin: '0 0 12px' }}>
-          {t('registerGate.subtext')}
+        <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: '#9B7B74', lineHeight: 1.5, margin: '4px 0 16px', padding: '0 8px' }}>
+          There are <strong style={{ color: '#1C0F0C' }}>{remainingDays} more days</strong> of quotes, music, journaling, and breathing waiting for you.
         </p>
 
-        <button onClick={onCreateAccount} className="btn-primary" style={{ background: accent }}>
-          {t('registerGate.createAccount')}
-        </button>
-
-        <button onClick={handleContinueGuest} style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          fontFamily: "'Karla', sans-serif", fontSize: 13, color: mutedColor,
-          textDecoration: 'underline', padding: '8px 0',
+        {/* Card 1: Unlock full journey */}
+        <button onClick={onUnlock || onCreateAccount} style={{
+          width: '100%', border: '2px solid #C4614A', borderRadius: 14, padding: '16px',
+          background: '#C4614A', cursor: 'pointer', textAlign: 'left',
         }}>
-          {t('registerGate.continueAsGuest')}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: 700, color: 'white' }}>Unlock full journey</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>£9.99</div>
+          </div>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: 1.4 }}>
+            All {cycleDays} days, journal, favourites, and more
+          </div>
         </button>
-        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: 'rgba(253,246,240,0.3)', letterSpacing: '0.05em', lineHeight: 1.6 }}>
-          {t('registerGate.guestWarning')}
-        </p>
+
+        {/* Card 2: Create free account */}
+        <button onClick={onCreateAccount} style={{
+          width: '100%', border: '1.5px solid rgba(196,97,74,0.2)', borderRadius: 14, padding: '16px',
+          background: 'white', cursor: 'pointer', textAlign: 'left',
+        }}>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: 700, color: '#1C0F0C', marginBottom: 4 }}>Save my progress</div>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: '#9B7B74', lineHeight: 1.4 }}>
+            Create a free account. Upgrade whenever you're ready.
+          </div>
+        </button>
+
+        {/* Card 3: Stay on free days */}
+        <button onClick={onContinueGuest} style={{
+          width: '100%', border: '1px dashed rgba(155,123,116,0.25)', borderRadius: 14, padding: '14px',
+          background: 'transparent', cursor: 'pointer', textAlign: 'left',
+        }}>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 12, color: '#9B7B74' }}>Keep browsing my free days</div>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 10, color: 'rgba(155,123,116,0.5)', marginTop: 2 }}>You can revisit Days 1–3 anytime</div>
+        </button>
       </div>
     </ScreenShell>
   )

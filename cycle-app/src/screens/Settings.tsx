@@ -22,11 +22,13 @@ interface Props {
   isPaused?: boolean
   onPause?: () => void
   onResume?: () => void
+  isPremium?: boolean
+  onUpgrade?: () => void
 }
 
 type EditMode = null | 'name' | 'treatment' | 'cycleDays' | 'vibe' | 'genres' | 'components' | 'notifyTime' | 'privacy' | 'language'
 
-const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onBack, isPaused, onPause, onResume }) => {
+const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onBack, isPaused, onPause, onResume, isPremium, onUpgrade }) => {
   const { t, i18n } = useTranslation()
   const visible = useFadeIn()
   const [editMode, setEditMode] = useState<EditMode>(null)
@@ -358,6 +360,38 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
 
         <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.account')}</div>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
+          {/* Plan */}
+          <div className="settings-row" style={{ borderBottom: `1px solid ${cardBorder}` }}>
+            {isPremium ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
+                <div className="settings-icon" style={{ background: 'rgba(123,212,160,0.12)' }}>✓</div>
+                <div style={{ flex: 1 }}>
+                  <div className="mono-hint" style={{ color: '#7BD4A0', marginBottom: 2, letterSpacing: '0.15em' }}>FULL JOURNEY</div>
+                  <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>All {data.cycleDays} days unlocked</div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <div className="settings-icon" style={{ background: `${vibe.accent}15` }}>🌱</div>
+                  <div style={{ flex: 1 }}>
+                    <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>FREE PLAN</div>
+                    <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>Access to Days 1–3</div>
+                  </div>
+                </div>
+                <button onClick={onUpgrade} style={{
+                  width: '100%', background: vibe.accent, color: 'white', border: 'none',
+                  borderRadius: 10, padding: '11px', fontFamily: typo.bodyFont, fontWeight: 700,
+                  fontSize: 12, cursor: 'pointer',
+                }}>
+                  Unlock full journey — £9.99
+                </button>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, textAlign: 'center', marginTop: 4, letterSpacing: '0.05em' }}>
+                  One-time payment · no subscription
+                </div>
+              </div>
+            )}
+          </div>
           <button onClick={onLogout} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
             <div className="settings-icon" style={{ background: `${vibe.accent}15` }}>🚪</div>
             <div style={{ flex: 1 }}>
