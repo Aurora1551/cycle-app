@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — Comprehensive UX Critique</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Karla:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0E0E0E; color: #FDF6F0; font-family: 'Karla', sans-serif; padding: 40px 20px; max-width: 900px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: rgba(253,246,240,0.4); font-size: 13px; margin-bottom: 12px; }
+  .toc { margin-bottom: 48px; }
+  .toc a { display: block; font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.45); text-decoration: none; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); transition: color 0.2s; }
+  .toc a:hover { color: #C4614A; }
+  .toc a span { color: #C4614A; margin-right: 8px; }
+  .section { margin-bottom: 64px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(196,97,74,0.2); }
+  .section-intro { font-size: 14px; color: rgba(253,246,240,0.5); line-height: 1.6; margin-bottom: 24px; }
+  .item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+  .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }
+  .item-num { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.25); min-width: 28px; }
+  .item-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: #FDF6F0; flex: 1; line-height: 1.2; }
+  .severity { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .sev-critical { background: rgba(220,60,60,0.15); color: #E86A6A; border: 1px solid rgba(220,60,60,0.25); }
+  .sev-important { background: rgba(245,200,66,0.1); color: #F5C842; border: 1px solid rgba(245,200,66,0.2); }
+  .sev-nice { background: rgba(100,200,140,0.1); color: #7BD4A0; border: 1px solid rgba(100,200,140,0.2); }
+  .problem { font-size: 14px; color: rgba(253,246,240,0.65); line-height: 1.6; margin-bottom: 16px; }
+  .suggestion { background: rgba(196,97,74,0.06); border: 1px solid rgba(196,97,74,0.12); border-radius: 10px; padding: 16px; font-size: 13px; color: rgba(253,246,240,0.75); line-height: 1.6; }
+  .suggestion-label { font-family: 'DM Mono', monospace; font-size: 9px; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .phones { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; margin: 16px 0; flex-wrap: wrap; }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .phone-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(253,246,240,0.35); letter-spacing: 0.1em; text-transform: uppercase; text-align: center; max-width: 220px; }
+  .phone { width: 220px; min-height: 300px; border-radius: 24px; border: 2px solid rgba(255,255,255,0.08); padding: 16px 14px; position: relative; }
+  .phone.light { background: #FDF6F0; border-color: rgba(196,97,74,0.15); }
+  .phone.dark { background: #1C0F0C; }
+  .phone.yellow { background: #F5C842; border-color: rgba(196,97,74,0.15); }
+  .notch { width: 50px; height: 3px; border-radius: 2px; margin: 0 auto 10px; }
+  .notch-light { background: rgba(0,0,0,0.06); }
+  .notch-dark { background: rgba(255,255,255,0.1); }
+  .arrow { color: #C4614A; font-size: 24px; flex-shrink: 0; align-self: center; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .serif { font-family: 'Cormorant Garamond', serif; }
+  .btn-mock { border-radius: 12px; padding: 10px 14px; font-size: 11px; font-weight: 700; text-align: center; }
+  .vs-label { font-family: 'DM Mono', monospace; font-size: 11px; color: #C4614A; letter-spacing: 0.1em; text-align: center; align-self: center; flex-shrink: 0; padding: 8px 12px; border: 1px solid rgba(196,97,74,0.2); border-radius: 8px; }
+  .vote-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .vote-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: none; color: rgba(253,246,240,0.4); cursor: pointer; transition: all 0.2s; }
+  .vote-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(253,246,240,0.7); }
+  .vote-btn.voted-yes { background: rgba(100,200,140,0.15); border-color: rgba(100,200,140,0.3); color: #7BD4A0; }
+  .vote-btn.voted-no { background: rgba(220,60,60,0.1); border-color: rgba(220,60,60,0.2); color: #E86A6A; }
+  .vote-btn.voted-later { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.2); color: #F5C842; }
+  .counter { position: fixed; top: 20px; right: 20px; background: rgba(14,14,14,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 18px; font-family: 'DM Mono', monospace; font-size: 11px; z-index: 100; backdrop-filter: blur(10px); }
+  .counter div { margin-bottom: 4px; }
+  .counter .c-agree { color: #7BD4A0; }
+  .counter .c-disagree { color: #E86A6A; }
+  .counter .c-later { color: #F5C842; }
+  .highlight { color: #C4614A; }
+  .problem-box { background: rgba(220,60,60,0.04); border: 1px solid rgba(220,60,60,0.12); border-radius: 8px; padding: 8px 10px; font-size: 10px; color: #E86A6A; margin-top: 8px; line-height: 1.5; }
+  .good-box { background: rgba(100,200,140,0.04); border: 1px solid rgba(100,200,140,0.12); border-radius: 8px; padding: 8px 10px; font-size: 10px; color: #7BD4A0; margin-top: 8px; line-height: 1.5; }
+  .wording-compare { display: flex; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+  .wording-box { flex: 1; min-width: 200px; border-radius: 10px; padding: 14px; font-size: 13px; line-height: 1.5; }
+  .wording-before { background: rgba(220,60,60,0.04); border: 1px solid rgba(220,60,60,0.1); color: rgba(253,246,240,0.5); }
+  .wording-after { background: rgba(100,200,140,0.04); border: 1px solid rgba(100,200,140,0.1); color: rgba(253,246,240,0.7); }
+  .wording-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .nav-back { position: fixed; top: 20px; left: 20px; font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(253,246,240,0.35); text-decoration: none; z-index: 100; }
+  .nav-back:hover { color: #C4614A; }
+  @media (max-width: 600px) {
+    body { padding: 20px 12px; }
+    h1 { font-size: 28px; }
+    .counter { display: none; }
+    .nav-back { display: none; }
+    .phones { flex-direction: column; align-items: center; }
+    .arrow { transform: rotate(90deg); margin: 4px 0; }
+    .vs-label { margin: 4px 0; }
+    .wording-compare { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<a class="nav-back" href="review.html">&larr; Back to Review</a>
+
+<div class="counter" id="counter">
+  <div class="c-agree">Agree: <span id="count-agree">0</span></div>
+  <div class="c-disagree">Disagree: <span id="count-disagree">0</span></div>
+  <div class="c-later">Later: <span id="count-later">0</span></div>
+  <div style="color: rgba(253,246,240,0.25); margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px;">Reviewed: <span id="count-total">0</span>/<span id="count-max">0</span></div>
+</div>
+
+<h1>UX Critique</h1>
+<p class="subtitle">A comprehensive audit of user experience, drop-off risks, missing features, wording, and visual polish.</p>
+<p style="font-size: 12px; color: rgba(253,246,240,0.3); margin-bottom: 40px;">Vote on each issue: Agree (we should fix this) / Disagree (it's fine) / Later (parking lot)</p>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <a href="#s1"><span>01</span> Drop-off Risk Points</a>
+  <a href="#s2"><span>02</span> Missing Features for Fertility Audience</a>
+  <a href="#s3"><span>03</span> UX Improvements</a>
+  <a href="#s4"><span>04</span> Wording Improvements</a>
+  <a href="#s5"><span>05</span> Visual Polish</a>
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SECTION 1: DROP-OFF RISK POINTS -->
+<!-- ================================================================== -->
+<div class="section" id="s1">
+  <div class="section-title">Section 1 &mdash; Drop-off Risk Points</div>
+  <p class="section-intro">Where in the user journey are we most likely to lose someone? Each of these is a moment where a user might close the tab and never come back.</p>
+
+  <!-- 1.1 Onboarding length -->
+  <div class="item" data-id="1.1">
+    <div class="item-header">
+      <span class="item-num">1.1</span>
+      <span class="item-title">6-step onboarding is too many screens</span>
+      <span class="severity sev-critical">&nbsp;&#x1F534; Critical</span>
+    </div>
+    <div class="problem">
+      The current onboarding has <strong>6 distinct screens</strong>: Splash &rarr; Name &rarr; Treatment &rarr; Cycle Days &rarr; Components &rarr; Vibe &rarr; Music. Each screen requires a tap, wait, render. Industry data shows every extra onboarding step loses 10-20% of users. By step 6, you could be down to 30% of people who started.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current &mdash; 6 steps</div>
+        <div class="phone dark">
+          <div class="notch notch-dark"></div>
+          <div style="display:flex; flex-direction:column; gap:6px; padding-top:10px">
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:20px;height:20px;border-radius:50%;background:#C4614A;display:flex;align-items:center;justify-content:center;font-size:9px;color:white" class="mono">1</div>
+              <div style="font-size:11px;color:#FDF6F0">Name</div>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:20px;height:20px;border-radius:50%;background:#C4614A;display:flex;align-items:center;justify-content:center;font-size:9px;color:white" class="mono">2</div>
+              <div style="font-size:11px;color:#FDF6F0">Treatment type</div>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:20px;height:20px;border-radius:50%;background:#C4614A;display:flex;align-items:center;justify-content:center;font-size:9px;color:white" class="mono">3</div>
+              <div style="font-size:11px;color:#FDF6F0">Cycle days</div>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:20px;height:20px;border-radius:50%;background:#C4614A;display:flex;align-items:center;justify-content:center;font-size:9px;color:white" class="mono">4</div>
+              <div style="font-size:11px;color:#FDF6F0">Components</div>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:20px;height:20px;border-radius:50%;background:#C4614A;display:flex;align-items:center;justify-content:center;font-size:9px;color:white" class="mono">5</div>
+              <div style="font-size:11px;color:#FDF6F0">Vibe</div>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:20px;height:20px;border-radius:50%;background:#C4614A;display:flex;align-items:center;justify-content:center;font-size:9px;color:white" class="mono">6</div>
+              <div style="font-size:11px;color:#FDF6F0">Music preference</div>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="margin-top:8px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:#E86A6A" class="serif">6 taps</div>
+              <div style="font-size:9px;color:rgba(253,246,240,0.3)" class="mono">before seeing any content</div>
+            </div>
+          </div>
+          <div class="problem-box">Each step = potential drop-off. Users want value fast.</div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Proposed &mdash; 3 steps</div>
+        <div class="phone dark">
+          <div class="notch notch-dark"></div>
+          <div style="display:flex; flex-direction:column; gap:10px; padding-top:10px">
+            <div style="background:rgba(196,97,74,0.06);border:1px solid rgba(196,97,74,0.15);border-radius:12px;padding:12px">
+              <div style="font-size:11px;font-weight:600;color:#C4614A;margin-bottom:6px" class="mono">STEP 1 &mdash; About You</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.5);line-height:1.5">Name + Treatment type + Cycle days<br><span style="color:rgba(253,246,240,0.3)">(one scrollable screen)</span></div>
+            </div>
+            <div style="background:rgba(196,97,74,0.06);border:1px solid rgba(196,97,74,0.15);border-radius:12px;padding:12px">
+              <div style="font-size:11px;font-weight:600;color:#C4614A;margin-bottom:6px" class="mono">STEP 2 &mdash; Your Vibe</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.5);line-height:1.5">Components + Vibe selection<br><span style="color:rgba(253,246,240,0.3)">(combined into one)</span></div>
+            </div>
+            <div style="background:rgba(196,97,74,0.06);border:1px solid rgba(196,97,74,0.15);border-radius:12px;padding:12px">
+              <div style="font-size:11px;font-weight:600;color:#C4614A;margin-bottom:6px" class="mono">STEP 3 &mdash; Music</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.5);line-height:1.5">Spotify connect <em>or</em> skip<br><span style="color:rgba(253,246,240,0.3)">(optional, prominent skip)</span></div>
+            </div>
+            <div style="margin-top:4px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:#7BD4A0" class="serif">3 taps</div>
+              <div style="font-size:9px;color:rgba(253,246,240,0.3)" class="mono">see content in under 60 seconds</div>
+            </div>
+          </div>
+          <div class="good-box">Combine Treatment+Days, Components+Vibe. Music stays separate but skip is prominent.</div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Merge <strong>Treatment + Cycle Days</strong> into one screen (they're contextually related &mdash; "What treatment? How many days?"). Merge <strong>Components + Vibe</strong> into one screen (both shape the daily experience). Music/Spotify stays separate because it's an optional integration. Add a clear progress indicator: "Step 1 of 3" at the top.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 1.2 Day 3 Register Gate -->
+  <div class="item" data-id="1.2">
+    <div class="item-header">
+      <span class="item-num">1.2</span>
+      <span class="item-title">Day 3 &rarr; Register Gate friction</span>
+      <span class="severity sev-critical">&nbsp;&#x1F534; Critical</span>
+    </div>
+    <div class="problem">
+      After 3 days of free, deeply personal content, the user hits a hard gate: create an account or you're stuck. The emotional whiplash is jarring &mdash; one moment you're reading a tender affirmation, the next you're filling out a signup form. This is the <strong>single highest drop-off risk</strong> in the entire app. The user has built a habit for 3 days and now faces a wall.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current &mdash; abrupt gate</div>
+        <div class="phone light">
+          <div class="notch notch-light"></div>
+          <div style="text-align:center;padding-top:24px">
+            <div style="font-size:28px;margin-bottom:8px">&#x1F31F;</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#1C0F0C;margin-bottom:6px">Ready to keep going?</div>
+            <div style="font-size:11px;color:#9B7B74;margin-bottom:20px;line-height:1.5;padding:0 8px">Save your progress and unlock the full journey.</div>
+            <div class="btn-mock" style="background:#C4614A;color:white;margin-bottom:8px">Create account &rarr;</div>
+            <div style="font-size:10px;color:#9B7B74">Continue without saving</div>
+          </div>
+          <div class="problem-box" style="margin-top:20px">
+            &bull; "Continue without saving" loops back to Day 3<br>
+            &bull; No acknowledgment of what they've already done<br>
+            &bull; Feels transactional, not warm
+          </div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Suggested &mdash; softer transition</div>
+        <div class="phone dark">
+          <div class="notch notch-dark"></div>
+          <div style="text-align:center;padding-top:16px">
+            <div style="font-size:28px;margin-bottom:8px">&#x1F49B;</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#FDF6F0;margin-bottom:6px;line-height:1.25">You've shown up for 3 days straight</div>
+            <div style="font-size:11px;color:rgba(253,246,240,0.5);margin-bottom:4px;line-height:1.5;padding:0 4px">That takes real courage. There are <strong style="color:#FDF6F0">15 more days</strong> of support waiting for you.</div>
+            <div style="margin:12px 0;padding:10px;background:rgba(196,97,74,0.06);border:1px solid rgba(196,97,74,0.12);border-radius:10px;text-align:left">
+              <div style="font-size:10px;color:rgba(253,246,240,0.7);line-height:1.8">
+                &#10003; Save your journal entries<br>
+                &#10003; Keep your favourites<br>
+                &#10003; Pick up where you left off
+              </div>
+            </div>
+            <div class="btn-mock" style="background:#C4614A;color:white;margin-bottom:8px;border-radius:12px;padding:12px">Create a free account</div>
+            <div class="btn-mock" style="background:transparent;border:1.5px solid rgba(196,97,74,0.2);color:rgba(253,246,240,0.6);margin-bottom:10px;border-radius:12px;padding:10px;font-size:10px">I'll explore Days 1&ndash;3 for now</div>
+          </div>
+          <div class="good-box">
+            &#10003; Acknowledges their effort<br>
+            &#10003; Clear what they get<br>
+            &#10003; Honest about what "skip" means
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Start the gate with <strong>recognition of what they've done</strong>, not what they need to do. Make the "skip" option honest ("I'll explore Days 1&ndash;3 for now" instead of misleading "Continue without saving"). Consider showing a <strong>preview snippet</strong> of Day 4's quote as a teaser. The register-gate-options page has explored better wording &mdash; confirm which option was chosen and ensure it's implemented.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 1.3 Paywall placement -->
+  <div class="item" data-id="1.3">
+    <div class="item-header">
+      <span class="item-num">1.3</span>
+      <span class="item-title">Paywall timing &mdash; too close to register gate</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      The user journey is: Day 3 Done &rarr; Register Gate &rarr; Account Creation &rarr; Paywall &rarr; Stripe. That's <strong>four screens in a row</strong> asking for things (email, password, payment) before they see Day 4. The user went from "I just finished a breathing exercise" to "enter your credit card" in under 2 minutes. It feels like a bait-and-switch, even though the app is genuinely valuable.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current flow</div>
+        <div class="phone dark" style="min-height:220px">
+          <div class="notch notch-dark"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:8px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#7BD4A0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#0E0E0E" class="mono">&#10003;</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.5)">Day 3 Done</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#E86A6A;display:flex;align-items:center;justify-content:center;font-size:8px;color:white" class="mono">!</div>
+              <div style="font-size:10px;color:#E86A6A">Register Gate</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#E86A6A;display:flex;align-items:center;justify-content:center;font-size:8px;color:white" class="mono">!</div>
+              <div style="font-size:10px;color:#E86A6A">Create Account</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#E86A6A;display:flex;align-items:center;justify-content:center;font-size:8px;color:white" class="mono">!</div>
+              <div style="font-size:10px;color:#E86A6A">Paywall</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#E86A6A;display:flex;align-items:center;justify-content:center;font-size:8px;color:white" class="mono">&#163;</div>
+              <div style="font-size:10px;color:#E86A6A">Stripe Payment</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:8px;color:rgba(253,246,240,0.3);display:flex;align-items:center;justify-content:center" class="mono">4</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.3)">Day 4 content</div>
+            </div>
+          </div>
+          <div class="problem-box" style="margin-top:12px">4 friction screens in a row before any new content</div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Suggested &mdash; breathe between</div>
+        <div class="phone dark" style="min-height:220px">
+          <div class="notch notch-dark"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:8px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#7BD4A0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#0E0E0E" class="mono">&#10003;</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.5)">Day 3 Done</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#F5C842;display:flex;align-items:center;justify-content:center;font-size:8px;color:#0E0E0E" class="mono">&#8594;</div>
+              <div style="font-size:10px;color:#F5C842">Soft nudge + account</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#7BD4A0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#0E0E0E" class="mono">&#10003;</div>
+              <div style="font-size:10px;color:#7BD4A0">Day 4 preview (locked)</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#F5C842;display:flex;align-items:center;justify-content:center;font-size:8px;color:#0E0E0E" class="mono">&#163;</div>
+              <div style="font-size:10px;color:#F5C842">Paywall (unlock to read)</div>
+            </div>
+            <div style="width:1px;height:8px;background:rgba(255,255,255,0.08);margin-left:8px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:16px;height:16px;border-radius:50%;background:#7BD4A0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#0E0E0E" class="mono">4</div>
+              <div style="font-size:10px;color:#7BD4A0">Day 4 unlocked!</div>
+            </div>
+          </div>
+          <div class="good-box" style="margin-top:12px">Show Day 4's quote blurred &mdash; they can see what they're unlocking</div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Consider letting the user <strong>see a blurred preview of Day 4</strong> before paying. They should feel the pull of "I want to read that" rather than "I have to pay to continue." Combine Register + Paywall into one screen where account creation is step 1 and payment is step 2 (same page, not separate routes). This reduces the total friction screens from 4 to 2.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 1.4 Meditation no voice -->
+  <div class="item" data-id="1.4">
+    <div class="item-header">
+      <span class="item-num">1.4</span>
+      <span class="item-title">Breathing exercise with no voice or haptic feedback</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      The breathing exercise shows an expanding/contracting circle with "Breathe in... Breathe out..." text. But there's <strong>no audio guidance</strong> and <strong>no haptic feedback</strong>. Users doing this while emotional (common in fertility treatment) may have their eyes closed and miss the visual cues entirely. The exercise feels incomplete &mdash; like a prototype.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current &mdash; visual only</div>
+        <div class="phone dark" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px">
+          <div style="width:80px;height:80px;border-radius:50%;border:2px solid rgba(196,97,74,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <div style="width:50px;height:50px;border-radius:50%;background:rgba(196,97,74,0.15)"></div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(253,246,240,0.5)">Breathe in...</div>
+          <div class="problem-box" style="margin-top:16px">No sound. No vibration.<br>Eyes closed = nothing.</div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Suggested &mdash; multi-sensory</div>
+        <div class="phone dark" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px">
+          <div style="width:80px;height:80px;border-radius:50%;border:2px solid rgba(196,97,74,0.5);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 0 20px rgba(196,97,74,0.15)">
+            <div style="width:50px;height:50px;border-radius:50%;background:rgba(196,97,74,0.2)"></div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:#FDF6F0">Breathe in...</div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <div style="font-size:9px;color:rgba(253,246,240,0.3);background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:12px" class="mono">&#x1F50A; soft chime</div>
+            <div style="font-size:9px;color:rgba(253,246,240,0.3);background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:12px" class="mono">&#x1F4F3; haptic</div>
+          </div>
+          <div class="good-box" style="margin-top:12px">Gentle chime on inhale/exhale.<br>Haptic pulse on mobile.</div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Add a <strong>soft chime or bell sound</strong> at each breath transition (inhale start, exhale start). Use the <strong>Vibration API</strong> for haptic feedback on supported devices (gentle pulse pattern: short buzz on inhale, longer on exhale). Add an optional <strong>ambient sound toggle</strong> (rain, ocean). These are low-effort additions that dramatically improve the meditation experience.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 1.5 Content loading failures -->
+  <div class="item" data-id="1.5">
+    <div class="item-header">
+      <span class="item-num">1.5</span>
+      <span class="item-title">Content loading failures are cold and unhelpful</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      When API content fails to load (network issues, server error), the user sees either a spinner that never resolves or a generic error. For a user who opens the app seeking comfort during a difficult fertility moment, <strong>a blank screen or error is the opposite of what they need</strong>. This is especially bad on Day 1 when first impressions matter most.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current &mdash; cold failure</div>
+        <div class="phone dark" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px">
+          <div style="font-size:24px;margin-bottom:8px">&#x26A0;&#xFE0F;</div>
+          <div style="font-size:13px;color:rgba(253,246,240,0.4);text-align:center">Something went wrong.<br>Please try again.</div>
+          <div class="btn-mock" style="background:rgba(255,255,255,0.06);color:rgba(253,246,240,0.5);margin-top:12px;font-size:10px;padding:8px 16px">Retry</div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Suggested &mdash; warm fallback</div>
+        <div class="phone dark" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;text-align:center;padding:16px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#FDF6F0;margin-bottom:8px;line-height:1.3">Today's content is taking a moment</div>
+          <div style="font-size:11px;color:rgba(253,246,240,0.4);margin-bottom:16px;line-height:1.5">While we sort this out, here's something to hold onto:</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#C4614A;line-height:1.4;padding:12px;border-left:2px solid rgba(196,97,74,0.3)">"You are doing something incredibly brave, and that is enough for today."</div>
+          <div style="font-size:9px;color:rgba(253,246,240,0.25);margin-top:12px" class="mono">we'll keep trying in the background</div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Bundle <strong>5-10 offline fallback affirmations and quotes</strong> into the app. When content fails to load, show a warm fallback with a cached quote, auto-retry silently in the background. Never show "Something went wrong" to a user in a vulnerable emotional state. The error should feel like a gentle pause, not a failure.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SECTION 2: MISSING FEATURES FOR FERTILITY AUDIENCE -->
+<!-- ================================================================== -->
+<div class="section" id="s2">
+  <div class="section-title">Section 2 &mdash; Missing Features for Fertility Audience</div>
+  <p class="section-intro">Features that users going through IVF, egg freezing, or other fertility treatments would genuinely benefit from. Prioritised by emotional impact.</p>
+
+  <!-- 2.1 Partner involvement -->
+  <div class="item" data-id="2.1">
+    <div class="item-header">
+      <span class="item-num">2.1</span>
+      <span class="item-title">Partner / support person involvement</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      Fertility treatment is rarely a solo experience. Partners, best friends, mothers, and support people often feel helpless &mdash; they want to help but don't know how. Currently the app is entirely single-player. There's a <strong>gift flow</strong> but no way for a support person to be part of the daily journey. This is a missed opportunity for connection and for organic growth (support person &rarr; new user).
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Concept &mdash; daily support card</div>
+        <div class="phone dark">
+          <div class="notch notch-dark"></div>
+          <div style="padding-top:10px">
+            <div style="font-size:9px;letter-spacing:0.12em;color:#C4614A;margin-bottom:6px" class="mono">FROM SARAH'S CYCLE</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:#FDF6F0;margin-bottom:12px">Day 8 &mdash; Stimulation Phase</div>
+            <div style="background:rgba(196,97,74,0.06);border:1px solid rgba(196,97,74,0.12);border-radius:10px;padding:12px;margin-bottom:10px">
+              <div style="font-size:9px;color:#C4614A;margin-bottom:4px" class="mono">HOW SHE MIGHT BE FEELING</div>
+              <div style="font-size:11px;color:rgba(253,246,240,0.6);line-height:1.5">Bloated, tired, anxious about egg count. Injections may be getting harder.</div>
+            </div>
+            <div style="background:rgba(196,97,74,0.06);border:1px solid rgba(196,97,74,0.12);border-radius:10px;padding:12px;margin-bottom:10px">
+              <div style="font-size:9px;color:#C4614A;margin-bottom:4px" class="mono">SOMETHING YOU CAN DO</div>
+              <div style="font-size:11px;color:rgba(253,246,240,0.6);line-height:1.5">"Run her a bath tonight. Don't ask about the appointment &mdash; let her bring it up."</div>
+            </div>
+            <div class="btn-mock" style="background:rgba(196,97,74,0.1);border:1px solid rgba(196,97,74,0.2);color:#C4614A;font-size:10px;padding:10px">Send her a note &#x1F49B;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Build a <strong>"Support Person" link</strong> in Settings. The primary user invites someone via SMS/email. The support person gets a daily card (no app required, just a web link) with: (1) what phase/day the user is on, (2) how they might be feeling, (3) one concrete suggestion for support. This is emotionally powerful, low-effort to build (daily email/SMS with a web card), and a natural growth channel.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 2.2 Symptom tracking -->
+  <div class="item" data-id="2.2">
+    <div class="item-header">
+      <span class="item-num">2.2</span>
+      <span class="item-title">Symptom and side-effect tracking</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      IVF and egg freezing come with significant physical side effects: bloating, injection site bruising, mood swings, headaches, nausea, fatigue. Users currently have nowhere to log these. The journal prompt is emotional, not physical. Having a <strong>quick daily symptom log</strong> would help users track patterns, share with their clinic, and feel validated that what they're experiencing is normal.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Concept &mdash; quick symptom log</div>
+        <div class="phone dark">
+          <div class="notch notch-dark"></div>
+          <div style="padding-top:8px">
+            <div style="font-size:9px;letter-spacing:0.12em;color:#C4614A;margin-bottom:8px" class="mono">HOW'S YOUR BODY TODAY?</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid rgba(196,97,74,0.3);color:rgba(253,246,240,0.5)">Bloated</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;background:rgba(196,97,74,0.15);border:1px solid rgba(196,97,74,0.4);color:#C4614A">Tired &#10003;</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid rgba(196,97,74,0.3);color:rgba(253,246,240,0.5)">Headache</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;background:rgba(196,97,74,0.15);border:1px solid rgba(196,97,74,0.4);color:#C4614A">Moody &#10003;</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid rgba(196,97,74,0.3);color:rgba(253,246,240,0.5)">Nausea</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid rgba(196,97,74,0.3);color:rgba(253,246,240,0.5)">Injection pain</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid rgba(196,97,74,0.3);color:rgba(253,246,240,0.5)">Cramps</div>
+              <div style="font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid rgba(196,97,74,0.3);color:rgba(253,246,240,0.5)">Insomnia</div>
+            </div>
+            <div style="font-size:10px;color:rgba(253,246,240,0.3);margin-bottom:8px">Intensity</div>
+            <div style="display:flex;gap:4px;margin-bottom:12px">
+              <div style="width:40px;height:4px;border-radius:2px;background:rgba(196,97,74,0.3)"></div>
+              <div style="width:40px;height:4px;border-radius:2px;background:rgba(196,97,74,0.5)"></div>
+              <div style="width:40px;height:4px;border-radius:2px;background:#C4614A"></div>
+              <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+            <div style="font-size:9px;color:rgba(253,246,240,0.25)" class="mono">Tap to select &middot; optional every day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Add an <strong>optional "Body check-in" card</strong> to the daily flow &mdash; quick tap on symptoms (no typing needed), optional intensity slider. Show a simple timeline/trend in the Journey tab so users can see patterns. Offer a "Share with my clinic" export. Keep it <em>optional</em> &mdash; some days you just want the affirmation and don't want to think about symptoms.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 2.3 Two-week wait support -->
+  <div class="item" data-id="2.3">
+    <div class="item-header">
+      <span class="item-num">2.3</span>
+      <span class="item-title">Two-week wait (TWW) specific support</span>
+      <span class="severity sev-critical">&nbsp;&#x1F534; Critical</span>
+    </div>
+    <div class="problem">
+      The two-week wait (after embryo transfer, before pregnancy test) is widely described as the hardest part of IVF. The anxiety is extreme. Users are symptom-spotting obsessively, googling constantly, and the uncertainty is unbearable. <strong>This is the moment your app should shine</strong> &mdash; but currently the content treats all days equally. A generic Day 14 quote doesn't cut it when you're 10 days post-transfer and losing your mind.
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Create a <strong>TWW-specific content track</strong> that activates based on treatment type and day. Content should: (1) Acknowledge the specific anxiety ("We know you're wondering. It's okay."), (2) Redirect from symptom-googling ("Close that browser tab. Come breathe with us instead."), (3) Provide distraction activities, not just reflection, (4) Include specific affirmations about patience and uncertainty. This is a content strategy task, not engineering &mdash; but the sub-phases system already supports it.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 2.4 Miscarriage/failed cycle sensitivity -->
+  <div class="item" data-id="2.4">
+    <div class="item-header">
+      <span class="item-num">2.4</span>
+      <span class="item-title">Miscarriage and failed cycle sensitivity</span>
+      <span class="severity sev-critical">&nbsp;&#x1F534; Critical</span>
+    </div>
+    <div class="problem">
+      The review.html already flags this as item #1. The end-of-cycle screen needs a branch for negative outcomes. But beyond end-of-cycle, the <strong>entire app needs sensitivity review</strong>. Words like "your baby," "when you're pregnant," or overly optimistic framing can be devastating for someone who has experienced loss. This applies to quotes, affirmations, journal prompts, and friend notes.
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      (1) Audit all content for <strong>outcome-assuming language</strong> &mdash; replace "when you get pregnant" with "whatever comes next." (2) The end-of-cycle flow should branch into three paths as detailed in the UX review: good news / it didn't work / not sure yet. (3) If a user returns after a break, the welcome-back should be <strong>extra tender</strong> and never assume why they left. (4) Consider a "sensitive mode" toggle in settings that adjusts tone.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 2.5 Community/peer connection -->
+  <div class="item" data-id="2.5">
+    <div class="item-header">
+      <span class="item-num">2.5</span>
+      <span class="item-title">Community or peer connection</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      Fertility treatment is isolating. Many women feel like nobody else understands. The app currently provides content but no sense of <strong>"I'm not alone."</strong> Building a full community feature is a big lift, but even small signals of togetherness help.
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Start small: (1) "X other women are on Day 8 with you today" &mdash; anonymous count, no interaction needed. (2) Daily anonymous poll ("How are you feeling today?" &rarr; see results &rarr; "42% of women on Day 8 also feel anxious"). (3) Curated "stories from others" quotes from real users who've been through it (submitted voluntarily). These create solidarity without the moderation burden of a full community.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 2.6 Clinic appointments -->
+  <div class="item" data-id="2.6">
+    <div class="item-header">
+      <span class="item-num">2.6</span>
+      <span class="item-title">Clinic appointment reminders</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      During treatment, clinic appointments are frequent and high-stakes (scans, blood draws, egg retrieval, transfer). The app knows which treatment type and day the user is on, so it could <strong>predict common appointment windows</strong> and offer gentle reminders or preparation tips.
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Phase 1: Add a simple "Add to calendar" card at the appropriate day (e.g., "Most clinics do a scan around Day 8 &mdash; do you have one coming up?"). Phase 2: Allow manual appointment entry and send a morning-of message ("Your scan is today. You've got this."). This positions the app as a genuine companion, not just a content feed.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 2.7 Post-cycle debrief -->
+  <div class="item" data-id="2.7">
+    <div class="item-header">
+      <span class="item-num">2.7</span>
+      <span class="item-title">Post-cycle debrief with clinic notes</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      After a cycle ends, many clinics do a debrief appointment. Users often forget what was discussed or feel overwhelmed. A space to capture key takeaways from the debrief &mdash; what worked, what to change next time, notes for the next cycle &mdash; would be valuable, especially for users doing multiple cycles.
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Add a "Cycle Notes" section to the end-of-cycle reflection. Prompt with: "Anything your clinic said that's worth remembering?" and "What would you do differently next time?" These notes carry forward and are visible when starting a new cycle, creating continuity between attempts.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SECTION 3: UX IMPROVEMENTS -->
+<!-- ================================================================== -->
+<div class="section" id="s3">
+  <div class="section-title">Section 3 &mdash; UX Improvements</div>
+  <p class="section-intro">Interaction patterns, navigation, loading states, and structural improvements that would make the app feel more polished and intuitive.</p>
+
+  <!-- 3.1 Skip for now prominence -->
+  <div class="item" data-id="3.1">
+    <div class="item-header">
+      <span class="item-num">3.1</span>
+      <span class="item-title">"Skip for now" should be more prominent on every step</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      On several onboarding and settings screens, the skip/dismiss option is either very small text, styled as a link, or missing entirely. Users in a hurry (or with decision fatigue) need a clear escape hatch at every step. This is especially important for music/Spotify and component selection, which aren't essential to get started.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current &mdash; easy to miss</div>
+        <div class="phone dark" style="min-height:180px">
+          <div class="notch notch-dark"></div>
+          <div style="text-align:center;padding-top:24px">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#FDF6F0;margin-bottom:16px">Connect Spotify</div>
+            <div class="btn-mock" style="background:#1DB954;color:white;margin-bottom:12px;padding:12px">Connect with Spotify</div>
+            <div style="font-size:10px;color:rgba(253,246,240,0.2)">skip</div>
+          </div>
+          <div class="problem-box" style="margin-top:12px">Skip is 10px, barely visible, no underline</div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Suggested &mdash; clear alternative</div>
+        <div class="phone dark" style="min-height:180px">
+          <div class="notch notch-dark"></div>
+          <div style="text-align:center;padding-top:24px">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#FDF6F0;margin-bottom:16px">Connect Spotify</div>
+            <div class="btn-mock" style="background:#1DB954;color:white;margin-bottom:10px;padding:12px">Connect with Spotify</div>
+            <div class="btn-mock" style="background:transparent;border:1.5px solid rgba(255,255,255,0.12);color:rgba(253,246,240,0.5);padding:10px;font-size:10px">Skip for now &mdash; I'll add it later</div>
+            <div style="font-size:9px;color:rgba(253,246,240,0.25);margin-top:6px" class="mono">you can always connect in settings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Make skip a <strong>proper button</strong> (not text link) with a minimum height of 44px. Add reassurance text: "You can always add this later in Settings." Apply this pattern to: Spotify connect, component selection, vibe selection, and dietary preferences.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 3.2 Loading states personality -->
+  <div class="item" data-id="3.2">
+    <div class="item-header">
+      <span class="item-num">3.2</span>
+      <span class="item-title">Loading states need personality</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      Current loading is a generic spinner or skeleton screen. For an app that's all about emotional connection, loading states are missed micro-moments. Users see loading every single day when opening the app &mdash; it should feel intentional, not empty.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Current &mdash; generic</div>
+        <div class="phone dark" style="display:flex;align-items:center;justify-content:center;min-height:200px">
+          <div style="text-align:center">
+            <div style="width:24px;height:24px;border:2px solid rgba(196,97,74,0.3);border-top-color:#C4614A;border-radius:50%;margin:0 auto 8px"></div>
+            <div style="font-size:10px;color:rgba(253,246,240,0.25)" class="mono">Loading...</div>
+          </div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Suggested &mdash; warm loading</div>
+        <div class="phone dark" style="display:flex;align-items:center;justify-content:center;min-height:200px;text-align:center">
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:rgba(253,246,240,0.4);margin-bottom:6px;line-height:1.4">Preparing something<br>just for you...</div>
+            <div style="display:flex;gap:4px;justify-content:center;margin-top:8px">
+              <div style="width:4px;height:4px;border-radius:50%;background:rgba(196,97,74,0.4)"></div>
+              <div style="width:4px;height:4px;border-radius:50%;background:rgba(196,97,74,0.6)"></div>
+              <div style="width:4px;height:4px;border-radius:50%;background:rgba(196,97,74,0.3)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Replace spinners with <strong>rotating warm messages</strong>: "Preparing something just for you...", "Choosing today's words...", "Finding your song...". Use the three-dot pulse animation instead of a spinner. This turns a wait into a moment of anticipation. Rotate messages every 2 seconds if loading takes longer.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 3.3 Empty states -->
+  <div class="item" data-id="3.3">
+    <div class="item-header">
+      <span class="item-num">3.3</span>
+      <span class="item-title">Empty states need warmth</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      When a user hasn't saved any favourites, hasn't written any journal entries, or opens the Journey tab on Day 1, the empty state is either blank or a generic "Nothing here yet." These moments should encourage, not deflate.
+    </div>
+    <div class="wording-compare">
+      <div class="wording-box wording-before">
+        <div class="wording-label" style="color:#E86A6A">Current empty states</div>
+        <strong>Favourites:</strong> "No favourites saved."<br>
+        <strong>Journal:</strong> (blank)<br>
+        <strong>Journey:</strong> "No entries yet."
+      </div>
+      <div class="wording-box wording-after">
+        <div class="wording-label" style="color:#7BD4A0">Warmer alternatives</div>
+        <strong>Favourites:</strong> "Nothing saved yet &mdash; tap the heart on any quote or song that moves you."<br>
+        <strong>Journal:</strong> "Your story starts here. Today's prompt is waiting for you."<br>
+        <strong>Journey:</strong> "Day 1 is a beginning. Come back tomorrow to see your journey grow."
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Every empty state should: (1) <strong>Acknowledge</strong> where the user is, (2) <strong>Invite</strong> them to take action, (3) <strong>Point</strong> them to where they can do it. Never just say "nothing here" &mdash; always suggest what to do next.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 3.4 Back navigation -->
+  <div class="item" data-id="3.4">
+    <div class="item-header">
+      <span class="item-num">3.4</span>
+      <span class="item-title">Back navigation is inconsistent</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      Some screens have a "&larr; Back" text link (top left), some use a chevron icon, some have no back button at all (e.g., onboarding steps, paywall). The browser back button works but sometimes breaks state (going back from payment to account screen loses form data). Users expect consistent, predictable navigation.
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Standardise on a <strong>consistent back pattern</strong>: left chevron icon + "Back" text, 44px touch target, always in the same position (top-left, 16px from edges). On screens where "back" would be destructive (e.g., mid-payment), show a "Cancel" instead with a confirmation dialog. Test browser back button on every screen transition to ensure state is preserved.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 3.5 Bottom nav tabs -->
+  <div class="item" data-id="3.5">
+    <div class="item-header">
+      <span class="item-num">3.5</span>
+      <span class="item-title">Bottom nav &mdash; confirm 3-tab structure (Today, Journey, Settings)</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      The app should have a clear bottom navigation with three tabs: <strong>Today</strong> (daily content), <strong>Journey</strong> (timeline/progress), and <strong>Settings</strong> (preferences, account, pause). This needs verification &mdash; is it implemented, and is the active tab state clearly visible?
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Expected bottom nav</div>
+        <div class="phone dark" style="min-height:120px;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="border-top:1px solid rgba(255,255,255,0.06);padding:10px 0 6px;display:flex;justify-content:space-around">
+            <div style="text-align:center">
+              <div style="font-size:18px;margin-bottom:2px">&#x2728;</div>
+              <div style="font-size:8px;color:#C4614A;font-weight:600" class="mono">TODAY</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;margin-bottom:2px;opacity:0.4">&#x1F4C5;</div>
+              <div style="font-size:8px;color:rgba(253,246,240,0.3)" class="mono">JOURNEY</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;margin-bottom:2px;opacity:0.4">&#x2699;&#xFE0F;</div>
+              <div style="font-size:8px;color:rgba(253,246,240,0.3)" class="mono">SETTINGS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Verify the bottom nav is implemented with: (1) Clear active state (accent color for active tab), (2) Labels under icons (not icons alone), (3) 48px minimum touch target height for the entire nav bar, (4) The nav hides during onboarding and only appears after Day 1 content loads. If not yet implemented, this should be straightforward since the routing structure already exists.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SECTION 4: WORDING IMPROVEMENTS -->
+<!-- ================================================================== -->
+<div class="section" id="s4">
+  <div class="section-title">Section 4 &mdash; Wording Improvements</div>
+  <p class="section-intro">The words in this app matter more than in most products. The audience is emotionally vulnerable. Every label, button, and message should feel like it was written by someone who understands.</p>
+
+  <!-- 4.1 Done button -->
+  <div class="item" data-id="4.1">
+    <div class="item-header">
+      <span class="item-num">4.1</span>
+      <span class="item-title">"Done &#10003;" button could be warmer</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      The "Done &#10003;" button at the bottom of each day's content is functional but clinical. For an app about emotional support during fertility treatment, completing a day is an act of self-care worth celebrating. "Done" treats it like a checkbox on a to-do list.
+    </div>
+    <div class="wording-compare">
+      <div class="wording-box wording-before">
+        <div class="wording-label" style="color:#E86A6A">Current</div>
+        <div style="text-align:center;font-size:16px;font-weight:700;padding:8px 0">Done &#10003;</div>
+      </div>
+      <div class="wording-box wording-after">
+        <div class="wording-label" style="color:#7BD4A0">Options to consider</div>
+        <div style="line-height:2">
+          &bull; "I showed up today" &#x2728;<br>
+          &bull; "Today is complete" &#x2728;<br>
+          &bull; "I'm here. That's enough." &#x2728;<br>
+          &bull; Keep "Done &#10003;" but add a micro-celebration
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      The strongest option: <strong>"I showed up today"</strong> &mdash; it reframes completion as an achievement of presence, not task completion. It validates the user. If the team prefers keeping "Done," add a <strong>micro-celebration</strong>: confetti particles, a gentle pulse, or a brief message that appears after tapping ("You showed up. That matters.").
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 4.2 Not for me on fuel -->
+  <div class="item" data-id="4.2">
+    <div class="item-header">
+      <span class="item-num">4.2</span>
+      <span class="item-title">"Not for me" on nutrition cards</span>
+      <span class="severity sev-nice">&nbsp;&#x1F7E2; Nice-to-have</span>
+    </div>
+    <div class="problem">
+      The dismiss action on nutrition/fuel cards currently says "Not for me." This wording implies rejection &mdash; the user is saying no to food the app suggested. During fertility treatment when diet feels loaded and stressful, even small wording choices around food matter. "Not for me" could trigger guilt.
+    </div>
+    <div class="wording-compare">
+      <div class="wording-box wording-before">
+        <div class="wording-label" style="color:#E86A6A">Current</div>
+        "Not for me" &#x1F44E;
+      </div>
+      <div class="wording-box wording-after">
+        <div class="wording-label" style="color:#7BD4A0">Warmer alternatives</div>
+        &bull; "Try something else" &#x1F504;<br>
+        &bull; "Show me another" &#x2728;<br>
+        &bull; "Swap this" &#x1F500;
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Change to <strong>"Try something else"</strong> or <strong>"Show me another."</strong> This frames the action as curiosity rather than rejection. The button should refresh/swap the card with an alternative suggestion rather than dismissing the nutrition component entirely.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 4.3 Register Gate wording -->
+  <div class="item" data-id="4.3">
+    <div class="item-header">
+      <span class="item-num">4.3</span>
+      <span class="item-title">Register Gate wording &mdash; confirm improvements</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      The register-gate-options.html page explored 4 different approaches to the register gate wording. The key improvements were: (1) Clearly state "You've completed 3 free days" instead of vague "Ready to keep going?", (2) Separate account creation (free) from payment (paid), (3) Make the skip option honest ("Stay on my free days for now"). <strong>Which option was chosen and is it implemented?</strong>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Verify the current implementation matches the chosen option. Key elements that must be present: (1) The number "3" should appear &mdash; users need to know why they're being gated. (2) "Create account" should be clearly separate from "Pay." (3) The skip option must not be misleading. If Option B or D was chosen, confirm the "What you'll unlock" list is accurate and current.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 4.4 End of cycle wording -->
+  <div class="item" data-id="4.4">
+    <div class="item-header">
+      <span class="item-num">4.4</span>
+      <span class="item-title">End-of-cycle reflection question alternatives</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      The end-of-cycle reflection should adapt its questions based on the user's emotional state. A one-size-fits-all "What did you learn?" can feel dismissive if the cycle failed. The reflection needs branching paths that respond to whether the outcome was positive, negative, or uncertain.
+    </div>
+    <div class="wording-compare">
+      <div class="wording-box wording-before">
+        <div class="wording-label" style="color:#E86A6A">Generic (risky)</div>
+        "What did you learn from this cycle?"<br>
+        "What's your favourite memory?"<br>
+        "How will you celebrate?"
+      </div>
+      <div class="wording-box wording-after">
+        <div class="wording-label" style="color:#7BD4A0">Outcome-sensitive</div>
+        <strong>Good news path:</strong><br>
+        "What moment from this cycle will you carry with you?"<br><br>
+        <strong>Didn't work path:</strong><br>
+        "What's one thing you want to remember about your strength during this cycle?"<br><br>
+        <strong>Uncertain path:</strong><br>
+        "What would you tell yourself on Day 1 of this cycle?"
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Use the <strong>end-of-cycle branching</strong> (from review.html item #1) to select appropriate reflection questions. After the user indicates their outcome, serve 2-3 reflection prompts matched to their emotional state. All prompts should focus on the user's <em>strength and presence</em>, never on the outcome itself.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SECTION 5: VISUAL POLISH -->
+<!-- ================================================================== -->
+<div class="section" id="s5">
+  <div class="section-title">Section 5 &mdash; Visual Polish</div>
+  <p class="section-intro">Design consistency, accessibility, and the small details that make an app feel professionally crafted rather than a prototype.</p>
+
+  <!-- 5.1 Card consistency across vibes -->
+  <div class="item" data-id="5.1">
+    <div class="item-header">
+      <span class="item-num">5.1</span>
+      <span class="item-title">Card visual consistency across 5 vibes</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      Each vibe (fierce, nurturing, calm, lighthearted, spiritual) has its own colour palette and emoji set. However, the card structure (padding, border-radius, label positioning, font sizes) may vary inconsistently across vibes. A quote card in "fierce" vibe should have the same structural layout as one in "calm" &mdash; only the colours and tone should change, not the architecture.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Fierce</div>
+        <div class="phone dark" style="min-height:140px">
+          <div style="background:rgba(220,60,60,0.06);border:1px solid rgba(220,60,60,0.15);border-radius:14px;padding:14px">
+            <div style="font-size:9px;color:#E86A6A;letter-spacing:0.12em;margin-bottom:6px" class="mono">&#x1F525; TODAY'S FIRE</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#FDF6F0;line-height:1.35">"She was fierce."</div>
+            <div style="font-size:9px;color:#E86A6A;margin-top:6px" class="mono">&mdash; Author</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone-label">Calm</div>
+        <div class="phone dark" style="min-height:140px">
+          <div style="background:rgba(120,160,200,0.06);border:1px solid rgba(120,160,200,0.15);border-radius:14px;padding:14px">
+            <div style="font-size:9px;color:#78A0C8;letter-spacing:0.12em;margin-bottom:6px" class="mono">&#x1F30A; GENTLE WAVE</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#FDF6F0;line-height:1.35">"Be still and know."</div>
+            <div style="font-size:9px;color:#78A0C8;margin-top:6px" class="mono">&mdash; Author</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone-label">Spiritual</div>
+        <div class="phone dark" style="min-height:140px">
+          <div style="background:rgba(180,140,220,0.06);border:1px solid rgba(180,140,220,0.15);border-radius:14px;padding:14px">
+            <div style="font-size:9px;color:#B48CDC;letter-spacing:0.12em;margin-bottom:6px" class="mono">&#x2728; DIVINE LIGHT</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#FDF6F0;line-height:1.35">"Trust the timing."</div>
+            <div style="font-size:9px;color:#B48CDC;margin-top:6px" class="mono">&mdash; Author</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Audit all 5 vibe themes and ensure: (1) Same card padding (16px), border-radius (14px), and label positioning. (2) Same font sizes for quote (16-18px), label (9px mono), author (9px mono). (3) Only the <strong>accent colour, background tint, emoji, and label text</strong> change per vibe. Create a shared CSS class system rather than inline styles per vibe.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 5.2 Font size on small screens -->
+  <div class="item" data-id="5.2">
+    <div class="item-header">
+      <span class="item-num">5.2</span>
+      <span class="item-title">Quote font size (22px) may be too large on small screens</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      The daily quote renders at 22px Cormorant Garamond italic. On a 375px-wide iPhone SE, a longer quote (2-3 sentences) can overflow awkwardly or require excessive scrolling. This is the first thing users see each day &mdash; if it looks cramped or broken, the magic is lost.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Large screen (390px) &mdash; fine</div>
+        <div class="phone dark" style="width:240px;min-height:160px">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:18px;color:#FDF6F0;line-height:1.35;padding:12px 4px">"She was powerful not because she wasn't scared but because she went on so strongly."</div>
+          <div style="font-size:9px;color:#C4614A" class="mono">&mdash; Atticus</div>
+        </div>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone-label">Small screen (320px) &mdash; cramped</div>
+        <div class="phone dark" style="width:180px;min-height:160px">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:18px;color:#FDF6F0;line-height:1.35;padding:12px 4px">"She was powerful not because she wasn't scared but because she went on so strongly."</div>
+          <div style="font-size:9px;color:#C4614A" class="mono">&mdash; Atticus</div>
+          <div class="problem-box" style="margin-top:8px">Same font size, less space = worse readability</div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Use <strong>responsive font sizing</strong>: <code style="font-family:'DM Mono',monospace;font-size:11px;background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:4px">clamp(18px, 4.5vw, 24px)</code> for quotes. This scales gracefully from small phones (18px) to tablets (24px). Also consider dynamic sizing based on quote length: shorter quotes get larger text, longer quotes get slightly smaller.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 5.3 Color contrast -->
+  <div class="item" data-id="5.3">
+    <div class="item-header">
+      <span class="item-num">5.3</span>
+      <span class="item-title">Colour contrast on calm and spiritual vibes</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      The calm vibe uses light blues and the spiritual vibe uses soft purples. Against the dark background (#1C0F0C or #0E0E0E), these lighter accent colours may not meet <strong>WCAG AA contrast requirements</strong> (4.5:1 for body text, 3:1 for large text). Users reading in dim light or with visual impairments may struggle.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Potential contrast issue</div>
+        <div class="phone dark" style="min-height:140px">
+          <div style="margin-bottom:10px">
+            <div style="font-size:9px;color:rgba(120,160,200,0.5);margin-bottom:4px" class="mono">CALM LABEL &mdash; low contrast</div>
+            <div style="font-size:13px;color:rgba(120,160,200,0.6)">Body text at 60% opacity</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:rgba(180,140,220,0.5);margin-bottom:4px" class="mono">SPIRITUAL LABEL &mdash; low contrast</div>
+            <div style="font-size:13px;color:rgba(180,140,220,0.6)">Body text at 60% opacity</div>
+          </div>
+          <div class="problem-box" style="margin-top:12px">Opacity-based colours on dark backgrounds often fail WCAG AA</div>
+        </div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="phone-wrap">
+        <div class="phone-label">Fixed &mdash; solid colours</div>
+        <div class="phone dark" style="min-height:140px">
+          <div style="margin-bottom:10px">
+            <div style="font-size:9px;color:#8FB8D8;margin-bottom:4px" class="mono">CALM LABEL &mdash; solid colour</div>
+            <div style="font-size:13px;color:#A3C7E0">Body text &mdash; solid, not opacity</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:#C4A0E8;margin-bottom:4px" class="mono">SPIRITUAL LABEL &mdash; solid colour</div>
+            <div style="font-size:13px;color:#D0B4F0">Body text &mdash; solid, not opacity</div>
+          </div>
+          <div class="good-box" style="margin-top:12px">Use solid hex values instead of rgba with opacity</div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Run all vibe accent colours through a <strong>contrast checker</strong> (WebAIM). Replace any rgba/opacity colours with solid hex values that meet WCAG AA. For calm: use #8FB8D8 (labels) and #A3C7E0 (body). For spiritual: use #C4A0E8 (labels) and #D0B4F0 (body). Test in both light and dark modes.
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+  <!-- 5.4 Touch targets -->
+  <div class="item" data-id="5.4">
+    <div class="item-header">
+      <span class="item-num">5.4</span>
+      <span class="item-title">Touch targets must be minimum 44px</span>
+      <span class="severity sev-important">&nbsp;&#x1F7E1; Important</span>
+    </div>
+    <div class="problem">
+      Apple's HIG and Google's Material Design both specify <strong>minimum 44x44px touch targets</strong>. Several elements in the app may be smaller: the heart/favourite icon, the share icon, "skip" text links, the back arrow, bottom nav items, and component toggle switches. During fertility treatment, users may be shaky (post-injection), emotional, or distracted &mdash; small targets are extra frustrating.
+    </div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone-label">Common offenders</div>
+        <div class="phone dark" style="min-height:220px">
+          <div style="display:flex;flex-direction:column;gap:10px;padding-top:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:16px;height:16px;border:1px solid rgba(196,97,74,0.3);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#C4614A">&#x2665;</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.4)">Heart icon &mdash; 16px actual</div>
+              <div style="font-size:9px;color:#E86A6A" class="mono">FAIL</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;color:rgba(253,246,240,0.2)">skip</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.4)">&mdash; ~20px tall</div>
+              <div style="font-size:9px;color:#E86A6A" class="mono">FAIL</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:14px;color:rgba(253,246,240,0.3)">&larr;</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.4)">&mdash; back arrow ~24px</div>
+              <div style="font-size:9px;color:#F5C842" class="mono">CLOSE</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:44px;height:44px;border:1px dashed rgba(100,200,140,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#7BD4A0" class="mono">44px</div>
+              <div style="font-size:10px;color:rgba(253,246,240,0.4)">&mdash; minimum target</div>
+              <div style="font-size:9px;color:#7BD4A0" class="mono">PASS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="suggestion">
+      <div class="suggestion-label">Recommendation</div>
+      Audit every tappable element. Even if the visual icon is 16px, the <strong>tap area</strong> should extend to 44x44px using padding or an invisible hit area. Apply this to: favourite hearts, share icons, back buttons, skip links, bottom nav items, close/dismiss buttons, and all toggle switches. Use CSS: <code style="font-family:'DM Mono',monospace;font-size:11px;background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:4px">min-height: 44px; min-width: 44px;</code>
+    </div>
+    <div class="vote-row"></div>
+  </div>
+
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SUMMARY -->
+<!-- ================================================================== -->
+<div class="section">
+  <div class="section-title">Summary &mdash; Priority Matrix</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    <div style="background:rgba(220,60,60,0.06);border:1px solid rgba(220,60,60,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:9px;color:#E86A6A;letter-spacing:0.12em;margin-bottom:8px" class="mono">&#x1F534; CRITICAL (4)</div>
+      <div style="font-size:12px;color:rgba(253,246,240,0.6);line-height:1.8">
+        1.1 Onboarding length<br>
+        1.2 Register gate friction<br>
+        2.3 Two-week wait support<br>
+        2.4 Failed cycle sensitivity
+      </div>
+    </div>
+    <div style="background:rgba(245,200,66,0.04);border:1px solid rgba(245,200,66,0.12);border-radius:12px;padding:16px">
+      <div style="font-size:9px;color:#F5C842;letter-spacing:0.12em;margin-bottom:8px" class="mono">&#x1F7E1; IMPORTANT (10)</div>
+      <div style="font-size:12px;color:rgba(253,246,240,0.6);line-height:1.8">
+        1.3 Paywall timing<br>
+        1.4 Breathing feedback<br>
+        1.5 Loading failures<br>
+        2.1 Partner involvement<br>
+        2.2 Symptom tracking<br>
+        3.1 Skip prominence<br>
+        3.2 Loading personality<br>
+        3.4 Back nav consistency<br>
+        4.3 Register wording<br>
+        4.4 End-of-cycle wording<br>
+        5.1&ndash;5.4 Visual polish
+      </div>
+    </div>
+    <div style="background:rgba(100,200,140,0.04);border:1px solid rgba(100,200,140,0.12);border-radius:12px;padding:16px">
+      <div style="font-size:9px;color:#7BD4A0;letter-spacing:0.12em;margin-bottom:8px" class="mono">&#x1F7E2; NICE-TO-HAVE (6)</div>
+      <div style="font-size:12px;color:rgba(253,246,240,0.6);line-height:1.8">
+        2.5 Community<br>
+        2.6 Clinic appointments<br>
+        2.7 Post-cycle debrief<br>
+        3.3 Empty state warmth<br>
+        3.5 Bottom nav check<br>
+        4.1 Done button wording<br>
+        4.2 Nutrition dismiss
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:32px 0;border-top:1px solid rgba(255,255,255,0.04)">
+  <div style="font-size:11px;color:rgba(253,246,240,0.2)" class="mono">Cycle UX Critique &middot; April 2026</div>
+</div>
+
+<script>
+// ---- Vote system ----
+const STORAGE_KEY = 'cycle-ux-critique-votes';
+const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+document.querySelectorAll('.item').forEach(item => {
+  const id = item.dataset.id;
+  const row = item.querySelector('.vote-row');
+  if (!row) return;
+
+  ['Agree', 'Disagree', 'Later'].forEach(label => {
+    const btn = document.createElement('button');
+    btn.className = 'vote-btn';
+    btn.textContent = label;
+    const cls = label === 'Agree' ? 'voted-yes' : label === 'Disagree' ? 'voted-no' : 'voted-later';
+    if (saved[id] === label) btn.classList.add(cls);
+    btn.addEventListener('click', () => {
+      row.querySelectorAll('.vote-btn').forEach(b => b.className = 'vote-btn');
+      if (saved[id] === label) {
+        delete saved[id];
+      } else {
+        saved[id] = label;
+        btn.classList.add(cls);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      updateCounter();
+    });
+    row.appendChild(btn);
+  });
+});
+
+function updateCounter() {
+  const vals = Object.values(saved);
+  document.getElementById('count-agree').textContent = vals.filter(v => v === 'Agree').length;
+  document.getElementById('count-disagree').textContent = vals.filter(v => v === 'Disagree').length;
+  document.getElementById('count-later').textContent = vals.filter(v => v === 'Later').length;
+  document.getElementById('count-total').textContent = vals.length;
+  document.getElementById('count-max').textContent = document.querySelectorAll('.item[data-id]').length;
+}
+updateCounter();
+</script>
+
+</body>
+</html>
