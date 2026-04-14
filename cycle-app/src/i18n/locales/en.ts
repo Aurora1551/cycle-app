@@ -338,8 +338,8 @@ const en = {
     // End of Cycle
     endOfCycle: {
       sectionLabel: 'Cycle complete',
-      heading: 'You did it, {{name}}.',
-      message: '{{days}} days of showing up for yourself. That takes incredible strength.',
+      heading: 'You showed up, {{name}}.',
+      message: '{{days}} days of courage, patience, and strength. Whatever comes next, this was never wasted.',
       yourJourney: 'Your journey',
       daysDone: 'Days done',
       songsPlayed: 'Songs played',

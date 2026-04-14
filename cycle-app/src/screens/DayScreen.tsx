@@ -695,7 +695,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
   // Consistent save + share row — always bottom-right of card
   const saveShareRow = (type: string, text: string, author?: string) => (
     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, marginTop: 10, alignItems: 'center' }}>
-      <button onClick={() => { toggleFavorite(type, text, author); track(`${type}_favorited`, { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', transition: 'opacity 0.2s', lineHeight: 0 }}>
+      <button onClick={() => { toggleFavorite(type, text, author); track(`${type}_favorited`, { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '12px', minWidth: 44, minHeight: 44, transition: 'opacity 0.2s', lineHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {isFavorited(type) ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         ) : (
@@ -706,7 +706,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         const shareText = author ? `"${text}" — ${author}\n\nShared via Cycle` : `${text}\n\nShared via Cycle`
         if (navigator.share) { navigator.share({ text: shareText }).catch(() => {}) } else { window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank') }
         track(`${type}_shared`, { day_number: dayNumber })
-      }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: mutedColor, padding: '2px', lineHeight: 1, opacity: 0.5 }}>
+      }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: mutedColor, padding: '12px', minWidth: 44, minHeight: 44, lineHeight: 1, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         &#10148;
       </button>
     </div>
@@ -720,7 +720,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
           {vibeLabel(vibeContent.labels.quote)}
           <div style={{ position: 'relative', padding: '0 8px' }}>
             <div style={{ fontFamily: typo.headingFont, fontSize: 48, color: `${vibe.accent}18`, lineHeight: 0.5, position: 'absolute', top: 4, left: -4 }}>"</div>
-            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 22, color: textColor, lineHeight: 1.35, marginBottom: 8, paddingLeft: 20 }}>{content?.quote}</div>
+            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 'clamp(18px, 4.5vw, 24px)', color: textColor, lineHeight: 1.35, marginBottom: 8, paddingLeft: 20 }}>{content?.quote}</div>
           </div>
           <div className="mono-sm" style={{ color: vibe.accent, paddingLeft: 28 }}>— {content?.quoteAuthor}</div>
           {saveShareRow('quote', content?.quote || '', content?.quoteAuthor)}
@@ -838,7 +838,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
-                <button onClick={() => { dismissFood(item.name); setFuelDismissKey(k => k + 1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, padding: '4px 6px', opacity: 0.5, letterSpacing: '0.05em' }} title="Show me another">
+                <button onClick={() => { dismissFood(item.name); setFuelDismissKey(k => k + 1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
                   swap
                 </button>
               </div>

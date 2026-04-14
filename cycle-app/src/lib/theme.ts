@@ -24,7 +24,7 @@ export function deriveTheme(vibe: VibeTheme): ThemeColors {
   return {
     isDark,
     textColor: isDark ? '#FDF6F0' : vibe.text,
-    mutedColor: isDark ? 'rgba(253,246,240,0.4)' : vibe.muted,
+    mutedColor: isDark ? 'rgba(253,246,240,0.6)' : vibe.muted,
     cardBg: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.7)',
     cardBorder: isDark ? 'rgba(255,255,255,0.08)' : `${vibe.accent}20`,
   }

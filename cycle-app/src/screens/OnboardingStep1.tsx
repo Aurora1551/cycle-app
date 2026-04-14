@@ -143,7 +143,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
         <button onClick={handleContinue} disabled={!canContinue} className="btn-primary" style={{ background: canContinue ? A : 'rgba(196,97,74,0.3)' }}>
           Continue
         </button>
-        <button onClick={() => onContinue('You', 'ivf', 18)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '10px 0 0', width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('You', 'ivf', 18)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </div>
