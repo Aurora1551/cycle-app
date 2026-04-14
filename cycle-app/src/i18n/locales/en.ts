@@ -317,7 +317,7 @@ const en = {
       children: "Children's privacy",
       childrenText: 'Cycle is designed for adults undergoing fertility treatment. We do not knowingly collect data from anyone under 18.',
       contact: 'Contact',
-      contactText: 'For any privacy questions, data requests, or concerns, please contact us at privacy@cycle-app.com.',
+      contactText: 'For privacy questions, data requests, or deletion requests, contact us at hello@cycleapp.co.',
       inShort: 'In short',
       inShortText: 'Your journal stays private. Your data is never sold. You can delete everything at any time. We only collect what\'s needed to personalise your experience.',
     },
