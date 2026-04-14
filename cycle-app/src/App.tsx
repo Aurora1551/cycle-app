@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isDarkBg } from './lib/theme'
 import SplashScreen from './screens/SplashScreen'
+import OnboardingStep1 from './screens/OnboardingStep1'
+import OnboardingStep2 from './screens/OnboardingStep2'
+import OnboardingMusic from './screens/OnboardingMusic'
+// Legacy imports kept for resume-from-partial support
 import OnboardingName from './screens/OnboardingName'
 import OnboardingTreatment from './screens/OnboardingTreatment'
 import OnboardingCycleLength from './screens/OnboardingCycleLength'
 import OnboardingComponents from './screens/OnboardingComponents'
 import OnboardingVibe from './screens/OnboardingVibe'
-import OnboardingMusic from './screens/OnboardingMusic'
 import Summary from './screens/Summary'
 import Paywall from './screens/Paywall'
 import CreateAccount from './screens/CreateAccount'
@@ -29,21 +32,22 @@ import { saveProfile } from './lib/db'
 import { handleSpotifyCallback, verifySpotifyState } from './lib/spotify'
 
 type Screen =
-  | 'splash' | 'login' | 'onboarding-name' | 'onboarding-treatment'
-  | 'onboarding-cycle-length' | 'onboarding-components'
-  | 'onboarding-vibe' | 'onboarding-music' | 'summary'
+  | 'splash' | 'login'
+  | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-music'
+  | 'onboarding-name' | 'onboarding-treatment' | 'onboarding-cycle-length' | 'onboarding-components' | 'onboarding-vibe'
+  | 'summary'
   | 'paywall' | 'create-account' | 'notification-settings'
   | 'day' | 'progress' | 'settings' | 'end-of-cycle' | 'gift-flow'
   | 'register-gate' | 'payment' | 'payment-success'
   | 'gift-redeem'
 
-const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow', 'payment', 'payment-success']
+const ONBOARDING_VIBE_SCREENS: Screen[] = ['onboarding-step2', 'onboarding-vibe', 'onboarding-music', 'summary', 'paywall', 'create-account', 'notification-settings', 'day', 'progress', 'settings', 'end-of-cycle', 'gift-flow', 'payment', 'payment-success']
 const NAV_SCREENS: Screen[] = ['day', 'progress']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
   if (screen === 'splash') return '#FFFBF0'
   if (screen === 'login' || screen === 'gift-redeem') return '#0E0E0E'
-  if (screen === 'register-gate') return '#FDF6F0'
+  if (screen === 'register-gate' || screen === 'onboarding-step1' || screen === 'onboarding-name' || screen === 'onboarding-treatment' || screen === 'onboarding-cycle-length') return '#FDF6F0'
   const activeVibe = preview || vibe
   if (ONBOARDING_VIBE_SCREENS.includes(screen) && activeVibe) {
     return VIBES.find(v => v.key === activeVibe)?.bg || '#FDF6F0'
@@ -165,10 +169,8 @@ function App() {
         } else if (d.name) {
           // Partial profile — resume onboarding from where they left off
           setData(d)
-          if (!d.treatment) setScreen('onboarding-treatment')
-          else if (!d.cycleDays) setScreen('onboarding-cycle-length')
-          else if (!d.components) setScreen('onboarding-components')
-          else if (!d.vibe) setScreen('onboarding-vibe')
+          if (!d.treatment || !d.cycleDays) setScreen('onboarding-step1')
+          else if (!d.components || !d.vibe) setScreen('onboarding-step2')
           else if (!d.genres) setScreen('onboarding-music')
           else setScreen('summary')
         }
@@ -242,14 +244,18 @@ function App() {
 
   return (
     <div style={{ width: '100%', minHeight: '100svh', display: 'flex', justifyContent: 'center', background: appBg, transition: 'background 0.5s ease' }}>
-      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-name') }} onHaveAccount={() => setScreen('login')} onGift={() => setScreen('gift-flow')} />}
-      {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('onboarding-name')} />}
-      {screen === 'onboarding-name' && <OnboardingName onBack={() => setScreen('splash')} onContinue={name => { update({ name }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-treatment') }} initialValue={data.name} />}
-      {screen === 'onboarding-treatment' && <OnboardingTreatment onBack={() => setScreen('onboarding-name')} onContinue={treatment => { update({ treatment }); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-cycle-length') }} initialValue={data.treatment} />}
-      {screen === 'onboarding-cycle-length' && <OnboardingCycleLength onBack={() => setScreen('onboarding-treatment')} onContinue={cycleDays => { update({ cycleDays }); track('onboarding_step_completed', { step: 3 }); setScreen('onboarding-components') }} initialValue={data.cycleDays} treatment={data.treatment} />}
-      {screen === 'onboarding-components' && <OnboardingComponents onBack={() => setScreen('onboarding-cycle-length')} onContinue={components => { update({ components }); track('onboarding_step_completed', { step: 4 }); setScreen('onboarding-vibe') }} initialValue={data.components} />}
-      {screen === 'onboarding-vibe' && <OnboardingVibe onBack={() => { setVibePreview(null); setScreen('onboarding-components') }} onContinue={vibeKey => { update({ vibe: vibeKey }); setVibePreview(null); track('onboarding_step_completed', { step: 5 }); setScreen('onboarding-music') }} initialValue={data.vibe || null} onPreview={setVibePreview} />}
-      {screen === 'onboarding-music' && data.vibe && <OnboardingMusic onBack={() => setScreen('onboarding-vibe')} onContinue={genres => { update({ genres }); track('onboarding_step_completed', { step: 6 }); setScreen('summary') }} vibe={data.vibe} initialValue={data.genres} />}
+      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-step1') }} onHaveAccount={() => setScreen('login')} onGift={() => setScreen('gift-flow')} />}
+      {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('onboarding-step1')} />}
+      {/* 3-step onboarding */}
+      {screen === 'onboarding-step1' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
+      {screen === 'onboarding-step2' && <OnboardingStep2 onBack={() => { setVibePreview(null); setScreen('onboarding-step1') }} onContinue={(vibeKey, components) => { update({ vibe: vibeKey, components }); setVibePreview(null); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-music') }} initialVibe={data.vibe || null} initialComponents={data.components} onPreview={setVibePreview} />}
+      {screen === 'onboarding-music' && data.vibe && <OnboardingMusic onBack={() => setScreen('onboarding-step2')} onContinue={genres => { update({ genres }); track('onboarding_step_completed', { step: 3 }); setScreen('summary') }} vibe={data.vibe} initialValue={data.genres} />}
+      {/* Legacy screens for resume-from-partial (old profiles) */}
+      {screen === 'onboarding-name' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
+      {screen === 'onboarding-treatment' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
+      {screen === 'onboarding-cycle-length' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
+      {screen === 'onboarding-components' && <OnboardingStep2 onBack={() => setScreen('onboarding-step1') } onContinue={(vibeKey, components) => { update({ vibe: vibeKey, components }); setScreen('onboarding-music') }} initialVibe={data.vibe || null} initialComponents={data.components} onPreview={setVibePreview} />}
+      {screen === 'onboarding-vibe' && <OnboardingStep2 onBack={() => setScreen('onboarding-step1') } onContinue={(vibeKey, components) => { update({ vibe: vibeKey, components }); setScreen('onboarding-music') }} initialVibe={data.vibe || null} initialComponents={data.components} onPreview={setVibePreview} />}
       {screen === 'summary' && data.name && data.treatment && data.cycleDays && data.components && data.vibe && data.genres && <Summary data={data as OnboardingData} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('notification-settings') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} />}
       {screen === 'paywall' && <Paywall name={data.name} onBack={() => setScreen('day')} onStartFree={() => { clearDayDoneKeys(); setDayNumber(1); localStorage.setItem(DAY_KEY, '1'); setScreen('day') }} onSelectPlan={plan => {
         track('plan_selected', { plan })
@@ -300,7 +306,7 @@ function App() {
         onCreateAccount={() => {
           // Recipient registered — they have premium, start onboarding
           window.history.replaceState({}, '', '/')
-          setScreen('onboarding-name')
+          setScreen('onboarding-step1')
         }}
         onLogin={() => {
           window.history.replaceState({}, '', '/')

@@ -1018,17 +1018,50 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
           </button>
         </div>
       ) : isLocked ? (
-        <div className="flex-col gap-12" style={{ padding: '0 18px 140px', flex: 1 }}>
-          {sortedComponents.slice(0, 2).map(c => (
-            <div key={c} style={{ opacity: 0.35, filter: 'blur(2px)', pointerEvents: 'none' }}>{renderComponent(c)}</div>
-          ))}
-          <Card cardBg={cardBg} cardBorder={cardBorder} style={{ textAlign: 'center', padding: '28px 18px' }}>
-            <div style={{ fontSize: 32 }}>🔒</div>
-            <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 18, color: textColor, lineHeight: 1.3, marginTop: 8 }}>{t('day.lockedHeading', { day: dayNumber })}</div>
-            <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 13, color: mutedColor, lineHeight: 1.5, margin: '8px 0 16px' }}>{t('day.lockedMessage')}</div>
-            <button onClick={onUnlock} className="btn-primary" style={{ background: '#C4614A' }}>{t('day.unlockButton')}</button>
-            <div className="mono-xs" style={{ color: mutedColor, marginTop: 8 }}>{t('day.unlockHint')}</div>
-          </Card>
+        <div style={{ position: 'relative', flex: 1, padding: '0 18px 140px' }}>
+          {/* Blurred Day content preview */}
+          <div style={{ filter: 'blur(5px)', opacity: 0.35, pointerEvents: 'none' }} className="flex-col gap-12">
+            {sortedComponents.slice(0, 3).map(c => renderComponent(c))}
+          </div>
+          {/* Gradient overlay with 3 options */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            background: `linear-gradient(transparent 5%, ${vibe.bg}ee 35%, ${vibe.bg} 60%)`,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            padding: '0 24px', gap: 10, textAlign: 'center',
+          }}>
+            <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 22, color: textColor, lineHeight: 1.2 }}>
+              Day {dayNumber} is ready for you
+            </div>
+            <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5, maxWidth: 260, marginBottom: 8 }}>
+              Unlock to read today's content
+            </div>
+            {/* Card 1: Unlock */}
+            <button onClick={onUnlock} style={{
+              width: '100%', maxWidth: 300, background: vibe.accent, color: 'white', border: 'none',
+              borderRadius: 14, padding: '15px', fontFamily: typo.bodyFont, fontWeight: 700, fontSize: 14,
+              cursor: 'pointer',
+            }}>
+              Unlock full journey — £9.99
+            </button>
+            {/* Card 2: Create free account */}
+            <button onClick={onUnlock} style={{
+              width: '100%', maxWidth: 300, background: isDark ? 'rgba(255,255,255,0.06)' : 'white',
+              border: `1.5px solid ${cardBorder}`, borderRadius: 14, padding: '13px',
+              fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor,
+              cursor: 'pointer',
+            }}>
+              Create a free account first
+            </button>
+            {/* Card 3: Go back */}
+            <button onClick={() => onGoToDay?.(3)} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, padding: '8px',
+              textDecoration: 'underline', textDecorationColor: `${mutedColor}40`,
+            }}>
+              Keep browsing my free days
+            </button>
+          </div>
         </div>
       ) : (
         <div className="flex-col gap-12" style={{ padding: '0 18px 140px', flex: 1 }}>
