@@ -488,6 +488,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
   const { t } = useTranslation()
   const [content, setContent] = useState<DayContent | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [journalText, setJournalText] = useState('')
   const [journalSaved, setJournalSaved] = useState(false)
@@ -528,6 +529,21 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     }
     return count
   }, [completedDays, dayNumber])
+
+  const loadingMessages = [
+    'Preparing something just for you...',
+    'Choosing today\u2019s words...',
+    'Finding your song...',
+    'Almost ready...',
+  ]
+
+  useEffect(() => {
+    if (!loading) return
+    const timer = setInterval(() => {
+      setLoadingMsgIdx(prev => (prev + 1) % 4)
+    }, 2000)
+    return () => clearInterval(timer)
+  }, [loading])
 
   // Cache key includes user name + vibe to bust cache when profile changes
   const localKey = `cycle_content_${data.name}_${data.vibe}_day${dayNumber}`
@@ -1006,7 +1022,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       {loading ? (
         <div className="flex-center" style={{ flex: 1, flexDirection: 'column', gap: 14 }}>
           <div className="spinner" style={{ width: 40, height: 40, border: `2px solid ${vibe.accent}40`, borderTop: `2px solid ${vibe.accent}` }} />
-          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 15, color: mutedColor }}>{t('day.loading')}</div>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 15, color: mutedColor, transition: 'opacity 0.3s' }}>{loadingMessages[loadingMsgIdx]}</div>
         </div>
       ) : error ? (
         <div className="flex-center" style={{ flex: 1, flexDirection: 'column', gap: 14, padding: '0 24px' }}>

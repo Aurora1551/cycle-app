@@ -406,15 +406,8 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </div>
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
           </button>
-          <button onClick={() => setConfirmDelete(true)} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
-            <div className="settings-icon" style={{ background: 'rgba(220,38,38,0.1)' }}>🗑️</div>
-            <div style={{ flex: 1 }}>
-              <div className="mono-hint" style={{ color: '#DC2626', marginBottom: 2, letterSpacing: '0.15em' }}>{t('settings.deleteAccount')}</div>
-              <div style={{ fontSize: 13, color: '#DC2626', fontFamily: typo.bodyFont }}>{t('settings.deleteSubtext')}</div>
-            </div>
-          </button>
           {/* Take a break */}
-          <button onClick={() => isPaused ? onResume?.() : onPause?.()} className="settings-row" style={{ cursor: 'pointer' }}>
+          <button onClick={() => isPaused ? onResume?.() : onPause?.()} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
             <div className="settings-icon" style={{ background: isPaused ? 'rgba(100,200,140,0.12)' : `${vibe.accent}15` }}>{isPaused ? '💚' : '🌙'}</div>
             <div style={{ flex: 1 }}>
               <div className="mono-hint" style={{ color: isPaused ? '#7BD4A0' : vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>
@@ -425,6 +418,14 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
               </div>
             </div>
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
+          </button>
+          {/* Delete account — always last */}
+          <button onClick={() => setConfirmDelete(true)} className="settings-row" style={{ cursor: 'pointer' }}>
+            <div className="settings-icon" style={{ background: 'rgba(220,38,38,0.1)' }}>🗑️</div>
+            <div style={{ flex: 1 }}>
+              <div className="mono-hint" style={{ color: '#DC2626', marginBottom: 2, letterSpacing: '0.15em' }}>{t('settings.deleteAccount')}</div>
+              <div style={{ fontSize: 13, color: '#DC2626', fontFamily: typo.bodyFont }}>{t('settings.deleteSubtext')}</div>
+            </div>
           </button>
         </Card>
 

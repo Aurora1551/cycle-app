@@ -20,6 +20,38 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
   const daysCompleted = Array.from({ length: data.cycleDays }, (_, i) => i + 1)
     .filter(d => localStorage.getItem(`cycle_day_${d}_done`) === '1').length
 
+  // Streak: count consecutive completed days ending at current position
+  const streak = React.useMemo(() => {
+    let count = 0
+    for (let d = dayNumber; d >= 1; d--) {
+      if (localStorage.getItem(`cycle_day_${d}_done`) === '1') count++
+      else break
+    }
+    return count
+  }, [dayNumber])
+
+  // Count saved favorites
+  const savedCount = React.useMemo(() => {
+    try { return (JSON.parse(localStorage.getItem('cycle_favorites') || '[]') as unknown[]).length } catch { return 0 }
+  }, [])
+
+  // Count journal entries
+  const journalCount = React.useMemo(() => {
+    let count = 0
+    for (let d = 1; d <= data.cycleDays; d++) {
+      const text = localStorage.getItem(`cycle_content_${data.name}_${data.vibe}_day${d}_journal`) || localStorage.getItem(`cycle_day_${d}_journal`)
+      if (text && text.trim()) count++
+    }
+    return count
+  }, [data.cycleDays, data.name, data.vibe])
+
+  // Check if today's journal exists
+  const hasTodayJournal = React.useMemo(() => {
+    const a = localStorage.getItem(`cycle_content_${data.name}_${data.vibe}_day${dayNumber}_journal`)
+    const b = localStorage.getItem(`cycle_day_${dayNumber}_journal`)
+    return !!(a && a.trim()) || !!(b && b.trim())
+  }, [data.name, data.vibe, dayNumber])
+
   const rows: number[][] = []
   for (let i = 0; i < data.cycleDays; i += 7) {
     rows.push(Array.from({ length: Math.min(7, data.cycleDays - i) }, (_, j) => i + j + 1))
@@ -60,12 +92,21 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
         </Card>
 
         <Card cardBg={cardBg} cardBorder={cardBorder}>
-          <SectionLabel color={vibe.accent}>{t('progress.stats')}</SectionLabel>
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            {[{ val: dayNumber, label: t('progress.daysDone') }, { val: data.cycleDays, label: t('progress.totalDays') }].map((s, i) => (
-              <div key={i} className="stat">
-                <div className="stat-value" style={{ fontFamily: typo.headingFont, fontSize: 30, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: vibe.accent }}>{s.val}</div>
-                <div className="stat-label" style={{ color: mutedColor }}>{s.label}</div>
+          <div style={{ textAlign: 'center', padding: '8px 0 4px' }}>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>&#127793; Current streak</div>
+            <div style={{ fontFamily: typo.headingFont, fontSize: 32, fontWeight: typo.headingWeight, fontStyle: 'italic', color: vibe.accent, lineHeight: 1.2 }}>{streak}</div>
+            <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, marginTop: 2 }}>days of showing up</div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 16, borderTop: `1px solid ${cardBorder}`, paddingTop: 14 }}>
+            {[
+              { val: dayNumber, label: 'DAY' },
+              { val: data.cycleDays, label: 'TOTAL' },
+              { val: savedCount, label: 'SAVED' },
+              { val: journalCount, label: 'JOURNAL' },
+            ].map((s, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: typo.headingFont, fontSize: 20, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: vibe.accent, lineHeight: 1.2 }}>{s.val}</div>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, letterSpacing: '0.12em', marginTop: 2 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -74,7 +115,15 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
         {(() => {
           let favs: Array<{ type: string; text: string; author?: string; day: number }> = []
           try { favs = JSON.parse(localStorage.getItem('cycle_favorites') || '[]') } catch {}
-          if (favs.length === 0) return null
+          if (favs.length === 0) return (
+            <Card cardBg={cardBg} cardBorder={cardBorder}>
+              <SectionLabel color={vibe.accent}>&#9829; {t('progress.saved', 'Saved')}</SectionLabel>
+              <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                <div style={{ fontSize: 28, opacity: 0.3, marginBottom: 8 }}>&#9825;</div>
+                <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5 }}>Tap the heart on any quote that moves you</div>
+              </div>
+            </Card>
+          )
           return (
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <SectionLabel color={vibe.accent}>&#9829; {t('progress.saved', 'Saved')}</SectionLabel>
@@ -117,7 +166,15 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             const text = localStorage.getItem(`cycle_content_${data.name}_${data.vibe}_day${d}_journal`) || localStorage.getItem(`cycle_day_${d}_journal`)
             if (text && text.trim()) journals.push({ day: d, text })
           }
-          if (journals.length === 0) return null
+          if (journals.length === 0) return (
+            <Card cardBg={cardBg} cardBorder={cardBorder}>
+              <SectionLabel color={vibe.accent}>&#9998; Journal</SectionLabel>
+              <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                <div style={{ fontSize: 28, opacity: 0.3, marginBottom: 8 }}>&#9997;</div>
+                <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5 }}>Today's journal prompt is waiting on the Today tab</div>
+              </div>
+            </Card>
+          )
           return (
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <SectionLabel color={vibe.accent}>&#9998; Journal</SectionLabel>
@@ -132,6 +189,21 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             </Card>
           )
         })()}
+
+        {/* Journal CTA if today not yet journaled */}
+        {!hasTodayJournal && (
+          <Card cardBg={cardBg} cardBorder={cardBorder}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 22 }}>&#9997;</span>
+                <span style={{ fontFamily: typo.bodyFont, fontSize: 14, color: textColor }}>Today's journal is waiting</span>
+              </div>
+              <button onClick={() => onGoToDay(dayNumber)} style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: vibe.accent, background: 'none', border: `1px solid ${vibe.accent}40`, borderRadius: 8, padding: '6px 14px', cursor: 'pointer', letterSpacing: '0.05em' }}>Go &#8594;</button>
+            </div>
+          </Card>
+        )}
+
+        {/* TODO: Cycle Story — end-of-cycle narrative summary (future feature) */}
       </div>
     </ScreenShell>
   )
