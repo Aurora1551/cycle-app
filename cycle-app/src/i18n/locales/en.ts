@@ -46,7 +46,7 @@ const en = {
     },
     onboardingMusic: {
       heading: 'Your music taste',
-      subtext: 'Suggested for {{emoji}} {{vibe}} — swap any out.',
+      subtext: 'Suggested for {{emoji}} {{vibe}} — tap to add or remove.',
       addMore: 'Add more',
       genresSelected: 'genre(s) selected',
       seeJourney: 'See my journey →',

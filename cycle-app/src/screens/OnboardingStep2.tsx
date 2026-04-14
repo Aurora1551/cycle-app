@@ -72,26 +72,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
         <div style={{ marginBottom: 4 }}>
           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: accent, letterSpacing: '0.1em', marginBottom: 8, transition: 'color 0.5s ease' }}>YOUR VIBE</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-            {VIBES.slice(0, 3).map(v => {
-              const sel = vibe === v.key
-              return (
-                <button key={v.key} onClick={() => handleSelect(v.key)} style={{
-                  border: sel ? `2px solid ${accent}` : `1.5px solid ${accent}25`,
-                  borderRadius: 14, padding: '12px 6px', textAlign: 'center', cursor: 'pointer',
-                  background: sel ? `${accent}15` : `${accent}08`,
-                  transition: 'all 0.25s ease', position: 'relative',
-                  boxShadow: sel ? `0 0 0 3px ${accent}33` : 'none',
-                }}>
-                  {sel && <div className="check-circle" style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, background: accent, fontSize: 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>✓</div>}
-                  <div style={{ fontSize: 24, marginBottom: 4 }}>{v.emoji}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, fontFamily: "'Karla', sans-serif", color: text, transition: 'color 0.25s ease' }}>{t(`vibes.${v.key}`)}</div>
-                  <div style={{ fontSize: 9, color: muted, lineHeight: 1.2, marginTop: 2, transition: 'color 0.25s ease' }}>{t(`vibeTaglines.${v.key}`)}</div>
-                </button>
-              )
-            })}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 8 }}>
-            {VIBES.slice(3).map(v => {
+            {VIBES.map(v => {
               const sel = vibe === v.key
               return (
                 <button key={v.key} onClick={() => handleSelect(v.key)} style={{

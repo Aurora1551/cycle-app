@@ -47,7 +47,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
 
   // Auto-fill days when treatment changes
   useEffect(() => {
-    if (treatment && treatment !== 'other' && TREATMENT_DEFAULTS[treatment] && !initialCycleDays) {
+    if (treatment && treatment !== 'other' && TREATMENT_DEFAULTS[treatment]) {
       setDays(TREATMENT_DEFAULTS[treatment])
     }
   }, [treatment])

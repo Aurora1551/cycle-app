@@ -48,7 +48,7 @@ const OnboardingMusic: React.FC<Props> = ({ onBack, onContinue, vibe, initialVal
       <button onClick={onBack} className="btn-back" style={{ color: muted }}>{t('back')}</button>
 
       <div className="content" style={{ gap: 14 }}>
-        <div className="step-label" style={{ color: accent }}>{t('stepOf', { step: 6 })}</div>
+        <div className="step-label" style={{ color: accent }}>{t('stepOf', { step: 3 }).replace('6', '3')}</div>
         <h1 className="heading" style={{ color: text }}>{t('onboardingMusic.heading')}</h1>
         <p className="subtext" style={{ color: muted, marginTop: -4 }}>{t('onboardingMusic.subtext', { emoji: vibeTheme.emoji, vibe: vibeTheme.label })}</p>
 
