@@ -141,7 +141,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
           className="btn-primary" style={{ background: canContinue ? accent : `${accent}44`, transition: 'background 0.4s ease' }}>
           Continue
         </button>
-        <button onClick={() => onContinue('calm', ALL_COMPONENTS.map(c => c.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: muted, padding: '10px 0 0', width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('calm', ALL_COMPONENTS.map(c => c.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: muted, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </div>
