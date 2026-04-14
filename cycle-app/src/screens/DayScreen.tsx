@@ -1033,9 +1033,6 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 22, color: textColor, lineHeight: 1.2 }}>
               Day {dayNumber} is ready for you
             </div>
-            <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5, maxWidth: 260, marginBottom: 8 }}>
-              Unlock to read today's content
-            </div>
             {/* Card 1: Unlock */}
             <button onClick={onUnlock} style={{
               width: '100%', maxWidth: 300, background: vibe.accent, color: 'white', border: 'none',
@@ -1051,7 +1048,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
               fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor,
               cursor: 'pointer',
             }}>
-              Create a free account first
+              Save my progress — free
             </button>
             {/* Card 3: Go back */}
             <button onClick={() => onGoToDay?.(3)} style={{
@@ -1059,7 +1056,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
               fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, padding: '8px',
               textDecoration: 'underline', textDecorationColor: `${mutedColor}40`,
             }}>
-              Keep browsing my free days
+              Stay on free days
             </button>
           </div>
         </div>

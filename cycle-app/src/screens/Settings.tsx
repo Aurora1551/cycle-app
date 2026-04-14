@@ -253,8 +253,6 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         {/* Dietary preferences */}
         <div className="mono-hint" style={{ color: mutedColor }}>DIETARY PREFERENCES</div>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
-          <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor, marginBottom: 4 }}>What should we keep in mind?</div>
-          <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 11, color: mutedColor, marginBottom: 12 }}>So we can suggest foods you'll actually enjoy</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {DIET_OPTIONS.map(opt => {
               const sel = dietPrefs.includes(opt.id)

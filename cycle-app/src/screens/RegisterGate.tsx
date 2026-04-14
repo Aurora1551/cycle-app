@@ -24,7 +24,7 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           You've completed 3 free days
         </h1>
         <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: '#9B7B74', lineHeight: 1.5, margin: '4px 0 16px', padding: '0 8px' }}>
-          There are <strong style={{ color: '#1C0F0C' }}>{remainingDays} more days</strong> of quotes, music, journaling, and breathing waiting for you.
+          <strong style={{ color: '#1C0F0C' }}>{remainingDays} more days</strong> waiting for you.
         </p>
 
         {/* Card 1: Unlock full journey */}
@@ -48,7 +48,7 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
         }}>
           <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: 700, color: '#1C0F0C', marginBottom: 4 }}>Save my progress</div>
           <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: '#9B7B74', lineHeight: 1.4 }}>
-            Create a free account. Upgrade whenever you're ready.
+            Free account · upgrade whenever
           </div>
         </button>
 
@@ -58,7 +58,6 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           background: 'transparent', cursor: 'pointer', textAlign: 'left',
         }}>
           <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 12, color: '#9B7B74' }}>Keep browsing my free days</div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 10, color: 'rgba(155,123,116,0.5)', marginTop: 2 }}>You can revisit Days 1–3 anytime</div>
         </button>
       </div>
     </ScreenShell>

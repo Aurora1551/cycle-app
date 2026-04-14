@@ -342,7 +342,7 @@ function App() {
         <div className="bottom-nav" style={{ background: vibe?.bg || '#FDF6F0', borderTop: `1px solid ${navBorder}` }}>
           {([
             { id: 'day' as Screen, label: t('nav.today'), icon: '☀' },
-            { id: 'progress' as Screen, label: t('nav.progress'), icon: '○' },
+            { id: 'progress' as Screen, label: t('nav.progress'), icon: '◈' },
             { id: 'settings' as Screen, label: 'Settings', icon: '⚙' },
           ]).map(tab => {
             const isActive = screen === tab.id

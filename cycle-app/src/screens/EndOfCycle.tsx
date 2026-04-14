@@ -53,10 +53,10 @@ const EndOfCycle: React.FC<Props> = ({ data, onStartNewCycle, onGift }) => {
         <Card cardBg={cardBg} cardBorder={cardBorder} style={{ width: '100%' }}>
           <SectionLabel color={vibe.accent}>&#128140; BEFORE YOU GO</SectionLabel>
           <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 18, color: textColor, lineHeight: 1.4, marginBottom: 4 }}>
-            What do you want to remember about who you were during this cycle?
+            What do you want to remember about this cycle?
           </div>
           <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, lineHeight: 1.5, marginBottom: 10 }}>
-            Not the outcome — you. Your strength, your moments, your truth.
+            Not the outcome — your strength, your moments.
           </div>
           <textarea
             value={reflection}

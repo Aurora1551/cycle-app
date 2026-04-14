@@ -66,7 +66,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
       <div style={{ padding: '16px 24px 32px', display: 'flex', flexDirection: 'column', flex: 1, gap: 10, overflowY: 'auto' }}>
         <div className="step-label" style={{ color: accent, transition: 'color 0.5s ease' }}>{t('stepOf', { step: 2 }).replace('6', '3')}</div>
         <h1 className="heading" style={{ color: text, transition: 'color 0.5s ease' }}>Shape your experience</h1>
-        <p className="subtext" style={{ color: muted, transition: 'color 0.5s ease' }}>Pick your vibe and what you'd like each day</p>
+        <p className="subtext" style={{ color: muted, transition: 'color 0.5s ease' }}>Your daily experience</p>
 
         {/* Vibe selector: 3 on first row, 2 on second */}
         <div style={{ marginBottom: 4 }}>
@@ -133,7 +133,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
               )
             })}
           </div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 10, color: muted, marginTop: 6, transition: 'color 0.5s ease' }}>All selected by default · tap to remove</div>
+          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 10, color: muted, marginTop: 6, transition: 'color 0.5s ease' }}>Tap to remove</div>
         </div>
 
         <div className="spacer" />

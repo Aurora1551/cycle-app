@@ -76,7 +76,6 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
       <div style={{ padding: '16px 24px 32px', display: 'flex', flexDirection: 'column', flex: 1, gap: 10, overflowY: 'auto' }}>
         <div className="step-label" style={{ color: A }}>{t('stepOf', { step: 1 }).replace('6', '3')}</div>
         <h1 className="heading" style={{ color: T, marginBottom: 4 }}>Tell us about you</h1>
-        <p className="subtext" style={{ marginBottom: 8 }}>So we can personalise your journey</p>
 
         {/* Name */}
         <div>
@@ -127,7 +126,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
         {/* Cycle Days */}
         {treatment && (
           <div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 6 }}>HOW MANY DAYS</div>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 6 }}>CYCLE LENGTH</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1.5px solid rgba(196,97,74,0.15)', borderRadius: 10, overflow: 'hidden' }}>
                 <button onClick={() => setDays(d => Math.max(1, d - 1))} style={{ width: 40, height: 44, background: 'none', border: 'none', color: A, fontSize: 18, cursor: 'pointer' }}>−</button>
