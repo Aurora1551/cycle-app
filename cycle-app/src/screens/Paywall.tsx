@@ -78,7 +78,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
             { emoji: '&#9998;', text: 'Guided journaling prompts' },
             { emoji: '&#10024;', text: '35-second breathing exercise' },
             { emoji: '&#9889;', text: 'Daily affirmation' },
-            { emoji: '&#128155;', text: 'A note from your person' },
+            { emoji: '&#128155;', text: 'A note just for you' },
           ].map((f, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 0' }}>
               <span style={{ fontSize: 14 }} dangerouslySetInnerHTML={{ __html: f.emoji }} />

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { OnboardingData, VibeKey } from '../types'
 import { VIBES, ALL_EXTRA_GENRES } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
-import { TREATMENT_LABELS, TREATMENT_EMOJIS, ALL_COMPONENTS, NOTIFICATION_CONTENT } from '../lib/constants'
+import { TREATMENT_LABELS, TREATMENT_EMOJIS, TREATMENT_DEFAULTS, ALL_COMPONENTS, NOTIFICATION_CONTENT } from '../lib/constants'
 import { deleteAccount } from '../lib/db'
 import { startSpotifyAuth, getSpotifyStatus, disconnectSpotify, isSpotifyConfigured } from '../lib/spotify'
 import { track } from '../lib/posthog'
@@ -18,6 +18,7 @@ interface Props {
   onUpdateData: (patch: Partial<OnboardingData>) => void
   onDeleteAccount: () => void
   onLogout: () => void
+  onSignOut?: () => void
   onBack: () => void
   isPaused?: boolean
   onPause?: () => void
@@ -28,7 +29,7 @@ interface Props {
 
 type EditMode = null | 'name' | 'treatment' | 'cycleDays' | 'vibe' | 'genres' | 'components' | 'notifyTime' | 'privacy' | 'language'
 
-const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onBack, isPaused, onPause, onResume, isPremium, onUpgrade }) => {
+const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onSignOut, onBack, isPaused, onPause, onResume, isPremium, onUpgrade }) => {
   const { t, i18n } = useTranslation()
   const visible = useFadeIn()
   const [editMode, setEditMode] = useState<EditMode>(null)
@@ -183,6 +184,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
       </div>
 
       <div className="flex-col gap-16" style={{ padding: '0 24px 120px' }}>
+        <div className="mono-hint" style={{ color: mutedColor }}>JOURNEY PERSONALIZATION</div>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {row('👤', t('settings.name'), data.name, () => { setEditName(data.name); setEditMode('name') })}
           {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => { setEditTreatment(data.treatment); setEditOtherText(''); setEditMode('treatment') })}
@@ -362,7 +364,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           <div className="settings-row" style={{ borderBottom: `1px solid ${cardBorder}` }}>
             {isPremium ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
-                <div className="settings-icon" style={{ background: 'rgba(123,212,160,0.12)' }}>✓</div>
+                <div className="settings-icon" style={{ background: 'rgba(123,212,160,0.12)' }}>✨</div>
                 <div style={{ flex: 1 }}>
                   <div className="mono-hint" style={{ color: '#7BD4A0', marginBottom: 2, letterSpacing: '0.15em' }}>FULL JOURNEY</div>
                   <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>All {data.cycleDays} days unlocked</div>
@@ -390,11 +392,21 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
               </div>
             )}
           </div>
+          {onSignOut && (
+            <button onClick={onSignOut} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
+              <div className="settings-icon" style={{ background: `${vibe.accent}15` }}>🚪</div>
+              <div style={{ flex: 1 }}>
+                <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>LOG OUT</div>
+                <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>Sign out. Your data stays saved.</div>
+              </div>
+              <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
+            </button>
+          )}
           <button onClick={onLogout} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
-            <div className="settings-icon" style={{ background: `${vibe.accent}15` }}>🚪</div>
+            <div className="settings-icon" style={{ background: 'rgba(212,149,106,0.14)' }}>↺</div>
             <div style={{ flex: 1 }}>
-              <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>{t('settings.logOut')}</div>
-              <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>{t('settings.logOutSubtext')}</div>
+              <div className="mono-hint" style={{ color: '#B86A3A', marginBottom: 2, letterSpacing: '0.15em' }}>RESET JOURNEY</div>
+              <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>Clear everything and start onboarding again.</div>
             </div>
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
           </button>
@@ -407,7 +419,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
           </button>
           {/* Take a break */}
-          <button onClick={() => isPaused ? onResume?.() : onPause?.()} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
+          <button onClick={() => { if (isPaused) { onResume?.() } else { onPause?.() } onBack() }} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
             <div className="settings-icon" style={{ background: isPaused ? 'rgba(100,200,140,0.12)' : `${vibe.accent}15` }}>{isPaused ? '💚' : '🌙'}</div>
             <div style={{ flex: 1 }}>
               <div className="mono-hint" style={{ color: isPaused ? '#7BD4A0' : vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>
@@ -495,7 +507,11 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             <button onClick={() => {
               const isOther = editTreatment === 'other' || (!Object.keys(TREATMENT_LABELS).includes(editTreatment) && editTreatment !== '')
               const val = isOther ? (editOtherText.trim() || 'other') : editTreatment
-              onUpdateData({ treatment: val })
+              const patch: Partial<OnboardingData> = { treatment: val }
+              if (!isOther && TREATMENT_DEFAULTS[val] && TREATMENT_DEFAULTS[val] !== data.cycleDays) {
+                patch.cycleDays = TREATMENT_DEFAULTS[val]
+              }
+              onUpdateData(patch)
               setEditMode(null)
             }} className="btn-primary" style={{ background: vibe.accent, marginBottom: 10 }}>{t('save')}</button>
             <button onClick={() => setEditMode(null)} style={{ width: '100%', background: `${vibe.accent}20`, border: `1px solid ${vibe.accent}40`, borderRadius: 14, padding: '14px', fontSize: 14, color: vibe.accent, cursor: 'pointer' }}>{t('cancel')}</button>

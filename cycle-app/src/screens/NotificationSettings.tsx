@@ -4,15 +4,16 @@ import type { OnboardingData } from '../types'
 import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
 import { NOTIFICATION_CONTENT } from '../lib/constants'
 import { useFadeIn } from '../hooks/useFadeIn'
-import { ScreenShell, Card, SectionLabel, PrimaryButton, GhostButton } from '../components/ui'
+import { ScreenShell, Card, SectionLabel, PrimaryButton, GhostButton, BackButton } from '../components/ui'
 import { subscribeToPush, registerServiceWorker } from '../lib/push'
 
 interface Props {
   data: OnboardingData
+  onBack: () => void
   onDone: () => void
 }
 
-const NotificationSettings: React.FC<Props> = ({ data, onDone }) => {
+const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
   const { t } = useTranslation()
   const [hour, setHour] = useState(8)
   const [minute, setMinute] = useState(0)
@@ -68,10 +69,11 @@ const NotificationSettings: React.FC<Props> = ({ data, onDone }) => {
 
   return (
     <ScreenShell bg={vibe.bg} visible={visible}>
-      <div style={{ padding: '32px 24px 24px' }}>
+      <BackButton onClick={onBack} color={mutedColor} />
+      <div style={{ padding: '4px 24px 20px' }}>
         <SectionLabel color={vibe.accent}>{t('notifications.sectionLabel')}</SectionLabel>
-        <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 30, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, margin: 0 }}>{t('notifications.heading')}</h1>
-        <p style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 13, color: mutedColor, lineHeight: 1.5, marginTop: 8 }}>{t('notifications.subtext')}</p>
+        <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 24, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.2, margin: 0 }}>{t('notifications.heading')}</h1>
+        <p style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 13, color: mutedColor, lineHeight: 1.5, marginTop: 6 }}>{t('notifications.subtext')}</p>
       </div>
 
       <div className="flex-col gap-14" style={{ padding: '0 24px', flex: 1 }}>

@@ -220,6 +220,11 @@ function App() {
     contentKeys.forEach(k => localStorage.removeItem(k))
   }
 
+  const signOut = () => {
+    track('sign_out')
+    setScreen('splash')
+  }
+
   const restartJourney = () => {
     localStorage.removeItem(DATA_KEY)
     localStorage.removeItem(DAY_KEY)
@@ -277,11 +282,11 @@ function App() {
           setScreen('paywall')
         }
       }} onLogin={() => setScreen('login')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} profileData={data as OnboardingData} dayNumber={dayNumber} />}
-      {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onDone={() => setScreen('day')} />}
+      {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onBack={() => setScreen('summary')} onDone={() => setScreen('day')} />}
       {screen === 'register-gate' && <RegisterGate onCreateAccount={() => setScreen('create-account')} onContinueGuest={() => { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} cycleDays={data.cycleDays} />}
       {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} isPaused={isPaused} onResume={resumeJourney} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3) { setScreen('register-gate'); return } if (!isPremium && nextDay > 3) { track('paywall_viewed'); setScreen('paywall'); return } advanceDay() }} onSettings={() => setScreen('settings')} onGoToDay={day => { if (!isPremium && day > 3) { track('paywall_viewed'); setScreen('paywall'); return } setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)) }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} onEndOfCycle={() => setScreen('end-of-cycle')} />}
       {screen === 'progress' && data.name && data.vibe && data.components && <Progress data={data as OnboardingData} dayNumber={dayNumber} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen('day') }} onSettings={() => setScreen('settings')} />}
-      {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onBack={() => setScreen('day')} isPaused={isPaused} onPause={pauseJourney} onResume={resumeJourney} isPremium={isPremium} onUpgrade={() => { track('paywall_viewed'); setScreen('paywall') }} />}
+      {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onSignOut={signOut} onBack={() => setScreen('day')} isPaused={isPaused} onPause={pauseJourney} onResume={resumeJourney} isPremium={isPremium} onUpgrade={() => { track('paywall_viewed'); setScreen('paywall') }} />}
       {/* Welcome back overlay after pause */}
       {showWelcomeBack && screen === 'day' && vibe && (
         <div style={{ position: 'fixed', inset: 0, background: vibe.bg, zIndex: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32, textAlign: 'center' }}>
@@ -341,15 +346,25 @@ function App() {
       {showNav && (
         <div className="bottom-nav" style={{ background: vibe?.bg || '#FDF6F0', borderTop: `1px solid ${navBorder}` }}>
           {([
-            { id: 'day' as Screen, label: t('nav.today'), icon: '☀' },
-            { id: 'progress' as Screen, label: t('nav.progress'), icon: '◈' },
-            { id: 'settings' as Screen, label: 'Settings', icon: '⚙' },
+            { id: 'day' as Screen, label: t('nav.today'), icon: '☀' as const },
+            { id: 'progress' as Screen, label: t('nav.progress'), icon: 'calendar' as const },
+            { id: 'settings' as Screen, label: 'Settings', icon: '⚙' as const },
           ]).map(tab => {
             const isActive = screen === tab.id
             const color = isActive ? navAccent : navMuted
+            const size = isActive ? 20 : 18
             return (
               <button key={tab.id} onClick={() => setScreen(tab.id)} className="btn-nav">
-                <span style={{ fontSize: isActive ? 20 : 18, color, transition: 'all 0.15s' }}>{tab.icon}</span>
+                {tab.icon === 'calendar' ? (
+                  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'all 0.15s' }}>
+                    <rect x="3" y="4.5" width="18" height="17" rx="2" />
+                    <line x1="16" y1="2.5" x2="16" y2="6.5" />
+                    <line x1="8" y1="2.5" x2="8" y2="6.5" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                ) : (
+                  <span style={{ fontSize: size, color, transition: 'all 0.15s' }}>{tab.icon}</span>
+                )}
                 <span className="nav-label" style={{ color }}>{tab.label}</span>
               </button>
             )

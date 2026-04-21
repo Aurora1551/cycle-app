@@ -484,6 +484,51 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
   )
 }
 
+type FuelItem = { name: string; emoji: string; protein: string }
+
+const ALL_FUEL_ITEMS: FuelItem[] = [
+  { name: 'Greek yoghurt with almonds & honey', emoji: '🥜', protein: '~20g' },
+  { name: 'Salmon with sweet potato', emoji: '🐟', protein: '~30g' },
+  { name: 'Avocado & egg toast', emoji: '🥑', protein: '~15g' },
+  { name: 'Chicken & quinoa bowl', emoji: '🍗', protein: '~35g' },
+  { name: 'Hummus with veggie sticks', emoji: '🥕', protein: '~8g' },
+  { name: 'Overnight oats with chia seeds', emoji: '🥣', protein: '~18g' },
+  { name: 'Lentil soup with crusty bread', emoji: '🍲', protein: '~18g' },
+  { name: 'Cottage cheese with berries', emoji: '🫐', protein: '~14g' },
+  { name: 'Edamame & rice bowl', emoji: '🍚', protein: '~22g' },
+  { name: 'Turkey & avocado wrap', emoji: '🌯', protein: '~28g' },
+  { name: 'Handful of almonds & banana', emoji: '🍌', protein: '~7g' },
+  { name: 'Bean & cheese quesadilla', emoji: '🧀', protein: '~20g' },
+  { name: 'Scrambled eggs on sourdough', emoji: '🍳', protein: '~18g' },
+  { name: 'Tuna & avocado salad', emoji: '🥗', protein: '~25g' },
+  { name: 'Peanut butter smoothie', emoji: '🥤', protein: '~15g' },
+  { name: 'Tofu stir-fry with vegetables', emoji: '🥦', protein: '~20g' },
+  { name: 'Black bean tacos', emoji: '🌮', protein: '~16g' },
+  { name: 'Shakshuka with bread', emoji: '🍅', protein: '~18g' },
+]
+
+const categorizeFuel = (name: string): string => {
+  const n = name.toLowerCase()
+  if (/chicken|turkey|beef|pork|lamb|steak|bacon/.test(n)) return 'meat'
+  if (/salmon|tuna|prawn|shrimp|cod|fish/.test(n)) return 'fish'
+  if (/egg|shakshuka|omelette/.test(n)) return 'egg'
+  if (/yoghurt|yogurt|cottage|cheese|milk/.test(n)) return 'dairy'
+  return 'plant'
+}
+
+const getDismissedFuel = (): string[] => { try { return JSON.parse(localStorage.getItem('cycle_fuel_dismissed') || '[]') } catch { return [] } }
+const getDismissedCats = (): Record<string, number> => { try { return JSON.parse(localStorage.getItem('cycle_fuel_cat_counts') || '{}') } catch { return {} } }
+
+const pickNextFuel = (pool: FuelItem[], exclude: Set<string>): FuelItem | null => {
+  const counts = getDismissedCats()
+  const avail = pool.filter(p => !exclude.has(p.name))
+  if (!avail.length) return null
+  const scored = avail.map(p => ({ item: p, score: counts[categorizeFuel(p.name)] || 0 }))
+  const minScore = Math.min(...scored.map(s => s.score))
+  const best = scored.filter(s => s.score === minScore).map(s => s.item)
+  return best[Math.floor(Math.random() * best.length)]
+}
+
 const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onResume, onDayComplete, onSettings, onGoToDay, onUnlock, onEndOfCycle }) => {
   const { t } = useTranslation()
   const [content, setContent] = useState<DayContent | null>(null)
@@ -492,8 +537,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
   const [error, setError] = useState<string | null>(null)
   const [journalText, setJournalText] = useState('')
   const [journalSaved, setJournalSaved] = useState(false)
-  const [fuelIdx, setFuelIdx] = useState(0)
-  const [fuelDismissKey, setFuelDismissKey] = useState(0) // bump to force re-render after dismiss
+  const [visibleFuel, setVisibleFuel] = useState<FuelItem[] | null>(null)
   const [favorites, setFavorites] = useState<Array<{ type: string; text: string; author?: string; day: number }>>(() => {
     try { return JSON.parse(localStorage.getItem('cycle_favorites') || '[]') } catch { return [] }
   })
@@ -555,11 +599,33 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     setJournalText(localStorage.getItem(`cycle_day_${dayNumber}_journal`) || '')
     setMeditationStarted(false)
     setJournalSaved(false)
-    setFuelIdx(0)
+    setVisibleFuel(null)
     setMood(localStorage.getItem(`cycle_mood_day${dayNumber}`))
     // Scroll to top of screen
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [dayNumber])
+
+  // Initialize visibleFuel once per day when content is ready
+  useEffect(() => {
+    if (visibleFuel !== null) return
+    const dismissed = getDismissedFuel()
+    const isDismissed = (name: string) => dismissed.some(d => d.toLowerCase() === name.toLowerCase())
+    const aiItems: FuelItem[] = ((content?.fuelItems as FuelItem[] | undefined) || []).filter(p => !isDismissed(p.name))
+    const pool = ALL_FUEL_ITEMS.filter(p => !isDismissed(p.name))
+    const initial: FuelItem[] = []
+    const taken = new Set<string>()
+    for (const item of aiItems.slice(0, 3)) {
+      initial.push(item)
+      taken.add(item.name)
+    }
+    while (initial.length < 3) {
+      const next = pickNextFuel(pool, taken)
+      if (!next) break
+      initial.push(next)
+      taken.add(next.name)
+    }
+    setVisibleFuel(initial)
+  }, [content, visibleFuel])
 
   useEffect(() => {
     // Check localStorage cache for this specific user+day combo
@@ -786,58 +852,41 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       </div>
     )
     if (component === 'fuel') {
-      const ALL_FUEL_ITEMS = [
-        { name: 'Greek yoghurt with almonds & honey', emoji: '🥜', protein: '~20g' },
-        { name: 'Salmon with sweet potato', emoji: '🐟', protein: '~30g' },
-        { name: 'Avocado & egg toast', emoji: '🥑', protein: '~15g' },
-        { name: 'Chicken & quinoa bowl', emoji: '🍗', protein: '~35g' },
-        { name: 'Hummus with veggie sticks', emoji: '🥕', protein: '~8g' },
-        { name: 'Overnight oats with chia seeds', emoji: '🥣', protein: '~18g' },
-        { name: 'Lentil soup with crusty bread', emoji: '🍲', protein: '~18g' },
-        { name: 'Cottage cheese with berries', emoji: '🫐', protein: '~14g' },
-        { name: 'Edamame & rice bowl', emoji: '🍚', protein: '~22g' },
-        { name: 'Turkey & avocado wrap', emoji: '🌯', protein: '~28g' },
-        { name: 'Handful of almonds & banana', emoji: '🍌', protein: '~7g' },
-        { name: 'Bean & cheese quesadilla', emoji: '🧀', protein: '~20g' },
-        { name: 'Scrambled eggs on sourdough', emoji: '🍳', protein: '~18g' },
-        { name: 'Tuna & avocado salad', emoji: '🥗', protein: '~25g' },
-        { name: 'Peanut butter smoothie', emoji: '🥤', protein: '~15g' },
-        { name: 'Tofu stir-fry with vegetables', emoji: '🥦', protein: '~20g' },
-        { name: 'Black bean tacos', emoji: '🌮', protein: '~16g' },
-        { name: 'Shakshuka with bread', emoji: '🍅', protein: '~18g' },
-      ]
-      // Dismissed foods — stored in localStorage, used to filter future suggestions
-      const getDismissed = (): string[] => { try { return JSON.parse(localStorage.getItem('cycle_fuel_dismissed') || '[]') } catch { return [] } }
-      const dismissFood = (name: string) => {
-        const current = getDismissed()
+      const swapAt = (idx: number, name: string) => {
+        const current = getDismissedFuel()
         if (!current.includes(name)) {
           localStorage.setItem('cycle_fuel_dismissed', JSON.stringify([...current, name]))
         }
-        setFuelDismissKey(k => k + 1)
-        track('fuel_item_dismissed', { food: name, day_number: dayNumber })
+        const cats = getDismissedCats()
+        const cat = categorizeFuel(name)
+        cats[cat] = (cats[cat] || 0) + 1
+        localStorage.setItem('cycle_fuel_cat_counts', JSON.stringify(cats))
+        track('fuel_item_dismissed', { food: name, day_number: dayNumber, category: cat })
+        setVisibleFuel(prev => {
+          if (!prev) return prev
+          const currentNames = new Set(prev.map(f => f.name))
+          currentNames.delete(name)
+          const dismissed = getDismissedFuel()
+          const pool = ALL_FUEL_ITEMS.filter(p =>
+            !dismissed.some(d => d.toLowerCase() === p.name.toLowerCase())
+          )
+          const next = pickNextFuel(pool, currentNames)
+          const copy = [...prev]
+          if (next) copy[idx] = next
+          else copy.splice(idx, 1)
+          return copy
+        })
       }
-      const dismissed = getDismissed()
-      const aiFuel = content?.fuelItems
-      // Filter out dismissed from all available items
-      const available = ALL_FUEL_ITEMS.filter(item => !dismissed.some(d => item.name.toLowerCase() === d.toLowerCase()))
-      // Pick 3 items: AI items first (if not dismissed), then fill from available pool
-      const aiFiltered = aiFuel ? aiFuel.filter((item: any) => !dismissed.some((d: string) => item.name.toLowerCase() === d.toLowerCase())) : []
-      const startIdx = (fuelIdx * 3) % Math.max(available.length, 1)
-      const poolItems = available.slice(startIdx, startIdx + 3)
-      const extraNeeded = 3 - (aiFiltered.length > 0 && fuelIdx === 0 ? aiFiltered.length : poolItems.length)
-      const currentFuel = fuelIdx === 0 && aiFiltered.length > 0
-        ? [...aiFiltered, ...available.filter(a => !aiFiltered.some((ai: any) => ai.name === a.name)).slice(0, Math.max(0, 3 - aiFiltered.length))].slice(0, 3)
-        : [...poolItems, ...available.filter(a => !poolItems.includes(a)).slice(0, Math.max(0, extraNeeded))].slice(0, 3)
       const dietPrefs: string[] = (() => { try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] } })()
       const hasDietPrefs = dietPrefs.length > 0 && !dietPrefs.includes('none')
-      // If all items dismissed for this set, auto-advance
+      const currentFuel = visibleFuel || []
       if (currentFuel.length === 0) {
         return (
           <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
             {vibeLabel(vibeContent.labels.fuel)}
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
-              <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, marginBottom: 8 }}>No suggestions left for this set</div>
-              <button onClick={() => setFuelIdx(prev => prev + 1)} style={{ background: vibe.accent, color: 'white', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont }}>Show more ideas</button>
+              <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, marginBottom: 8 }}>No suggestions left</div>
+              <button onClick={() => { localStorage.removeItem('cycle_fuel_dismissed'); setVisibleFuel(null) }} style={{ background: vibe.accent, color: 'white', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont }}>Reset suggestions</button>
             </div>
           </Card>
         )
@@ -847,14 +896,14 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
           {vibeLabel(vibeContent.labels.fuel)}
           <div style={{ fontFamily: typo.bodyFont, fontWeight: 300, fontSize: 12, color: mutedColor, marginBottom: 12 }}>Protein-rich ideas for today</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {currentFuel.map((item: any, i: number) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: 10 }}>
+            {currentFuel.map((item: FuelItem, i: number) => (
+              <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: 10 }}>
                 <div style={{ fontSize: 22 }}>{item.emoji}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
-                <button onClick={() => { dismissFood(item.name); setFuelDismissKey(k => k + 1) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
+                <button onClick={() => swapAt(i, item.name)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
                   swap
                 </button>
               </div>
@@ -871,7 +920,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         {vibeLabel(vibeContent.labels.journal)}
         <div style={{ fontSize: 18, color: textColor, fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, lineHeight: 1.4, marginBottom: 12, borderLeft: `2px solid ${vibe.accent}40`, paddingLeft: 14 }}>{content?.journalPrompt}</div>
-        <textarea value={journalText} onChange={e => setJournalText(e.target.value)} placeholder={t('day.writePlaceholder')} style={inputStyle} />
+        <textarea value={journalText} onChange={e => setJournalText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveJournal() } }} placeholder={t('day.writePlaceholder')} style={inputStyle} />
         <button onClick={saveJournal} style={{ marginTop: 8, background: journalSaved ? `${vibe.accent}20` : vibe.accent, color: journalSaved ? vibe.accent : 'white', border: journalSaved ? `1px solid ${vibe.accent}40` : 'none', borderRadius: 10, padding: '10px 18px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: typo.bodyFont, transition: 'all 0.2s' }}>
           {journalSaved ? t('day.saved') : t('day.saveEntry')}
         </button>
@@ -889,8 +938,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
-          <button onClick={() => { unlockSpeech(); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `${vibe.accent}15`, border: `1px solid ${vibe.accent}30`, borderRadius: 12, padding: '20px', cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: vibe.accent }}>
-            Breathe with me · 35s
+          <button onClick={() => { unlockSpeech(); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `linear-gradient(135deg, ${vibe.accent}22, ${vibe.accent}10)`, color: vibe.accent, border: `1px solid ${vibe.accent}30`, borderRadius: 999, padding: '14px 20px', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', marginTop: 4, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <span style={{ fontSize: 14, opacity: 0.85 }}>✦</span> Breathe with me · 35s
           </button>
         ) : (
           <YourMoment
@@ -964,12 +1013,14 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 2 }}>You're on day</div>
               <div style={{
-                fontFamily: (data.vibe === 'lighthearted') ? "'Nunito', sans-serif" : "'Cormorant Garamond', serif",
-                fontWeight: 900,
-                fontSize: 44,
+                fontFamily: "'Karla', sans-serif",
+                fontWeight: 400,
+                fontSize: 32,
                 color: (data.vibe === 'fierce') ? '#FDF6F0' : (data.vibe === 'nurturing') ? '#3D1810' : (data.vibe === 'calm') ? '#E8F4F0' : (data.vibe === 'lighthearted') ? '#1A0A00' : '#F0EAF8',
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                letterSpacing: '-0.01em',
+                fontVariantNumeric: 'tabular-nums',
+                opacity: 0.92,
               }}>
                 {dayNumber}
               </div>

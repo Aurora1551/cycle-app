@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — UX & Market Audit</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 32px 24px; background: #FDF6F0; color: #1C0F0C; line-height: 1.55; }
+  h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 34px; margin: 0 0 6px; }
+  .sub { color: #9B7B74; margin-bottom: 32px; font-size: 14px; }
+  h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; margin: 34px 0 8px; border-bottom: 1px solid #E8D8D0; padding-bottom: 6px; }
+  h3 { font-size: 16px; margin: 22px 0 6px; color: #3D1810; }
+  .item { background: white; border-radius: 10px; padding: 14px 16px; margin: 10px 0; border-left: 4px solid #ccc; }
+  .item.high { border-left-color: #C4614A; }
+  .item.med  { border-left-color: #D4956A; }
+  .item.low  { border-left-color: #9BB5A0; }
+  .item.quick { border-left-color: #7FB5A0; }
+  .tag { display: inline-block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-weight: 600; }
+  .tag.high { background: #C4614A; color: white; }
+  .tag.med  { background: #D4956A; color: white; }
+  .tag.low  { background: #9BB5A0; color: white; }
+  .tag.review { background: #FDF6F0; color: #C4614A; border: 1px solid #C4614A; }
+  .tag.quick { background: #7FB5A0; color: white; }
+  .title { font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #1C0F0C; }
+  .num { display: inline-block; background: #1C0F0C; color: white; border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 700; margin-right: 8px; font-family: 'DM Mono', monospace; }
+  .item.high .num { background: #C4614A; }
+  .item.med .num { background: #D4956A; }
+  .item.low .num { background: #9BB5A0; }
+  .item.quick .num { background: #7FB5A0; }
+  .desc { font-size: 13px; color: #3D1810; }
+  .sugg { font-size: 13px; color: #6D4A42; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #E8D8D0; }
+  .sugg strong { color: #C4614A; }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; font-size: 13px; }
+  .legend { background: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 24px; font-size: 13px; }
+  .legend span { margin-right: 12px; }
+  .toc { background: white; padding: 16px; border-radius: 10px; margin: 16px 0 24px; font-size: 13px; }
+  .toc a { color: #C4614A; text-decoration: none; margin-right: 12px; }
+  .done { opacity: 0.6; text-decoration: line-through; }
+  .review-box { background: #FFF4EE; border: 1px solid #C4614A; border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+  .review-box .copy-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .review-box .copy-compare div { background: white; padding: 8px 10px; border-radius: 6px; font-size: 12px; }
+  .review-box .copy-compare .label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #9B7B74; margin-bottom: 4px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Cycle — UX & Market Audit</h1>
+<div class="sub">Fertility companion app · Review of flow, language, layout, market fit · 2026-04-21</div>
+
+<div class="legend">
+  <strong>Priority:</strong>
+  <span class="tag high">HIGH</span>user-blocking or retention risk
+  <span class="tag med">MED</span>friction or polish
+  <span class="tag low">LOW</span>nice-to-have
+  <span class="tag quick">QUICK WIN</span>low effort, high value
+  <span class="tag review">NEEDS REVIEW</span>requires your input on copy/direction
+</div>
+
+<div class="toc">
+  <strong>Jump to:</strong>
+  <a href="#flow">Flow</a>
+  <a href="#language">Language</a>
+  <a href="#layout">Layout/UI</a>
+  <a href="#market">Market fit</a>
+  <a href="#audience">Audience alignment</a>
+  <a href="#quickwins">Quick wins</a>
+</div>
+
+<h2 id="flow">1. Flow issues</h2>
+
+<div class="item high">
+  <span class="tag high">HIGH</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">F1</span>Paywall gate at Day 4 is abrupt</div>
+  <div class="desc">User completes 3 days, hits lock with 2 blurred cards. No free preview of Day 4's flavour, no trial period, no "keep the streak" emotional hook. In a vulnerable state, a hard wall can read as transactional.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Offer 7-day free trial with one-tap cancel, OR give Day 4 in full with gentle "you've unlocked this — continue your journey with X" prompt at Day 5. Competitor Expectful gives 7 days; Flo gives 7-day premium trial. <br/><em>Review needed:</em> which model fits your business plan?</div>
+</div>
+
+<div class="item high">
+  <span class="tag high">HIGH</span>
+  <div class="title"><span class="num">F2</span>No cross-device sync before account creation</div>
+  <div class="desc">User can run the entire onboarding + 3 days of content as a guest. If they switch devices or clear cookies, all emotional state is gone. For a treatment companion where streaks matter emotionally, this is high-risk.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Prompt for lightweight account (email or magic link) at end of onboarding, before Day 1 content. Frame as "Save your journey" not "Sign up."</div>
+</div>
+
+<div class="item high">
+  <span class="tag high">HIGH</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">F3</span>Log out = full reset with no warning</div>
+  <div class="desc">Settings → Log out resets all localStorage and returns to splash. Loses journal entries, favourites, streak. Expected behaviour for "log out" is to preserve server state. Users may log out to switch accounts and lose everything.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Either (a) rename button "Start over" or "Reset journey" with confirm dialog, OR (b) actual logout that preserves Supabase-stored data across sessions. <br/><em>Review needed:</em> what's the intended semantic?</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">F4</span>Onboarding doesn't ask about treatment stage</div>
+  <div class="desc">User picks treatment type (IVF, IUI, etc.) and cycle length — but no question about where they are in the journey (pre-transfer, stims, 2WW, post-beta). The content is the same for Day 1 whether it's injection day 1 or embryo transfer day.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Add one optional step: "where are you in your cycle?" with 3-4 options. Use this to subtly tune tone of Day 1 opening without forking all content.</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">F5</span>No visible re-entry path to onboarding</div>
+  <div class="desc">If user wants to change vibe or treatment type later, Settings has overlays but finding them is discovery-only. No "edit my profile" top-level affordance.</div>
+  <div class="sugg"><strong>Suggestion:</strong> In Settings, group under a visible "Personalisation" section header with clear sub-items (Vibe, Components, Genres, Treatment).</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">F6</span>End-of-cycle screen has no clear next action</div>
+  <div class="desc">After the glowing orb moment, what's next? Does the user restart? Continue to a new cycle? See a summary? Unclear flow state.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Add a narrative summary ("Your cycle in words") + clear CTAs: Start a new cycle / Share milestone / Go to journal archive.</div>
+</div>
+
+<h2 id="language">2. Language & copy</h2>
+
+<div class="item quick">
+  <span class="tag quick">QUICK WIN</span>
+  <div class="title"><span class="num">L1</span>"From your person" — ambiguous (addressed)</div>
+  <div class="desc">Updated to "A note for you" this session. Less assumption-laden, works for single/partnered/solo users.</div>
+</div>
+
+<div class="item high">
+  <span class="tag high">HIGH</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">L2</span>App name "Cycle" collides with menstrual tracking</div>
+  <div class="desc">Target market will first associate "Cycle" with period tracking (Flo, Clue, Natural Cycles). Fertility treatment is its own emotional category — the name may make users bounce when searching.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Consider a name that signals companionship/treatment: e.g., "Held", "Warmth", "The Daily" (just examples). <em>Review needed:</em> huge decision, flagging as worth discussing.</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">L3</span>Vibe names — "Fierce" / "Warrior" framing</div>
+  <div class="desc">For a user mid-treatment who feels depleted, being called a "warrior" or expected to be "fierce" can feel demanding rather than supportive. Research suggests fertility patients often reject combat metaphors.</div>
+  <div class="review-box">
+    <strong>Option to review:</strong>
+    <div class="copy-compare">
+      <div><div class="label">Current</div>Fierce 🔥 "She's Got This"<br/>"bold, fierce, warrior energy"</div>
+      <div><div class="label">Alt</div>Strong 🔥 "She's Strong"<br/>"grounded strength, steady resolve"</div>
+    </div>
+    <div style="margin-top: 8px; font-size: 12px;">Keeps the energy vibe option but reframes away from combat.</div>
+  </div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">L4</span>Medical disclaimer only on food section</div>
+  <div class="desc">"For inspiration only · follow your clinic's guidance" appears on fuel. But affirmations, quotes, breathing content — all lack this. Important for reg/compliance and user trust.</div>
+  <div class="sugg"><strong>Suggestion:</strong> One-time modal on first open: "Cycle is for emotional support, not medical advice. Always consult your clinic." Plus footer link in Settings → About.</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">L5</span>Day header phrasing "She's At Peace / She's Got This"</div>
+  <div class="desc">Third-person framing ("She") feels slightly detached. First-person ("I am at peace" / "I've got this") is more affirmation-psychology correct, but changes the voice.</div>
+  <div class="sugg"><strong>Review needed:</strong> Do you want first-person (empowering, self-talk) or third-person (observer tone, gentler)?</div>
+</div>
+
+<div class="item low">
+  <span class="tag low">LOW</span>
+  <div class="title"><span class="num">L6</span>Mix of British/American spelling</div>
+  <div class="desc">"favorites" (US), "yoghurt" (UK) co-exist. Pick one.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Given the £9.99 pricing, align on UK English throughout.</div>
+</div>
+
+<h2 id="layout">3. Layout & UI</h2>
+
+<div class="item high">
+  <span class="tag high">HIGH</span>
+  <div class="title"><span class="num">U1</span>Heavy emoji density in Day screen</div>
+  <div class="desc">Every card has an emoji prefix, section labels include emojis, bottom nav has mixed icons+emoji. For users who want gravitas, this can feel juvenile. Flo/Clue use refined line-icon sets for this reason.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Replace functional emojis (card labels, nav) with a consistent line-icon set (Feather/Lucide). Keep emotive emojis (streak 🌱, friend-note 💛) for decorative moments only.</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">U2</span>Day box circles don't scale past ~14 days</div>
+  <div class="desc">Grid shows all cycleDays as circles. At 21+ days, the row wraps and circles shrink below touch-target minimum. Also no weeks grouping on the main Day header — unlike Journey tab which groups by week.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Cap Day header circle row to 7 (current week), let full grid live on Journey. Add week label ("Week 2 of 4").</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">U3</span>Settings page is one long scroll</div>
+  <div class="desc">Plan, Personalisation, Notifications, Privacy, Account, Delete, Log out — all stacked. No sectioning visual hierarchy beyond section labels.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Break into tabs or expand/collapse sections. Or move "Danger zone" (delete, reset) to a dedicated sub-page.</div>
+</div>
+
+<div class="item quick">
+  <span class="tag quick">QUICK WIN</span>
+  <div class="title"><span class="num">U4</span>Breathing session — "tap to end" ambiguity</div>
+  <div class="desc">During the breathing circle, small "tap to end" text is the only affordance. Users may not see it while focusing on the breath.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Add a tiny × close button in the top-right of the overlay that's always visible but muted.</div>
+</div>
+
+<div class="item low">
+  <span class="tag low">LOW</span>
+  <div class="title"><span class="num">U5</span>Inline styles everywhere</div>
+  <div class="desc">Theming + future design-token migration will be painful. Not user-facing but will cost velocity as app grows.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Gradually migrate recurring patterns to CSS classes or a tiny styled-primitives layer. No rush — only when touching files.</div>
+</div>
+
+<h2 id="market">4. Market comparison</h2>
+
+<h3>Direct competitors in fertility-support space</h3>
+<ul>
+  <li><strong>Expectful</strong> — meditation & mindfulness for fertility + pregnancy. Strong: audio-led content, expert contributors. Weak: subscription fatigue, broad (fertility through postpartum).</li>
+  <li><strong>Kindbody</strong> — clinic-integrated app. Strong: medical integration, appointment sync. Weak: only works if you're at their clinic.</li>
+  <li><strong>FertilityIQ</strong> — community + clinic reviews. Strong: peer wisdom. Weak: not a daily companion.</li>
+  <li><strong>Glow/Eve</strong> — tracking-first with community. Strong: data-rich. Weak: data-pressure can worsen anxiety.</li>
+  <li><strong>Proov Insight</strong> — hormone tracking. Strong: data. Weak: clinical, not emotional.</li>
+</ul>
+
+<div class="item high">
+  <span class="tag high">HIGH</span>
+  <div class="title"><span class="num">M1</span>Cycle's differentiator is emotional-first, not data-first</div>
+  <div class="desc">This is a real gap in the market. But the positioning needs to lean in harder. Currently the app looks like "another cycle app" on first glance — same color palette cues, similar nav.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Strengthen the "emotional companion" identity in app store listing, splash screen, and onboarding. Consider tagline like "You can't track your feelings. But you can be held."</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">M2</span>Missing: partner/support-person mode</div>
+  <div class="desc">Several competitors (Kindara, Glow) have a "partner" view. For fertility, the non-carrying partner often feels helpless. A read-only partner link that shows "how she's doing this week" could be a differentiator — and justify price.</div>
+  <div class="sugg"><strong>Review needed:</strong> worth a future sprint?</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">M3</span>No medication/injection reminders</div>
+  <div class="desc">IVF patients often juggle 4-6 injections per day with tight timing. No reminder system. Other apps (Ivy, Embie) have this as a core feature.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Optional injection schedule with notifications — even basic version would be a moat. Don't need to get clinical (just "time to inject" reminder).</div>
+</div>
+
+<div class="item low">
+  <span class="tag low">LOW</span>
+  <div class="title"><span class="num">M4</span>No community / peer feature</div>
+  <div class="desc">Most apps in space have forums. Cycle doesn't — which can be a strength (no toxicity, no comparison) or a gap.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Keep community out of v1. Could add "anonymous wall" of affirmations from other users later, but it's a big moderation lift.</div>
+</div>
+
+<h2 id="audience">5. Alignment with target user</h2>
+
+<div class="item high">
+  <span class="tag high">HIGH</span>
+  <div class="title"><span class="num">A1</span>User is already emotionally exhausted — minimize cognitive load</div>
+  <div class="desc">Fertility patients are doing 20+ decisions a day (which clinic, which protocol, what to eat). App adds more decisions: pick vibe, pick components, pick music, pick notifications, pick food. This can feel like work.</div>
+  <div class="sugg"><strong>Suggestion:</strong> (a) Add a "just decide for me" button at each onboarding step (smart default), (b) reduce component toggle to 3 essentials with "more" expandable, (c) default notifications ON with one-tap disable.</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span>
+  <div class="title"><span class="num">A2</span>Premium/free boundary feels extractive in context</div>
+  <div class="desc">"You did 3 days → pay to keep going" matches the app model but not the emotional covenant. User is vulnerable; this can feel like a bait-and-switch.</div>
+  <div class="sugg"><strong>Suggestion:</strong> Consider a "pay what you want" or "£9.99 one cycle, or gift it to someone going through this" framing. The current gift flow is a great start.</div>
+</div>
+
+<div class="item med">
+  <span class="tag med">MED</span><span class="tag review">NEEDS REVIEW</span>
+  <div class="title"><span class="num">A3</span>"Daily" expectation adds pressure on hard days</div>
+  <div class="desc">On an injection-failure day or a bad-news call, the app may feel like another thing to perform. Streaks especially can backfire ("I broke my streak on the day I found out").</div>
+  <div class="review-box">
+    <strong>Option to review:</strong> Add a "pause day" affordance that doesn't break streak. "Today is hard. I'll come back tomorrow." Button grants grace without guilt. Competitor Finch does this for mental-health tracking — users love it.
+  </div>
+</div>
+
+<h2 id="quickwins">6. Quick-win summary (do this week)</h2>
+<ol style="font-size: 13px;">
+  <li><strong>Q1.</strong> Breathing overlay: add persistent × close button (see U4)</li>
+  <li><strong>Q2.</strong> Medical disclaimer one-time modal on first app open (see L4)</li>
+  <li><strong>Q3.</strong> Pick British or American English, apply consistently (see L6)</li>
+  <li><strong>Q4.</strong> Settings → rename "Log out" or add confirm dialog (see F3)</li>
+  <li><strong>Q5.</strong> Day header: limit day-circle row to current week, add "Week N of X" label (see U2)</li>
+  <li><strong>Q6.</strong> Add "Just decide for me" buttons on onboarding steps that offer defaults (see A1)</li>
+  <li><strong>Q7.</strong> Add pause-day grace mechanism for streaks (see A3)</li>
+</ol>
+
+<div style="margin-top: 20px; padding: 14px 16px; background: white; border-radius: 10px; font-size: 12px;">
+  <strong>Reference key:</strong>
+  <span style="margin-left: 8px;">F1–F6 = Flow</span> ·
+  <span>L1–L6 = Language</span> ·
+  <span>U1–U5 = Layout/UI</span> ·
+  <span>M1–M4 = Market</span> ·
+  <span>A1–A3 = Audience</span> ·
+  <span>Q1–Q7 = Quick wins</span>
+</div>
+
+<h2>7. Items flagged this session (already addressed)</h2>
+<ul>
+  <li class="done">Allow notifications — back button added, heading sized to proportion</li>
+  <li class="done">"Day 1" no longer renders like Roman numeral (Karla sans-serif)</li>
+  <li class="done">"FROM YOUR PERSON" → "A NOTE FOR YOU" across all vibes + Paywall + Journey</li>
+  <li class="done">Calm vibe "YOUR STILLNESS" duplicate → "YOUR PRESENCE" (also fixed Fierce "YOUR FIRE" duplicate → "YOUR TRUTH")</li>
+  <li class="done">"Breathe with me" button restyled to match card button pattern</li>
+  <li class="done">Fuel card: swap replaces only the tapped item + learns category preference</li>
+  <li class="done">Journey tab: calendar icon, main count = days completed, streak as sub-number</li>
+  <li class="done">Removed "Today's journal is waiting" card</li>
+  <li class="done">Unified empty-state icons on Journey tab</li>
+  <li class="done">Settings "FULL JOURNEY" tick → sparkles ✨</li>
+</ul>
+
+<div style="margin-top: 40px; padding: 20px; background: white; border-radius: 10px; text-align: center; font-size: 12px; color: #9B7B74;">
+  Generated 2026-04-21 · Review items flagged <span class="tag review">NEEDS REVIEW</span> require your direction before implementation.
+</div>
+
+</body>
+</html>

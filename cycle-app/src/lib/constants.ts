@@ -39,6 +39,12 @@ export const ALL_COMPONENTS = [
 
 export const COMPONENT_ORDER = ['quote', 'anthem', 'affirmation', 'journal', 'gratitude', 'meditation', 'breathing', 'fuel']
 
+// Default cycle length per treatment type (days). User can override in onboarding or Settings.
+export const TREATMENT_DEFAULTS: Record<string, number> = {
+  ivf: 18, iui: 28, 'egg-freezing': 14, 'egg-donation': 14, icsi: 18,
+  'embryo-transfer': 18, fet: 18, 'medicated-cycle': 21, surrogacy: 28, preparing: 14,
+}
+
 export const NOTIFICATION_TIMES = [
   '06:00', '07:00', '07:30', '08:00', '08:30',
   '09:00', '10:00', '12:00', '19:00', '20:00', '21:00',
@@ -60,13 +66,13 @@ export const VIBE_CONTENT: Record<string, {
       quote: { emoji: '🔥', text: "TODAY'S FIRE" },
       anthem: { emoji: '🎵', text: "TODAY'S ANTHEM" },
       affirmation: { emoji: '⚡', text: 'YOUR POWER' },
-      journal: { emoji: '✍️', text: 'YOUR FIRE' },
+      journal: { emoji: '✍️', text: 'YOUR TRUTH' },
       gratitude: { emoji: '💛', text: "TODAY'S GRATITUDE" },
       breathing: { emoji: '✨', text: 'YOUR MOMENT' },
       fuel: { emoji: '🍳', text: 'YOUR FUEL' },
     },
     tones: { quote: 'bold, fierce, warrior energy, make her feel unstoppable', anthem: 'powerful, pump-up energy', affirmation: 'fierce first-person declaration of strength', journal: 'bold reflective prompt about courage and strength', gratitude: 'strong and proud not soft', breathing: 'energising breath', fuel: 'powerful, energising protein-rich foods to fuel her warrior body' },
-    friendNote: { emoji: '💛', heading: 'FROM YOUR PERSON', text: 'I am so proud of you. Every single injection. Every early morning. You are doing something extraordinary.' },
+    friendNote: { emoji: '💛', heading: 'A NOTE FOR YOU', text: 'I am so proud of you. Every single injection. Every early morning. You are doing something extraordinary.' },
   },
   nurturing: {
     splash: { tagline: 'DAY BY DAY, HELD BY LOVE', subtitle: 'Your daily warmth companion · here for every step' },
@@ -81,7 +87,7 @@ export const VIBE_CONTENT: Record<string, {
       fuel: { emoji: '🍳', text: 'YOUR NOURISHMENT' },
     },
     tones: { quote: 'warm, gentle, held, comforting', anthem: 'soft, warm, soothing', affirmation: 'gentle reassurance, soft first person', journal: 'gentle reflective prompt about feelings and self compassion', gratitude: 'soft and tender', breathing: 'slow, soft, calming', fuel: 'warm, nourishing comfort foods with plenty of protein to support her body' },
-    friendNote: { emoji: '🌸', heading: 'FROM YOUR PERSON', text: 'You are so loved. Every step of this journey, every hard moment. I am holding your hand.' },
+    friendNote: { emoji: '🌸', heading: 'A NOTE FOR YOU', text: 'You are so loved. Every step of this journey, every hard moment. I am holding your hand.' },
   },
   calm: {
     splash: { tagline: 'DAY BY DAY, BREATH BY BREATH', subtitle: 'Your daily stillness companion · grounded and present' },
@@ -90,13 +96,13 @@ export const VIBE_CONTENT: Record<string, {
       quote: { emoji: '🌊', text: "TODAY'S STILLNESS" },
       anthem: { emoji: '🎵', text: "TODAY'S SOUNDTRACK" },
       affirmation: { emoji: '🍃', text: 'YOUR GROUND' },
-      journal: { emoji: '✍️', text: 'YOUR STILLNESS' },
+      journal: { emoji: '✍️', text: 'YOUR PRESENCE' },
       gratitude: { emoji: '💛', text: "TODAY'S GRATITUDE" },
       breathing: { emoji: '✨', text: 'YOUR MOMENT' },
       fuel: { emoji: '🍳', text: 'YOUR FUEL' },
     },
     tones: { quote: 'grounded, peaceful, present', anthem: 'ambient, meditative', affirmation: 'centred, rooted, peaceful first person', journal: 'quiet reflective prompt about presence and acceptance', gratitude: 'simple and grounded', breathing: 'slow, meditative', fuel: 'simple, grounding whole foods with clean protein to keep her centred' },
-    friendNote: { emoji: '🌊', heading: 'FROM YOUR PERSON', text: 'You are exactly where you need to be. Breathe. I am with you.' },
+    friendNote: { emoji: '🌊', heading: 'A NOTE FOR YOU', text: 'You are exactly where you need to be. Breathe. I am with you.' },
   },
   lighthearted: {
     splash: { tagline: 'DAY BY DAY, JOY BY JOY', subtitle: 'Your daily sunshine companion · you\'ve got this' },
@@ -111,7 +117,7 @@ export const VIBE_CONTENT: Record<string, {
       fuel: { emoji: '🍳', text: 'YOUR FUEL' },
     },
     tones: { quote: 'joyful, fun, uplifting, makes her smile', anthem: 'fun, danceable, energy', affirmation: 'playful, fun, light first person declaration', journal: 'light fun reflective prompt that makes her laugh or smile', gratitude: 'joyful and fun', breathing: 'light and energising', fuel: 'fun, colourful, easy-to-make high-protein meals and snacks she will actually enjoy' },
-    friendNote: { emoji: '☀️', heading: 'FROM YOUR PERSON', text: 'Day [X], you are absolutely killing it. Honestly. Someone get this woman a trophy.' },
+    friendNote: { emoji: '☀️', heading: 'A NOTE FOR YOU', text: 'Day [X], you are absolutely killing it. Honestly. Someone get this woman a trophy.' },
   },
   spiritual: {
     splash: { tagline: 'DAY BY DAY, GUIDED BY FAITH', subtitle: 'Your daily soul companion · trust the journey' },
@@ -126,7 +132,7 @@ export const VIBE_CONTENT: Record<string, {
       fuel: { emoji: '🍳', text: 'YOUR NOURISHMENT' },
     },
     tones: { quote: 'faith-led, hopeful, sacred', anthem: 'soulful, devotional, uplifting', affirmation: 'faithful, hopeful, sacred first person', journal: 'spiritual reflective prompt about faith and trust', gratitude: 'reverent and hopeful', breathing: 'gentle, prayerful', fuel: 'wholesome, blessed foods to nourish and sustain her body and spirit through treatment' },
-    friendNote: { emoji: '🙏', heading: 'FROM YOUR PERSON', text: 'You are being guided, [name]. Every step of this path has purpose. I believe in you completely.' },
+    friendNote: { emoji: '🙏', heading: 'A NOTE FOR YOU', text: 'You are being guided, [name]. Every step of this path has purpose. I believe in you completely.' },
   },
 }
 

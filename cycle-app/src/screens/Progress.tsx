@@ -45,13 +45,6 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
     return count
   }, [data.cycleDays, data.name, data.vibe])
 
-  // Check if today's journal exists
-  const hasTodayJournal = React.useMemo(() => {
-    const a = localStorage.getItem(`cycle_content_${data.name}_${data.vibe}_day${dayNumber}_journal`)
-    const b = localStorage.getItem(`cycle_day_${dayNumber}_journal`)
-    return !!(a && a.trim()) || !!(b && b.trim())
-  }, [data.name, data.vibe, dayNumber])
-
   const rows: number[][] = []
   for (let i = 0; i < data.cycleDays; i += 7) {
     rows.push(Array.from({ length: Math.min(7, data.cycleDays - i) }, (_, j) => i + j + 1))
@@ -93,14 +86,14 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
 
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div style={{ textAlign: 'center', padding: '8px 0 4px' }}>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>&#127793; Current streak</div>
-            <div style={{ fontFamily: typo.headingFont, fontSize: 32, fontWeight: typo.headingWeight, fontStyle: 'italic', color: vibe.accent, lineHeight: 1.2 }}>{streak}</div>
-            <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, marginTop: 2 }}>days of showing up</div>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>Days completed</div>
+            <div style={{ fontFamily: typo.headingFont, fontSize: 32, fontWeight: typo.headingWeight, fontStyle: 'italic', color: vibe.accent, lineHeight: 1.2 }}>{daysCompleted}</div>
+            <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, marginTop: 2 }}>of {data.cycleDays}</div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 16, borderTop: `1px solid ${cardBorder}`, paddingTop: 14 }}>
             {[
               { val: dayNumber, label: 'DAY' },
-              { val: data.cycleDays, label: 'TOTAL' },
+              { val: streak, label: 'STREAK' },
               { val: savedCount, label: 'SAVED' },
               { val: journalCount, label: 'JOURNAL' },
             ].map((s, i) => (
@@ -119,7 +112,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <SectionLabel color={vibe.accent}>&#9829; {t('progress.saved', 'Saved')}</SectionLabel>
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                <div style={{ fontSize: 28, opacity: 0.3, marginBottom: 8 }}>&#9825;</div>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 30, color: mutedColor, opacity: 0.4, marginBottom: 8, lineHeight: 1 }}>&#9825;</div>
                 <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5 }}>Tap the heart on any quote that moves you</div>
               </div>
             </Card>
@@ -143,7 +136,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
                     ) : f.type === 'friendNote' ? (
                       <>
                         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: textColor, lineHeight: 1.5, textAlign: 'center', padding: '4px 0' }}>{f.text}</div>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em', textAlign: 'center' }}>FROM YOUR PERSON · DAY {f.day}</div>
+                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em', textAlign: 'center' }}>A NOTE FOR YOU · DAY {f.day}</div>
                       </>
                     ) : (
                       <>
@@ -170,7 +163,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <SectionLabel color={vibe.accent}>&#9998; Journal</SectionLabel>
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                <div style={{ fontSize: 28, opacity: 0.3, marginBottom: 8 }}>&#9997;</div>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 30, color: mutedColor, opacity: 0.4, marginBottom: 8, lineHeight: 1 }}>&#9998;</div>
                 <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5 }}>Today's journal prompt is waiting on the Today tab</div>
               </div>
             </Card>
@@ -189,19 +182,6 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             </Card>
           )
         })()}
-
-        {/* Journal CTA if today not yet journaled */}
-        {!hasTodayJournal && (
-          <Card cardBg={cardBg} cardBorder={cardBorder}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 22 }}>&#9997;</span>
-                <span style={{ fontFamily: typo.bodyFont, fontSize: 14, color: textColor }}>Today's journal is waiting</span>
-              </div>
-              <button onClick={() => onGoToDay(dayNumber)} style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: vibe.accent, background: 'none', border: `1px solid ${vibe.accent}40`, borderRadius: 8, padding: '6px 14px', cursor: 'pointer', letterSpacing: '0.05em' }}>Go &#8594;</button>
-            </div>
-          </Card>
-        )}
 
         {/* TODO: Cycle Story — end-of-cycle narrative summary (future feature) */}
       </div>
