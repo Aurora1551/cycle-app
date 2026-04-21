@@ -66,7 +66,10 @@ function App() {
   })
   const [vibePreview, setVibePreview] = useState<VibeKey | null>(null)
   const [dayNumber, setDayNumber] = useState(() => parseInt(localStorage.getItem(DAY_KEY) || '1', 10))
-  const [isPremium, setIsPremium] = useState(() => localStorage.getItem('cycle_premium') === '1')
+  // Testing bypass: in dev mode or when VITE_BYPASS_PAYWALL=1, treat everyone as premium
+  // so the Day 4+ gate does not interrupt testing.
+  const BYPASS_PAYWALL = import.meta.env.DEV || import.meta.env.VITE_BYPASS_PAYWALL === '1'
+  const [isPremium, setIsPremium] = useState(() => BYPASS_PAYWALL || localStorage.getItem('cycle_premium') === '1')
   const [isPaused, setIsPaused] = useState(() => localStorage.getItem('cycle_paused') === '1')
   const [showWelcomeBack, setShowWelcomeBack] = useState(() => {
     // Show welcome back if user was paused and just returned
