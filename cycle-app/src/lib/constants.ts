@@ -61,7 +61,7 @@ export const VIBE_CONTENT: Record<string, {
 }> = {
   fierce: {
     splash: { tagline: 'DAY BY DAY, FIRE BY FIRE', subtitle: 'Your daily strength companion' },
-    dayHeader: { tagline: 'DAY BY DAY, FIRE BY FIRE', title: "She's Got This", subtitle: 'Your daily strength companion' },
+    dayHeader: { tagline: 'DAY BY DAY, FIRE BY FIRE', title: "I've Got This", subtitle: 'Your daily strength companion' },
     labels: {
       quote: { emoji: '🔥', text: "TODAY'S FIRE" },
       anthem: { emoji: '🎵', text: "TODAY'S ANTHEM" },
@@ -76,7 +76,7 @@ export const VIBE_CONTENT: Record<string, {
   },
   nurturing: {
     splash: { tagline: 'DAY BY DAY, HELD BY LOVE', subtitle: 'Your daily warmth companion · here for every step' },
-    dayHeader: { tagline: 'DAY BY DAY, HELD BY LOVE', title: "She's Loved", subtitle: 'Your daily warmth companion' },
+    dayHeader: { tagline: 'DAY BY DAY, HELD BY LOVE', title: "I Am Loved", subtitle: 'Your daily warmth companion' },
     labels: {
       quote: { emoji: '🌸', text: "TODAY'S LIGHT" },
       anthem: { emoji: '🎵', text: "TODAY'S MELODY" },
@@ -91,7 +91,7 @@ export const VIBE_CONTENT: Record<string, {
   },
   calm: {
     splash: { tagline: 'DAY BY DAY, BREATH BY BREATH', subtitle: 'Your daily stillness companion · grounded and present' },
-    dayHeader: { tagline: 'DAY BY DAY, BREATH BY BREATH', title: "She's At Peace", subtitle: 'Your daily stillness companion' },
+    dayHeader: { tagline: 'DAY BY DAY, BREATH BY BREATH', title: "I Am At Peace", subtitle: 'Your daily stillness companion' },
     labels: {
       quote: { emoji: '🌊', text: "TODAY'S STILLNESS" },
       anthem: { emoji: '🎵', text: "TODAY'S SOUNDTRACK" },
@@ -106,7 +106,7 @@ export const VIBE_CONTENT: Record<string, {
   },
   lighthearted: {
     splash: { tagline: 'DAY BY DAY, JOY BY JOY', subtitle: 'Your daily sunshine companion · you\'ve got this' },
-    dayHeader: { tagline: 'DAY BY DAY, JOY BY JOY', title: "She's Shining ☀️", subtitle: 'Your daily sunshine companion' },
+    dayHeader: { tagline: 'DAY BY DAY, JOY BY JOY', title: "I'm Shining ☀️", subtitle: 'Your daily sunshine companion' },
     labels: {
       quote: { emoji: '☀️', text: "TODAY'S SUNSHINE" },
       anthem: { emoji: '🎵', text: "TODAY'S BANGER" },
@@ -121,7 +121,7 @@ export const VIBE_CONTENT: Record<string, {
   },
   spiritual: {
     splash: { tagline: 'DAY BY DAY, GUIDED BY FAITH', subtitle: 'Your daily soul companion · trust the journey' },
-    dayHeader: { tagline: 'DAY BY DAY, GUIDED BY FAITH', title: "She's Blessed", subtitle: 'Your daily soul companion' },
+    dayHeader: { tagline: 'DAY BY DAY, GUIDED BY FAITH', title: 'I Am Blessed', subtitle: 'Your daily soul companion' },
     labels: {
       quote: { emoji: '🙏', text: "TODAY'S BLESSING" },
       anthem: { emoji: '🎵', text: "TODAY'S HYMN" },

@@ -184,7 +184,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
       </div>
 
       <div className="flex-col gap-16" style={{ padding: '0 24px 120px' }}>
-        <div className="mono-hint" style={{ color: mutedColor }}>JOURNEY PERSONALIZATION</div>
+        <div className="mono-hint" style={{ color: mutedColor }}>JOURNEY PERSONALISATION</div>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {row('👤', t('settings.name'), data.name, () => { setEditName(data.name); setEditMode('name') })}
           {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => { setEditTreatment(data.treatment); setEditOtherText(''); setEditMode('treatment') })}
