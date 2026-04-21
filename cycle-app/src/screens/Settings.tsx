@@ -33,8 +33,14 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
   const { t, i18n } = useTranslation()
   const visible = useFadeIn()
   const [editMode, setEditMode] = useState<EditMode>(null)
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
-  const toggleSection = (key: string) => setCollapsed(c => ({ ...c, [key]: !c[key] }))
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem('cycle_settings_collapsed') || '{}') } catch { return {} }
+  })
+  const toggleSection = (key: string) => setCollapsed(c => {
+    const next = { ...c, [key]: !c[key] }
+    try { localStorage.setItem('cycle_settings_collapsed', JSON.stringify(next)) } catch {}
+    return next
+  })
   const sectionHeader = (key: string, label: string) => (
     <button onClick={() => toggleSection(key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', minHeight: 32 }}>
       <span className="mono-hint" style={{ color: mutedColor }}>{label}</span>
