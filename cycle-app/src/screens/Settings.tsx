@@ -41,22 +41,37 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
     try { localStorage.setItem('cycle_settings_collapsed', JSON.stringify(next)) } catch {}
     return next
   })
-  const Section: React.FC<{ k: string; label: string; children: React.ReactNode }> = ({ k, label, children }) => (
+  const Section: React.FC<{ k: string; label: string; summary?: string; children: React.ReactNode }> = ({ k, label, summary, children }) => (
     <div>
       <button onClick={() => toggleSection(k)} style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: '100%', cursor: 'pointer',
-        padding: '11px 14px',
+        padding: '14px',
         background: `${vibe.accent}0A`,
         border: `1px solid ${cardBorder}`,
-        borderRadius: 10,
+        borderRadius: 12,
+        textAlign: 'left',
+        gap: 10,
       }}>
-        <span className="mono-hint" style={{ color: mutedColor }}>{label}</span>
-        <span style={{ color: vibe.accent, fontSize: 11, transition: 'transform 0.2s', transform: collapsed[k] ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▾</span>
+        <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+          <div className="mono-hint" style={{ color: vibe.accent, marginBottom: summary ? 3 : 0, letterSpacing: '0.15em' }}>{label}</div>
+          {summary && <div className="body-font" style={{ fontSize: 12, color: textColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</div>}
+        </div>
+        <span style={{ color: mutedColor, fontSize: 16, transition: 'transform 0.2s', transform: collapsed[k] ? 'rotate(0deg)' : 'rotate(90deg)', flexShrink: 0 }}>›</span>
       </button>
       {!collapsed[k] && <div style={{ marginTop: 8 }}>{children}</div>}
     </div>
   )
+
+  const dietSummary = (() => {
+    const active = dietPrefs.filter(d => d !== 'none')
+    if (!active.length) return 'None selected'
+    return DIET_OPTIONS.filter(o => active.includes(o.id)).map(o => o.label).join(' · ')
+  })()
+  const personalisationSummary = `${data.name} · ${t(`treatments.${data.treatment}`) || data.treatment} · ${data.cycleDays} days · ${t(`vibes.${data.vibe}`)}`
+  const musicSummary = !spotifyConfigured ? 'Spotify not configured' : spotifyConnected ? `Spotify · ${spotifyDisplayName || 'connected'}` : 'Spotify not connected'
+  const notifSummary = notifyEnabled ? `Daily at ${notifyHour}:${String(notifyMinute).padStart(2, '0')} ${notifyPeriod}` : 'Off'
+  const accountSummary = isPremium ? 'Full journey unlocked ✨' : 'Free plan · Days 1–3'
   const [editName, setEditName] = useState(data.name)
   const [editCycleDays, setEditCycleDays] = useState(data.cycleDays)
   const [editTreatment, setEditTreatment] = useState(data.treatment)
@@ -208,7 +223,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
       </div>
 
       <div className="flex-col gap-12" style={{ padding: '0 24px 120px' }}>
-        <Section k="personalisation" label="JOURNEY PERSONALISATION">
+        <Section k="personalisation" label="JOURNEY PERSONALISATION" summary={personalisationSummary}>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {row('👤', t('settings.name'), data.name, () => { setEditName(data.name); setEditMode('name') })}
           {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => { setEditTreatment(data.treatment); setEditOtherText(''); setEditMode('treatment') })}
@@ -221,7 +236,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         </Section>
 
         {/* Music / Spotify section */}
-        <Section k="music" label="MUSIC">
+        <Section k="music" label="MUSIC" summary={musicSummary}>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           {!spotifyConfigured ? (
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -279,7 +294,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         </Section>
 
         {/* Dietary preferences */}
-        <Section k="diet" label="DIETARY PREFERENCES">
+        <Section k="diet" label="DIETARY PREFERENCES" summary={dietSummary}>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {DIET_OPTIONS.map(opt => {
@@ -300,7 +315,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         </Card>
         </Section>
 
-        <Section k="notifications" label={t('settings.notificationsSection').toUpperCase()}>
+        <Section k="notifications" label={t('settings.notificationsSection').toUpperCase()} summary={notifSummary}>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div className="flex-between" style={{ marginBottom: 16 }}>
             <div>
@@ -363,7 +378,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           }
           if (reflections.length === 0) return null
           return (
-            <Section k="past" label="PAST CYCLES">
+            <Section k="past" label="PAST CYCLES" summary={`${reflections.length} cycle${reflections.length === 1 ? '' : 's'}`}>
               <Card cardBg={cardBg} cardBorder={cardBorder}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {reflections.map((r: any, i: number) => (
@@ -385,7 +400,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           )
         })()}
 
-        <Section k="account" label={t('settings.account').toUpperCase()}>
+        <Section k="account" label={t('settings.account').toUpperCase()} summary={accountSummary}>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {/* Plan */}
           <div className="settings-row" style={{ borderBottom: `1px solid ${cardBorder}` }}>
