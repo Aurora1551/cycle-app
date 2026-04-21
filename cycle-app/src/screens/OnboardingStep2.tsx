@@ -84,7 +84,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
                 }}>
                   {sel && <div className="check-circle" style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, background: accent, fontSize: 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>✓</div>}
                   <div style={{ fontSize: 24, marginBottom: 4 }}>{v.emoji}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, fontFamily: "'Karla', sans-serif", color: text, transition: 'color 0.25s ease' }}>{t(`vibes.${v.key}`)}</div>
+                  <div className="body-font" style={{ fontSize: 12, fontWeight: 600, color: text, transition: 'color 0.25s ease' }}>{t(`vibes.${v.key}`)}</div>
                   <div style={{ fontSize: 9, color: muted, lineHeight: 1.2, marginTop: 2, transition: 'color 0.25s ease' }}>{t(`vibeTaglines.${v.key}`)}</div>
                 </button>
               )
@@ -99,11 +99,11 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
             {ALL_COMPONENTS.map(c => {
               const sel = components.includes(c.id)
               return (
-                <button key={c.id} onClick={() => toggleComponent(c.id)} style={{
+                <button key={c.id} onClick={() => toggleComponent(c.id)} className="body-font" style={{
                   padding: '6px 12px', borderRadius: 20, cursor: 'pointer',
                   border: sel ? `1.5px solid ${accent}` : `1.5px solid ${accent}20`,
                   background: sel ? `${accent}12` : 'transparent',
-                  fontFamily: "'Karla', sans-serif", fontSize: 12, fontWeight: sel ? 600 : 400,
+                  fontSize: 12, fontWeight: sel ? 600 : 400,
                   color: sel ? text : muted, display: 'flex', alignItems: 'center', gap: 5,
                   transition: 'all 0.15s',
                 }}>
@@ -114,7 +114,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
               )
             })}
           </div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 10, color: muted, marginTop: 6, transition: 'color 0.5s ease' }}>Tap to remove</div>
+          <div className="body-font" style={{fontSize: 10, color: muted, marginTop: 6, transition: 'color 0.5s ease' }}>Tap to remove</div>
         </div>
 
         <div className="spacer" />
@@ -122,7 +122,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
           className="btn-primary" style={{ background: canContinue ? accent : `${accent}44`, transition: 'background 0.4s ease' }}>
           Continue
         </button>
-        <button onClick={() => onContinue('calm', ALL_COMPONENTS.map(c => c.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: muted, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('calm', ALL_COMPONENTS.map(c => c.id))} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: muted, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </div>

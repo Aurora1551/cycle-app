@@ -99,7 +99,7 @@ const PaymentSuccess: React.FC<Props> = ({ onComplete, vibeBg = '#1C0F0C', vibeA
             borderTopColor: vibeAccent, borderRadius: '50%',
             animation: 'spin 0.6s linear infinite',
           }} />
-          <p style={{ color: mutedColor, fontFamily: "'Karla', sans-serif", fontSize: 14 }}>
+          <p className="body-font" style={{ color: mutedColor, fontSize: 14 }}>
             {t('payment.confirming')}
           </p>
         </div>
@@ -114,7 +114,7 @@ const PaymentSuccess: React.FC<Props> = ({ onComplete, vibeBg = '#1C0F0C', vibeA
           }}>
             {t('payment.successHeading')}
           </h2>
-          <p style={{ color: mutedColor, fontFamily: "'Karla', sans-serif", fontSize: 14 }}>
+          <p className="body-font" style={{ color: mutedColor, fontSize: 14 }}>
             {t('payment.successMessage')}
           </p>
         </div>
@@ -129,7 +129,7 @@ const PaymentSuccess: React.FC<Props> = ({ onComplete, vibeBg = '#1C0F0C', vibeA
           }}>
             {t('payment.errorHeading')}
           </h2>
-          <p style={{ color: '#E8907A', fontFamily: "'Karla', sans-serif", fontSize: 14 }}>
+          <p className="body-font" style={{ color: '#E8907A', fontSize: 14 }}>
             {errorMsg}
           </p>
           <button

@@ -23,7 +23,7 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
         <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 700, color: '#1C0F0C', lineHeight: 1.1, margin: 0 }}>
           You've completed 3 free days
         </h1>
-        <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: '#9B7B74', lineHeight: 1.5, margin: '4px 0 16px', padding: '0 8px' }}>
+        <p className="body-font" style={{fontSize: 13, color: '#9B7B74', lineHeight: 1.5, margin: '4px 0 16px', padding: '0 8px' }}>
           <strong style={{ color: '#1C0F0C' }}>{remainingDays} more days</strong> waiting for you.
         </p>
 
@@ -33,10 +33,10 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           background: '#C4614A', cursor: 'pointer', textAlign: 'left',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-            <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: 700, color: 'white' }}>Unlock full journey</div>
+            <div className="body-font" style={{fontSize: 14, fontWeight: 700, color: 'white' }}>Unlock full journey</div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>£9.99</div>
           </div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: 1.4 }}>
+          <div className="body-font" style={{fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: 1.4 }}>
             All {cycleDays} days, journal, favourites, and more
           </div>
         </button>
@@ -46,8 +46,8 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           width: '100%', border: '1.5px solid rgba(196,97,74,0.2)', borderRadius: 14, padding: '16px',
           background: 'white', cursor: 'pointer', textAlign: 'left',
         }}>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: 700, color: '#1C0F0C', marginBottom: 4 }}>Save my progress</div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: '#9B7B74', lineHeight: 1.4 }}>
+          <div className="body-font" style={{fontSize: 14, fontWeight: 700, color: '#1C0F0C', marginBottom: 4 }}>Save my progress</div>
+          <div className="body-font" style={{fontSize: 11, color: '#9B7B74', lineHeight: 1.4 }}>
             Free account · upgrade whenever
           </div>
         </button>
@@ -57,7 +57,7 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           width: '100%', border: '1px dashed rgba(155,123,116,0.25)', borderRadius: 14, padding: '14px',
           background: 'transparent', cursor: 'pointer', textAlign: 'left',
         }}>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 12, color: '#9B7B74' }}>Keep browsing my free days</div>
+          <div className="body-font" style={{fontSize: 12, color: '#9B7B74' }}>Keep browsing my free days</div>
         </button>
       </div>
     </ScreenShell>

@@ -64,9 +64,9 @@ const GiftFlow: React.FC<Props> = ({ onBack, onDone, vibeAccent = '#C4614A', vib
       </p>
       {recipientName && (
         <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 14, padding: '16px 18px', width: '100%', textAlign: 'center' }}>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 12, color: mutedColor, marginBottom: 4 }}>SENT TO</div>
+          <div className="body-font" style={{fontSize: 12, color: mutedColor, marginBottom: 4 }}>SENT TO</div>
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 700, color: textColor }}>{recipientName}</div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: mutedColor, marginTop: 2 }}>{recipientEmail}</div>
+          <div className="body-font" style={{fontSize: 13, color: mutedColor, marginTop: 2 }}>{recipientEmail}</div>
         </div>
       )}
       <button onClick={onDone} className="btn-primary" style={{ background: vibeAccent, width: '100%' }}>
@@ -78,7 +78,7 @@ const GiftFlow: React.FC<Props> = ({ onBack, onDone, vibeAccent = '#C4614A', vib
   if (step === 'sending') return (
     <ScreenShell bg={vibeBg} visible={visible} style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: 28 }}>
       <div style={{ fontSize: 48, animation: 'float 2s ease-in-out infinite' }}>✉️</div>
-      <p style={{ fontFamily: "'Karla', sans-serif", fontSize: 15, color: mutedColor, textAlign: 'center' }}>
+      <p className="body-font" style={{fontSize: 15, color: mutedColor, textAlign: 'center' }}>
         Sending gift to {recipientName || recipientEmail}...
       </p>
     </ScreenShell>

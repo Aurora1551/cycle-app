@@ -50,7 +50,7 @@ const LanguagePicker: React.FC<Props> = ({ open, onClose, accent = '#C4614A', bg
               >
                 <span style={{ fontSize: 22 }}>{lang.flag}</span>
                 <div style={{ flex: 1 }}>
-                  <span style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: isActive ? 600 : 400, color: textColor }}>{lang.label}</span>
+                  <span className="body-font" style={{fontSize: 14, fontWeight: isActive ? 600 : 400, color: textColor }}>{lang.label}</span>
                   <span className="mono" style={{fontSize: 10, color: mutedColor, marginLeft: 8 }}>{lang.code.toUpperCase()}</span>
                 </div>
                 {isActive && <span style={{ fontSize: 14, color: accent }}>✓</span>}
@@ -58,7 +58,7 @@ const LanguagePicker: React.FC<Props> = ({ open, onClose, accent = '#C4614A', bg
             )
           })}
         </div>
-        <button onClick={onClose} style={{ width: '100%', marginTop: 16, background: `${accent}20`, border: `1px solid ${accent}40`, borderRadius: 14, padding: '12px', fontSize: 14, fontFamily: "'Karla', sans-serif", color: accent, cursor: 'pointer' }}>
+        <button onClick={onClose} className="body-font" style={{ width: '100%', marginTop: 16, background: `${accent}20`, border: `1px solid ${accent}40`, borderRadius: 14, padding: '12px', fontSize: 14, color: accent, cursor: 'pointer' }}>
           {t('close')}
         </button>
       </div>

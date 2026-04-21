@@ -60,8 +60,8 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
   )
 
   const spinnerBox = (value: string) => (
-    <div style={{
-      fontFamily: "'DM Mono', monospace", fontSize: 32, fontWeight: 700, color: textColor,
+    <div className="mono" style={{
+      fontSize: 32, fontWeight: 700, color: textColor,
       background: isDark ? 'rgba(255,255,255,0.06)' : `${vibe.accent}08`,
       border: `1.5px solid ${vibe.accent}40`, borderRadius: 12, padding: '8px 16px', minWidth: 56, textAlign: 'center',
     }}>{value}</div>
@@ -94,10 +94,10 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 8 }}>
               {(['AM', 'PM'] as const).map(p => (
-                <button key={p} onClick={() => setPeriod(p)} style={{
+                <button key={p} onClick={() => setPeriod(p)} className="mono" style={{
                   background: period === p ? vibe.accent : 'transparent',
                   border: `1.5px solid ${period === p ? vibe.accent : `${vibe.accent}40`}`,
-                  borderRadius: 10, padding: '8px 14px', fontFamily: "'DM Mono', monospace", fontSize: 14, fontWeight: 600,
+                  borderRadius: 10, padding: '8px 14px', fontSize: 14, fontWeight: 600,
                   color: period === p ? 'white' : textColor, cursor: 'pointer', transition: 'all 0.15s',
                 }}>{p}</button>
               ))}

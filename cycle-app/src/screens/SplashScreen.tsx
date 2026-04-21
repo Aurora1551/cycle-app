@@ -50,8 +50,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
       </button>
 
       {/* Vibe tagline at top */}
-      <div style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500,
+      <div className="mono" style={{
+        fontSize: 10, fontWeight: 500,
         color: 'rgba(28,15,12,0.35)', letterSpacing: '0.2em', textTransform: 'uppercase',
         marginTop: 48, marginBottom: 40,
       }}>
@@ -78,8 +78,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
       </h1>
 
       {/* Vibe subtitle */}
-      <p style={{
-        fontFamily: "'Karla', sans-serif", fontSize: 13, fontWeight: 300,
+      <p className="body-font" style={{
+        fontSize: 13, fontWeight: 300,
         color: 'rgba(28,15,12,0.45)', letterSpacing: '0.02em', textAlign: 'center',
         lineHeight: 1.4,
       }}>

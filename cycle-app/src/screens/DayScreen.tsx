@@ -767,8 +767,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
   const vibeLabel = (label: { emoji: string; text: string }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
       <span style={{ fontSize: 13, lineHeight: 1 }}>{label.emoji}</span>
-      <span style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500,
+      <span className="mono" style={{
+        fontSize: 10, fontWeight: 500,
         color: vibe.accent, letterSpacing: '0.15em', textTransform: 'uppercase',
       }}>{label.text}</span>
     </div>
@@ -903,7 +903,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
                   <div className="mono" style={{fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
-                <button onClick={() => swapAt(i, item.name)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
+                <button onClick={() => swapAt(i, item.name)} className="mono" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
                   swap
                 </button>
               </div>
@@ -1012,8 +1012,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             {/* Left side: You're on + day number + of X days */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <div className="mono" style={{fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 2 }}>You're on day</div>
-              <div style={{
-                fontFamily: "'Karla', sans-serif",
+              <div className="body-font" style={{
                 fontWeight: 400,
                 fontSize: 32,
                 color: (data.vibe === 'fierce') ? '#FDF6F0' : (data.vibe === 'nurturing') ? '#3D1810' : (data.vibe === 'calm') ? '#E8F4F0' : (data.vibe === 'lighthearted') ? '#1A0A00' : '#F0EAF8',
@@ -1134,8 +1133,8 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
           <Card cardBg={cardBg} cardBorder={cardBorder}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
               <span style={{ fontSize: 13, lineHeight: 1 }}>{vibeContent.friendNote.emoji}</span>
-              <span style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500,
+              <span className="mono" style={{
+                fontSize: 10, fontWeight: 500,
                 color: vibe.accent, letterSpacing: '0.15em', textTransform: 'uppercase',
               }}>{vibeContent.friendNote.heading}</span>
             </div>

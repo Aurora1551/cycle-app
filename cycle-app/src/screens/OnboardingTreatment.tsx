@@ -54,7 +54,7 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
                 }}>
                   <div className="icon-box flex-center" style={{ width: 36, height: 36, background: sel ? 'rgba(196,97,74,0.15)' : 'rgba(232,165,152,0.12)', fontSize: 18 }}>{tr.emoji}</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: T, fontFamily: "'Karla', sans-serif" }}>{t(`treatments.${tr.id}`)}</div>
+                    <div className="body-font" style={{ fontSize: 14, fontWeight: 600, color: T }}>{t(`treatments.${tr.id}`)}</div>
                   </div>
                   <div className="check-circle" style={{
                     width: 18, height: 18, background: sel ? A : 'transparent',
@@ -74,9 +74,9 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
                       onKeyDown={e => { if (e.key === 'Enter' && otherText.trim()) onContinue(otherText.trim()) }}
                       placeholder={t('onboardingTreatment.otherPlaceholder')}
                       autoFocus
-                      style={{
+                      className="body-font" style={{
                         width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                        fontFamily: "'Karla', sans-serif", fontSize: 14, color: T, caretColor: A,
+                        fontSize: 14, color: T, caretColor: A,
                       }}
                     />
                   </div>
@@ -91,7 +91,7 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
           className="btn-primary" style={{ background: canContinue ? A : 'rgba(196,97,74,0.3)' }}>
           {t('continue')}
         </button>
-        <button onClick={() => onContinue('ivf')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('ivf')} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </OnboardingLayout>

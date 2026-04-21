@@ -57,7 +57,7 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
               >
                 {sel && <div className="check-circle" style={{ position: 'absolute', top: 8, right: 10, width: 16, height: 16, background: accent, fontSize: 9 }}>✓</div>}
                 <div style={{ fontSize: 26, marginBottom: 6 }}>{v.emoji}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, fontFamily: "'Karla', sans-serif", color: text, marginBottom: 3, transition: 'color 0.25s ease' }}>{t(`vibes.${v.key}`)}</div>
+                <div className="body-font" style={{ fontSize: 13, fontWeight: 600, color: text, marginBottom: 3, transition: 'color 0.25s ease' }}>{t(`vibes.${v.key}`)}</div>
                 <div style={{ fontSize: 10, color: muted, lineHeight: 1.3, transition: 'color 0.25s ease' }}>{t(`vibeTaglines.${v.key}`)}</div>
               </button>
             )
@@ -68,7 +68,7 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
           <div className="info-banner" style={{ background: `${accent}11`, border: `1px solid ${accent}33`, display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.4s ease' }}>
             <span style={{ fontSize: 20 }}>{activeVibe?.emoji}</span>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: text, fontFamily: "'Karla', sans-serif" }}>{t(`vibes.${selected}`)} {t('onboardingVibe.vibeSelected')}</div>
+              <div className="body-font" style={{ fontSize: 12, fontWeight: 600, color: text }}>{t(`vibes.${selected}`)} {t('onboardingVibe.vibeSelected')}</div>
               <div style={{ fontSize: 11, color: muted }}>{t(`vibeTaglines.${selected}`)}</div>
             </div>
           </div>
@@ -79,7 +79,7 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
           className="btn-primary" style={{ background: selected ? accent : `${accent}44`, transition: 'background 0.4s ease' }}>
           {t('continue')}
         </button>
-        <button onClick={() => onContinue('calm')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: 'rgba(253,246,240,0.35)', padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('calm')} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'rgba(253,246,240,0.35)', padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </div>

@@ -97,11 +97,11 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
             {TREATMENTS.map(tr => {
               const sel = treatment === tr.id
               return (
-                <button key={tr.id} onClick={() => setTreatment(tr.id)} style={{
+                <button key={tr.id} onClick={() => setTreatment(tr.id)} className="body-font" style={{
                   padding: '7px 12px', borderRadius: 20, cursor: 'pointer',
                   border: sel ? `1.5px solid ${A}` : '1.5px solid rgba(196,97,74,0.15)',
                   background: sel ? 'rgba(196,97,74,0.06)' : 'white',
-                  fontFamily: "'Karla', sans-serif", fontSize: 12, fontWeight: sel ? 600 : 400,
+                  fontSize: 12, fontWeight: sel ? 600 : 400,
                   color: sel ? T : M, display: 'flex', alignItems: 'center', gap: 5,
                   transition: 'all 0.15s',
                 }}>
@@ -117,7 +117,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
                 type="text" value={otherText} onChange={e => setOtherText(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleContinue() }}
                 placeholder="Tell us your treatment" autoFocus
-                style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontFamily: "'Karla', sans-serif", fontSize: 14, color: T, caretColor: A }}
+                className="body-font" style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: T, caretColor: A }}
               />
             </div>
           )}
@@ -133,7 +133,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
                 <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 700, color: T, width: 48, textAlign: 'center', borderLeft: '1px solid rgba(196,97,74,0.1)', borderRight: '1px solid rgba(196,97,74,0.1)', lineHeight: '44px' }}>{days}</div>
                 <button onClick={() => setDays(d => Math.min(60, d + 1))} style={{ width: 40, height: 44, background: 'none', border: 'none', color: A, fontSize: 18, cursor: 'pointer' }}>+</button>
               </div>
-              <span style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: M }}>days</span>
+              <span className="body-font" style={{fontSize: 13, color: M }}>days</span>
             </div>
           </div>
         )}
@@ -142,7 +142,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
         <button onClick={handleContinue} disabled={!canContinue} className="btn-primary" style={{ background: canContinue ? A : 'rgba(196,97,74,0.3)' }}>
           Continue
         </button>
-        <button onClick={() => onContinue('You', 'ivf', 18)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('You', 'ivf', 18)} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </div>

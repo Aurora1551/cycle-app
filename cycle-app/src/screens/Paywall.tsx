@@ -34,14 +34,14 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
   return (
     <div className="screen fade-in" style={{ background: '#FDF6F0', opacity: visible ? 1 : 0 }}>
       <div className="content" style={{ padding: '32px 24px 24px', gap: 12 }}>
-        {onBack && <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 6px', minHeight: 44, fontFamily: "'Karla', sans-serif", fontSize: 13, fontWeight: 500, color: M }}><span style={{ fontSize: 16 }}>‹</span> Back</button>}
+        {onBack && <button onClick={onBack} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 6px', minHeight: 44, fontSize: 13, fontWeight: 500, color: M }}><span style={{ fontSize: 16 }}>‹</span> Back</button>}
         <div className="step-label" style={{ color: A }}>{t('paywall.unlock')}</div>
         <h1 className="heading-lg" style={{ color: T }}>{t('paywall.choosePlan')}</h1>
         <p className="subtext" style={{ marginBottom: 4 }}>{t('paywall.subtext')}</p>
 
         <button onClick={() => setSelected('free')} style={{ ...planBtn(selected === 'free'), background: 'transparent', border: `1.5px dashed ${selected === 'free' ? A : 'rgba(196,97,74,0.3)'}` }}>
           <div className="flex-between" style={{ marginBottom: 4 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: T, fontFamily: "'Karla', sans-serif" }}>{t('paywall.tryFree')}</div>
+            <div className="body-font" style={{ fontSize: 14, fontWeight: 600, color: T }}>{t('paywall.tryFree')}</div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 700, color: M }}>{t('paywall.tryFreePrice')}</div>
           </div>
           <div style={{ fontSize: 11, color: M }}>{t('paywall.tryFreeDetails')}</div>
@@ -55,7 +55,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
         }) }}>
           <div className="mono-xs" style={{ position: 'absolute', top: -10, right: 14, background: A, color: 'white', textTransform: 'uppercase', letterSpacing: '0.12em', padding: '3px 9px', borderRadius: 20 }}>{t('paywall.bestValue')}</div>
           <div className="flex-between" style={{ marginBottom: 4 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: selected === 'one-cycle' ? '#FDF6F0' : T, fontFamily: "'Karla', sans-serif" }}>{t('paywall.oneCycle')}</div>
+            <div className="body-font" style={{ fontSize: 14, fontWeight: 600, color: selected === 'one-cycle' ? '#FDF6F0' : T }}>{t('paywall.oneCycle')}</div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 700, color: '#E8A598' }}>{t('paywall.oneCyclePrice')}</div>
           </div>
           <div style={{ fontSize: 11, color: selected === 'one-cycle' ? 'rgba(253,246,240,0.5)' : M }}>{t('paywall.oneCycleDetails')}</div>
@@ -63,7 +63,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
 
         <button onClick={() => setSelected('gift')} style={{ ...planBtn(selected === 'gift'), background: selected === 'gift' ? 'rgba(196,97,74,0.04)' : 'white', border: `1.5px solid ${selected === 'gift' ? A : 'rgba(196,97,74,0.2)'}` }}>
           <div className="flex-between" style={{ marginBottom: 4 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: T, fontFamily: "'Karla', sans-serif" }}>{t('paywall.giftCycle')}</div>
+            <div className="body-font" style={{ fontSize: 14, fontWeight: 600, color: T }}>{t('paywall.giftCycle')}</div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 700, color: A }}>{t('paywall.giftPrice')}</div>
           </div>
           <div style={{ fontSize: 11, color: M }}>{t('paywall.giftDetails')}</div>
@@ -82,7 +82,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
           ].map((f, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 0' }}>
               <span style={{ fontSize: 14 }} dangerouslySetInnerHTML={{ __html: f.emoji }} />
-              <span style={{ fontFamily: "'Karla', sans-serif", fontSize: 13, color: T }}>{f.text}</span>
+              <span className="body-font" style={{fontSize: 13, color: T }}>{f.text}</span>
             </div>
           ))}
         </div>

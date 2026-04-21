@@ -283,6 +283,87 @@
   <p><strong>Recommendation:</strong> the middle-ground — icons for functional section labels, emojis reserved for decorative/emotional moments (friend-note heart, streak seedling, end-of-cycle orb).</p>
 </div>
 
+<!-- SETTINGS DROPDOWNS SECTION -->
+<h1 style="margin-top: 48px;">Settings dropdown — reference patterns</h1>
+<div class="sub">Five options, adapted from real apps. Current app uses option B. Pick the one that feels right.</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">
+
+  <!-- A. iOS Settings style -->
+  <div style="background: white; border-radius: 12px; padding: 18px 14px;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #B86A3A; letter-spacing: 0.15em; margin-bottom: 10px;">A · iOS SETTINGS</div>
+    <div style="background: #F2F2F7; border-radius: 10px; overflow: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: white;">
+        <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; color: #9B7B74;">JOURNEY</span>
+        <span style="color: #C7C7CC; font-size: 13px;">›</span>
+      </div>
+    </div>
+    <div style="font-size: 11px; color: #9B7B74; margin-top: 10px; line-height: 1.5;">Flat list row with trailing chevron. Tap takes you to a new screen (not expand). Best when sections have lots of content — avoids long scrolls. Used in iOS Settings, Messenger, Spotify.</div>
+  </div>
+
+  <!-- B. Inline expand (current) -->
+  <div style="background: white; border-radius: 12px; padding: 18px 14px;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #B86A3A; letter-spacing: 0.15em; margin-bottom: 10px;">B · CURRENT — INLINE EXPAND</div>
+    <button style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 11px 14px; background: rgba(196,97,74,0.04); border: 1px solid rgba(196,97,74,0.15); border-radius: 10px; cursor: pointer;">
+      <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; color: #9B7B74;">JOURNEY</span>
+      <span style="color: #C4614A; font-size: 11px;">▾</span>
+    </button>
+    <div style="font-size: 11px; color: #9B7B74; margin-top: 10px; line-height: 1.5;">Tinted button with chevron. Tap expands in place. Works for short sections. Used in Stripe Dashboard, Linear settings, Notion toggles.</div>
+  </div>
+
+  <!-- C. Material expansion -->
+  <div style="background: white; border-radius: 12px; padding: 18px 14px;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #B86A3A; letter-spacing: 0.15em; margin-bottom: 10px;">C · MATERIAL EXPANSION</div>
+    <div style="box-shadow: 0 1px 3px rgba(0,0,0,0.08); background: white; border-radius: 10px; overflow: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 16px; cursor: pointer;">
+        <span style="font-family: 'Karla', sans-serif; font-size: 14px; font-weight: 600; color: #3D1810;">Journey personalisation</span>
+        <span style="color: #C4614A; font-size: 14px;">⌄</span>
+      </div>
+    </div>
+    <div style="font-size: 11px; color: #9B7B74; margin-top: 10px; line-height: 1.5;">Full-weight heading (not mono-case), elevated card, larger chevron. Feels substantial, announces the section. Used in Google Material apps, GitHub settings. Heavier visual weight than current.</div>
+  </div>
+
+  <!-- D. Notion-style toggle -->
+  <div style="background: white; border-radius: 12px; padding: 18px 14px;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #B86A3A; letter-spacing: 0.15em; margin-bottom: 10px;">D · NOTION TRIANGLE</div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer;">
+      <span style="color: #9B7B74; font-size: 10px; transform: rotate(-90deg); display: inline-block;">▶</span>
+      <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; color: #9B7B74;">JOURNEY</span>
+    </div>
+    <div style="font-size: 11px; color: #9B7B74; margin-top: 10px; line-height: 1.5;">Leading triangle that rotates. No background, no border — very minimal. Best for dense UIs with many toggles (like Notion). Can feel too utilitarian for a consumer wellness app.</div>
+  </div>
+
+  <!-- E. Card with preview -->
+  <div style="background: white; border-radius: 12px; padding: 18px 14px;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #B86A3A; letter-spacing: 0.15em; margin-bottom: 10px;">E · PREVIEW SUMMARY ★</div>
+    <button style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 14px; background: rgba(196,97,74,0.05); border: 1px solid rgba(196,97,74,0.15); border-radius: 12px; cursor: pointer;">
+      <div style="text-align: left;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.15em; color: #C4614A; margin-bottom: 3px;">JOURNEY</div>
+        <div style="font-family: 'Karla', sans-serif; font-size: 12px; color: #3D1810; font-weight: 400;">Aurora · IVF · 18 days · Fierce</div>
+      </div>
+      <span style="color: #9B7B74; font-size: 14px;">›</span>
+    </button>
+    <div style="font-size: 11px; color: #9B7B74; margin-top: 10px; line-height: 1.5;">Section header doubles as a summary. Useful for user state (shows what's currently set), collapsed by default. Used in Calm, Headspace, Duolingo settings. Tap opens the section.</div>
+  </div>
+
+  <!-- F. Divider-only -->
+  <div style="background: white; border-radius: 12px; padding: 18px 14px;">
+    <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #B86A3A; letter-spacing: 0.15em; margin-bottom: 10px;">F · DIVIDER + ARROW</div>
+    <div style="border-top: 1px solid rgba(196,97,74,0.2); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+      <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; color: #9B7B74;">JOURNEY PERSONALISATION</span>
+      <span style="color: #9B7B74; font-size: 11px;">+</span>
+    </div>
+    <div style="font-size: 11px; color: #9B7B74; margin-top: 10px; line-height: 1.5;">Horizontal rule separator + plus/minus icon. Zero chrome, very minimal. Used in Medium profile settings, Substack. Feels like reading, not configuring.</div>
+  </div>
+
+</div>
+
+<div style="background: white; padding: 18px 20px; border-radius: 12px; border-left: 4px solid #7FB5A0; margin-top: 24px; font-size: 14px;">
+  <strong>My recommendation: E (preview summary).</strong>
+  <p>Your sections are mostly about user state ("vibe: fierce", "treatment: IVF", "notifications: 8am"). A summary-header does two jobs at once: tells you what's in the section AND invites you to tap. It also makes the settings screen feel more like a profile than a config panel — which fits the emotional tone of the app.</p>
+  <p>If you want to keep the current pattern (B) but polish it: bump the header padding a bit more, add a subtle drop-shadow on hover, and animate the chevron rotate more visibly (0.3s with easing).</p>
+</div>
+
 </div>
 </body>
 </html>

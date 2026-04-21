@@ -136,11 +136,11 @@ interface BackButtonProps {
 }
 
 export const BackButton: React.FC<BackButtonProps> = ({ onClick, color, label = 'Back' }) => (
-  <button onClick={onClick} style={{
+  <button onClick={onClick} className="body-font" style={{
     background: 'none', border: 'none', cursor: 'pointer',
     display: 'flex', alignItems: 'center', gap: 4,
     padding: '14px 20px 6px', minHeight: 44,
-    fontFamily: "'Karla', sans-serif", fontSize: 13, fontWeight: 500, color,
+    fontSize: 13, fontWeight: 500, color,
     transition: 'color 0.2s',
   }}>
     <span style={{ fontSize: 16, lineHeight: 1 }}>‹</span> {label}

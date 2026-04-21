@@ -84,14 +84,14 @@ const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialVal
             <span className="mono" style={{fontSize: 9, color: A, letterSpacing: '0.1em' }}>DAY 1</span>
             <span className="mono" style={{fontSize: 9, color: M, letterSpacing: '0.1em' }}>DAY {days}</span>
           </div>
-          <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: M, marginTop: 8, textAlign: 'center' }}>
+          <div className="body-font" style={{fontSize: 11, color: M, marginTop: 8, textAlign: 'center' }}>
             {days} days of daily content made just for you
           </div>
         </div>
 
         <div className="spacer" />
         <button onClick={() => onContinue(days)} className="btn-primary" style={{ background: A }}>{t('continue')}</button>
-        <button onClick={() => onContinue(28)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue(28)} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </OnboardingLayout>

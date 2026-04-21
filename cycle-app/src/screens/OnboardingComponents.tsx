@@ -53,7 +53,7 @@ const OnboardingComponents: React.FC<Props> = ({ onBack, onContinue, initialValu
                 border: sel ? `1.5px solid ${A}` : '1.5px solid rgba(196,97,74,0.12)',
               }}>
                 <span style={{ fontSize: 18 }}>{c.emoji}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: sel ? T : M, fontFamily: "'Karla', sans-serif", lineHeight: 1.2, transition: 'color 0.18s ease' }}>{t(`components.${c.id}`)}</span>
+                <span className="body-font" style={{ fontSize: 12, fontWeight: 600, color: sel ? T : M, lineHeight: 1.2, transition: 'color 0.18s ease' }}>{t(`components.${c.id}`)}</span>
                 {sel && (
                   <div className="check-circle" style={{ position: 'absolute', top: 6, right: 8, width: 14, height: 14, background: A }}>✓</div>
                 )}
@@ -68,7 +68,7 @@ const OnboardingComponents: React.FC<Props> = ({ onBack, onContinue, initialValu
           className="btn-primary" style={{ background: selected.length > 0 ? A : 'rgba(196,97,74,0.3)' }}>
           {t('continue')}
         </button>
-        <button onClick={() => onContinue(['quote', 'anthem', 'affirmation', 'journal', 'breathing'])} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Karla', sans-serif", fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue(['quote', 'anthem', 'affirmation', 'journal', 'breathing'])} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </OnboardingLayout>
