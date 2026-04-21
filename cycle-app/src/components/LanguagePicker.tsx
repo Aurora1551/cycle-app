@@ -51,7 +51,7 @@ const LanguagePicker: React.FC<Props> = ({ open, onClose, accent = '#C4614A', bg
                 <span style={{ fontSize: 22 }}>{lang.flag}</span>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, fontWeight: isActive ? 600 : 400, color: textColor }}>{lang.label}</span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor, marginLeft: 8 }}>{lang.code.toUpperCase()}</span>
+                  <span className="mono" style={{fontSize: 10, color: mutedColor, marginLeft: 8 }}>{lang.code.toUpperCase()}</span>
                 </div>
                 {isActive && <span style={{ fontSize: 14, color: accent }}>✓</span>}
               </button>

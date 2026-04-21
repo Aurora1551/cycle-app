@@ -70,7 +70,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
 
         {/* Vibe selector: 3 on first row, 2 on second */}
         <div style={{ marginBottom: 4 }}>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: accent, letterSpacing: '0.1em', marginBottom: 8, transition: 'color 0.5s ease' }}>YOUR VIBE</div>
+          <div className="mono" style={{fontSize: 9, color: accent, letterSpacing: '0.1em', marginBottom: 8, transition: 'color 0.5s ease' }}>YOUR VIBE</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {VIBES.map(v => {
               const sel = vibe === v.key
@@ -94,7 +94,7 @@ const OnboardingStep2: React.FC<Props> = ({ onBack, onContinue, initialVibe, ini
 
         {/* Components */}
         <div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: accent, letterSpacing: '0.1em', marginBottom: 8, transition: 'color 0.5s ease' }}>YOUR DAILY CONTENT</div>
+          <div className="mono" style={{fontSize: 9, color: accent, letterSpacing: '0.1em', marginBottom: 8, transition: 'color 0.5s ease' }}>YOUR DAILY CONTENT</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {ALL_COMPONENTS.map(c => {
               const sel = components.includes(c.id)

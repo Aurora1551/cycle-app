@@ -847,7 +847,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       <div key={component} style={{ background: `linear-gradient(135deg, ${vibe.accent}0A 0%, ${vibe.accent}04 100%)`, border: `1px solid ${vibe.accent}18`, borderRadius: 14, padding: '20px 16px', textAlign: 'center' }}>
         {vibeLabel({ emoji: vibeContent.labels.affirmation.emoji, text: 'SAY THIS TO YOURSELF' })}
         <div style={{ fontFamily: typo.headingFont, fontWeight: 700, fontSize: 22, color: vibe.accent, lineHeight: 1.35, padding: '8px 4px' }}>{content?.affirmation}</div>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: `${vibe.accent}50`, marginTop: 6, letterSpacing: '0.1em' }}>BREATHE. REPEAT.</div>
+        <div className="mono" style={{fontSize: 9, color: `${vibe.accent}50`, marginTop: 6, letterSpacing: '0.1em' }}>BREATHE. REPEAT.</div>
         {saveShareRow('affirmation', content?.affirmation || '')}
       </div>
     )
@@ -901,7 +901,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                 <div style={{ fontSize: 22 }}>{item.emoji}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
+                  <div className="mono" style={{fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
                 <button onClick={() => swapAt(i, item.name)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
                   swap
@@ -909,7 +909,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
               </div>
             ))}
           </div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, opacity: 0.5, lineHeight: 1.5, marginTop: 10 }}>
+          <div className="mono" style={{fontSize: 8, color: mutedColor, opacity: 0.5, lineHeight: 1.5, marginTop: 10 }}>
             For inspiration only · follow your clinic's guidance
             {hasDietPrefs && <span> · {dietPrefs.join(', ')}</span>}
           </div>
@@ -931,7 +931,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         {vibeLabel({ emoji: vibeContent.labels.gratitude.emoji, text: 'PAUSE & REFLECT' })}
         <div style={{ fontSize: 18, color: isDark ? 'rgba(253,246,240,0.7)' : 'rgba(28,15,12,0.6)', fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 400, lineHeight: 1.5, padding: '4px 0' }}>{content?.gratitudePrompt}</div>
         <div style={{ borderBottom: `1px dashed ${vibe.accent}25`, marginTop: 14, paddingBottom: 20 }} />
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.05em', opacity: 0.6 }}>sit with this for a moment</div>
+        <div className="mono" style={{fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.05em', opacity: 0.6 }}>sit with this for a moment</div>
       </Card>
     )
     if (component === 'meditation' || component === 'breathing') return (
@@ -965,7 +965,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         <button onClick={onSettings} className="flex-center" style={{ position: 'absolute', top: 20, right: 22, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', fontSize: 14, zIndex: 1 }}>⚙️</button>
         <div style={{ textAlign: 'center' }}>
           {/* Tagline */}
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8, textShadow: `0 0 8px ${vibe.accent}60` }}>
+          <div className="mono" style={{fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8, textShadow: `0 0 8px ${vibe.accent}60` }}>
             {vibeContent.dayHeader.tagline}
           </div>
           {/* Title */}
@@ -1011,7 +1011,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left side: You're on + day number + of X days */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 2 }}>You're on day</div>
+              <div className="mono" style={{fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 2 }}>You're on day</div>
               <div style={{
                 fontFamily: "'Karla', sans-serif",
                 fontWeight: 400,
@@ -1024,11 +1024,11 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
               }}>
                 {dayNumber}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
+              <div className="mono" style={{fontSize: 10, fontWeight: 500, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>
                 of {data.cycleDays} days
               </div>
               {streak > 0 && (
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.08em', marginTop: 6, opacity: 0.8 }}>
+                <div className="mono" style={{fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.08em', marginTop: 6, opacity: 0.8 }}>
                   &#127793; {streak} {streak === 1 ? 'day' : 'days'} of loving yourself
                 </div>
               )}
@@ -1060,7 +1060,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                     {isLocked ? (
                       <span style={{ fontSize: 8 }}>🔒</span>
                     ) : (
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, fontWeight: 500, color: isDone ? 'white' : isViewing ? vibe.accent : mutedColor, lineHeight: 1 }}>{d}</span>
+                      <span className="mono" style={{fontSize: 7, fontWeight: 500, color: isDone ? 'white' : isViewing ? vibe.accent : mutedColor, lineHeight: 1 }}>{d}</span>
                     )}
                   </button>
                 )

@@ -86,7 +86,7 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
               {spinnerBox(String(hour))}
               {spinnerBtn(() => setHour(hour <= 1 ? 12 : hour - 1), '▼')}
             </div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 32, fontWeight: 700, color: textColor }}>:</div>
+            <div className="mono" style={{fontSize: 32, fontWeight: 700, color: textColor }}>:</div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
               {spinnerBtn(() => setMinute(minute >= 55 ? 0 : minute + 5), '▲')}
               {spinnerBox(String(minute).padStart(2, '0'))}

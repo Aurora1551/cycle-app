@@ -81,8 +81,8 @@ const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialVal
             }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: A, letterSpacing: '0.1em' }}>DAY 1</span>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em' }}>DAY {days}</span>
+            <span className="mono" style={{fontSize: 9, color: A, letterSpacing: '0.1em' }}>DAY 1</span>
+            <span className="mono" style={{fontSize: 9, color: M, letterSpacing: '0.1em' }}>DAY {days}</span>
           </div>
           <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 11, color: M, marginTop: 8, textAlign: 'center' }}>
             {days} days of daily content made just for you

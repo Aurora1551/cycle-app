@@ -27,7 +27,7 @@ interface Props {
   onUpgrade?: () => void
 }
 
-type EditMode = null | 'name' | 'treatment' | 'cycleDays' | 'vibe' | 'genres' | 'components' | 'notifyTime' | 'privacy' | 'language'
+type EditMode = null | 'name' | 'treatment' | 'cycleDays' | 'vibe' | 'genres' | 'components' | 'notifyTime' | 'privacy' | 'language' | 'about'
 
 const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAccount, onLogout, onSignOut, onBack, isPaused, onPause, onResume, isPremium, onUpgrade }) => {
   const { t, i18n } = useTranslation()
@@ -41,11 +41,21 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
     try { localStorage.setItem('cycle_settings_collapsed', JSON.stringify(next)) } catch {}
     return next
   })
-  const sectionHeader = (key: string, label: string) => (
-    <button onClick={() => toggleSection(key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', minHeight: 32 }}>
-      <span className="mono-hint" style={{ color: mutedColor }}>{label}</span>
-      <span style={{ color: mutedColor, fontSize: 11, transition: 'transform 0.15s', transform: collapsed[key] ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▾</span>
-    </button>
+  const Section: React.FC<{ k: string; label: string; children: React.ReactNode }> = ({ k, label, children }) => (
+    <div>
+      <button onClick={() => toggleSection(k)} style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        width: '100%', cursor: 'pointer',
+        padding: '11px 14px',
+        background: `${vibe.accent}0A`,
+        border: `1px solid ${cardBorder}`,
+        borderRadius: 10,
+      }}>
+        <span className="mono-hint" style={{ color: mutedColor }}>{label}</span>
+        <span style={{ color: vibe.accent, fontSize: 11, transition: 'transform 0.2s', transform: collapsed[k] ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▾</span>
+      </button>
+      {!collapsed[k] && <div style={{ marginTop: 8 }}>{children}</div>}
+    </div>
   )
   const [editName, setEditName] = useState(data.name)
   const [editCycleDays, setEditCycleDays] = useState(data.cycleDays)
@@ -197,9 +207,8 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 30, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, margin: 0 }}>{t('settings.yourJourney')}</h1>
       </div>
 
-      <div className="flex-col gap-16" style={{ padding: '0 24px 120px' }}>
-        {sectionHeader('personalisation', 'JOURNEY PERSONALISATION')}
-        {!collapsed['personalisation'] && (
+      <div className="flex-col gap-12" style={{ padding: '0 24px 120px' }}>
+        <Section k="personalisation" label="JOURNEY PERSONALISATION">
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {row('👤', t('settings.name'), data.name, () => { setEditName(data.name); setEditMode('name') })}
           {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => { setEditTreatment(data.treatment); setEditOtherText(''); setEditMode('treatment') })}
@@ -209,11 +218,10 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           {row('✨', t('settings.dailyComponents'), t('settings.nSelected', { n: data.components.length }), () => setEditMode('components'))}
           {(() => { const cl = LANGUAGES.find(l => i18n.language === l.code || i18n.language?.startsWith(l.code)) || LANGUAGES[0]; return row(`${cl.flag}`, t('settings.language'), cl.label, () => setEditMode('language')) })()}
         </Card>
-        )}
+        </Section>
 
         {/* Music / Spotify section */}
-        {sectionHeader('music', 'MUSIC')}
-        {!collapsed['music'] && (
+        <Section k="music" label="MUSIC">
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           {!spotifyConfigured ? (
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -235,7 +243,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{spotifyDisplayName}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1DB954' }} />
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#1DB954', letterSpacing: '0.1em' }}>CONNECTED</span>
+                    <span className="mono" style={{ fontSize: 10, color: '#1DB954', letterSpacing: '0.1em' }}>CONNECTED</span>
                   </div>
                 </div>
               </div>
@@ -268,11 +276,10 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </div>
           )}
         </Card>
-        )}
+        </Section>
 
         {/* Dietary preferences */}
-        {sectionHeader('diet', 'DIETARY PREFERENCES')}
-        {!collapsed['diet'] && (
+        <Section k="diet" label="DIETARY PREFERENCES">
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {DIET_OPTIONS.map(opt => {
@@ -291,10 +298,9 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             })}
           </div>
         </Card>
-        )}
+        </Section>
 
-        {sectionHeader('notifications', t('settings.notificationsSection').toUpperCase())}
-        {!collapsed['notifications'] && (
+        <Section k="notifications" label={t('settings.notificationsSection').toUpperCase()}>
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div className="flex-between" style={{ marginBottom: 16 }}>
             <div>
@@ -340,7 +346,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           )}
 
         </Card>
-        )}
+        </Section>
 
         {/* Past cycles & reflections */}
         {(() => {
@@ -357,18 +363,16 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           }
           if (reflections.length === 0) return null
           return (
-            <>
-              {sectionHeader('past', 'PAST CYCLES')}
-              {!collapsed['past'] && (
+            <Section k="past" label="PAST CYCLES">
               <Card cardBg={cardBg} cardBorder={cardBorder}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {reflections.map((r: any, i: number) => (
                     <div key={i} style={{ borderBottom: i < reflections.length - 1 ? `1px solid ${cardBorder}` : 'none', paddingBottom: i < reflections.length - 1 ? 14 : 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, letterSpacing: '0.08em' }}>
+                        <div className="mono" style={{ fontSize: 9, color: mutedColor, letterSpacing: '0.08em' }}>
                           {r.treatment ? r.treatment.toUpperCase() : ''}{r.cycleDays ? ` · ${r.cycleDays} DAYS` : ''}{r.date ? ` · ${new Date(r.date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}` : ''}
                         </div>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, letterSpacing: '0.08em' }}>&#10003; COMPLETED</div>
+                        <div className="mono" style={{ fontSize: 9, color: vibe.accent, letterSpacing: '0.08em' }}>&#10003; COMPLETED</div>
                       </div>
                       <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 400, fontSize: 14, color: isDark ? 'rgba(253,246,240,0.6)' : 'rgba(28,15,12,0.6)', lineHeight: 1.4 }}>
                         "{r.text}"
@@ -377,13 +381,11 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
                   ))}
                 </div>
               </Card>
-              )}
-            </>
+            </Section>
           )
         })()}
 
-        {sectionHeader('account', t('settings.account').toUpperCase())}
-        {!collapsed['account'] && (
+        <Section k="account" label={t('settings.account').toUpperCase()}>
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {/* Plan */}
           <div className="settings-row" style={{ borderBottom: `1px solid ${cardBorder}` }}>
@@ -411,7 +413,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
                 }}>
                   Unlock full journey — £9.99
                 </button>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, textAlign: 'center', marginTop: 4, letterSpacing: '0.05em' }}>
+                <div className="mono" style={{ fontSize: 8, color: mutedColor, textAlign: 'center', marginTop: 4, letterSpacing: '0.05em' }}>
                   One-time payment · no subscription
                 </div>
               </div>
@@ -432,6 +434,14 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             <div style={{ flex: 1 }}>
               <div className="mono-hint" style={{ color: '#B86A3A', marginBottom: 2, letterSpacing: '0.15em' }}>RESET JOURNEY</div>
               <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>Clear everything and start onboarding again.</div>
+            </div>
+            <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
+          </button>
+          <button onClick={() => setEditMode('about')} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
+            <div className="settings-icon" style={{ background: `${vibe.accent}15` }}>💛</div>
+            <div style={{ flex: 1 }}>
+              <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>ABOUT CYCLE</div>
+              <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>What this app is (and isn't).</div>
             </div>
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
           </button>
@@ -465,7 +475,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </div>
           </button>
         </Card>
-        )}
+        </Section>
 
         <div className="mono-xs text-center" style={{ color: mutedColor, marginTop: 8 }}>{t('settings.footer')}</div>
       </div>
@@ -718,6 +728,44 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
               <div style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 12, color: mutedColor, lineHeight: 1.5 }}>{t('privacy.inShortText')}</div>
             </div>
             <button onClick={() => setEditMode(null)} className="btn-primary" style={{ background: vibe.accent, marginTop: 24 }}>{t('close')}</button>
+          </div>
+        </div>
+      )}
+
+      {editMode === 'about' && (
+        <div className="modal-overlay" style={{ background: vibe.bg, overflowY: 'auto' }}>
+          <div style={{ maxWidth: 440, margin: '0 auto', padding: '20px 24px 40px' }}>
+            <div className="flex-between" style={{ marginBottom: 24 }}>
+              <button onClick={() => setEditMode(null)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
+                <span style={{ fontSize: 16 }}>‹</span> {t('back').replace('← ', '')}
+              </button>
+            </div>
+            <div style={{ marginBottom: 28 }}>
+              <SectionLabel color={vibe.accent}>ABOUT</SectionLabel>
+              <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 28, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, margin: '0 0 6px' }}>About Cycle</h1>
+              <div style={{ fontFamily: typo.bodyFont, fontSize: 11, color: mutedColor }}>A companion for your fertility journey</div>
+            </div>
+            <Card cardBg={cardBg} cardBorder={cardBorder}>
+              <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: textColor, lineHeight: 1.5, marginBottom: 10 }}>
+                Cycle is for emotional support, not medical advice.
+              </div>
+              <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: textColor, lineHeight: 1.6, opacity: 0.85 }}>
+                The quotes, affirmations, prompts, breathing exercises, music and food ideas in this app are here to hold space for you — not to diagnose, treat, or replace medical guidance. Anything to do with your treatment, medication, symptoms, or body: always consult your clinic first.
+              </div>
+            </Card>
+            <div style={{ marginTop: 20 }}>
+              <button onClick={() => setEditMode('privacy')} className="settings-row" style={{ cursor: 'pointer', width: '100%', background: `${vibe.accent}10`, borderRadius: 10, padding: '12px 14px', border: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>{t('settings.privacyPolicy')}</div>
+                  <div style={{ fontSize: 12, color: textColor, fontFamily: typo.bodyFont }}>How your data is handled</div>
+                </div>
+                <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
+              </button>
+            </div>
+            <div className="mono" style={{ fontSize: 9, color: mutedColor, opacity: 0.6, textAlign: 'center', marginTop: 32, letterSpacing: '0.05em' }}>
+              Cycle · made with care
+            </div>
+            <button onClick={() => setEditMode(null)} className="btn-primary" style={{ background: vibe.accent, marginTop: 20 }}>{t('close')}</button>
           </div>
         </div>
       )}

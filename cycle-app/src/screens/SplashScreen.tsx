@@ -46,7 +46,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onG
         borderRadius: 20, padding: '6px 12px', cursor: 'pointer',
       }}>
         <span style={{ fontSize: 16 }}>{currentLang.flag}</span>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: 'rgba(28,15,12,0.4)', letterSpacing: '0.1em' }}>{currentLang.code.toUpperCase()}</span>
+        <span className="mono" style={{fontSize: 10, color: 'rgba(28,15,12,0.4)', letterSpacing: '0.1em' }}>{currentLang.code.toUpperCase()}</span>
       </button>
 
       {/* Vibe tagline at top */}

@@ -64,7 +64,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
           <div className="flex-col gap-14">
             {rows.map((row, wi) => (
               <div key={wi} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, color: mutedColor, width: 18, flexShrink: 0 }}>{t('progress.week', { n: wi + 1 })}</div>
+                <div className="mono" style={{fontSize: 7, color: mutedColor, width: 18, flexShrink: 0 }}>{t('progress.week', { n: wi + 1 })}</div>
                 {row.map(day => {
                   const isDone = localStorage.getItem(`cycle_day_${day}_done`) === '1'
                   const isCurrent = day === dayNumber
@@ -74,7 +74,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
                       background: isDone ? vibe.accent : isCurrent ? `${vibe.accent}40` : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                       border: isCurrent ? `2px solid ${vibe.accent}` : 'none',
                     }}>
-                      <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 7, color: isDone ? 'white' : isCurrent ? vibe.accent : mutedColor, lineHeight: 1 }}>{day}</span>
+                      <span className="mono" style={{fontSize: 7, color: isDone ? 'white' : isCurrent ? vibe.accent : mutedColor, lineHeight: 1 }}>{day}</span>
                     </button>
                   )
                 })}
@@ -86,7 +86,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
 
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div style={{ textAlign: 'center', padding: '8px 0 4px' }}>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>Days completed</div>
+            <div className="mono" style={{fontSize: 10, color: mutedColor, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>Days completed</div>
             <div style={{ fontFamily: typo.headingFont, fontSize: 32, fontWeight: typo.headingWeight, fontStyle: 'italic', color: vibe.accent, lineHeight: 1.2 }}>{daysCompleted}</div>
             <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, marginTop: 2 }}>of {data.cycleDays}</div>
           </div>
@@ -99,7 +99,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: typo.headingFont, fontSize: 20, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: vibe.accent, lineHeight: 1.2 }}>{s.val}</div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: mutedColor, letterSpacing: '0.12em', marginTop: 2 }}>{s.label}</div>
+                <div className="mono" style={{fontSize: 8, color: mutedColor, letterSpacing: '0.12em', marginTop: 2 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -112,7 +112,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <SectionLabel color={vibe.accent}>&#9829; {t('progress.saved', 'Saved')}</SectionLabel>
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 30, color: mutedColor, opacity: 0.4, marginBottom: 8, lineHeight: 1 }}>&#9825;</div>
+                <div className="mono" style={{fontSize: 30, color: mutedColor, opacity: 0.4, marginBottom: 8, lineHeight: 1 }}>&#9825;</div>
                 <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5 }}>Tap the heart on any quote that moves you</div>
               </div>
             </Card>
@@ -126,22 +126,22 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
                     {f.type === 'quote' ? (
                       <>
                         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 18, color: textColor, lineHeight: 1.35 }}>"{f.text}"</div>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: vibe.accent, marginTop: 6, letterSpacing: '0.1em' }}>— {f.author} · DAY {f.day}</div>
+                        <div className="mono" style={{fontSize: 9, color: vibe.accent, marginTop: 6, letterSpacing: '0.1em' }}>— {f.author} · DAY {f.day}</div>
                       </>
                     ) : f.type === 'affirmation' ? (
                       <>
                         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: vibe.accent, lineHeight: 1.4, textAlign: 'center', padding: '4px 0' }}>{f.text}</div>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em', textAlign: 'center' }}>AFFIRMATION · DAY {f.day}</div>
+                        <div className="mono" style={{fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em', textAlign: 'center' }}>AFFIRMATION · DAY {f.day}</div>
                       </>
                     ) : f.type === 'friendNote' ? (
                       <>
                         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: textColor, lineHeight: 1.5, textAlign: 'center', padding: '4px 0' }}>{f.text}</div>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em', textAlign: 'center' }}>A NOTE FOR YOU · DAY {f.day}</div>
+                        <div className="mono" style={{fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em', textAlign: 'center' }}>A NOTE FOR YOU · DAY {f.day}</div>
                       </>
                     ) : (
                       <>
                         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: textColor, lineHeight: 1.4 }}>{f.text}</div>
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em' }}>
+                        <div className="mono" style={{fontSize: 9, color: mutedColor, marginTop: 6, letterSpacing: '0.1em' }}>
                           {f.author ? `— ${f.author} · ` : ''}{f.type.toUpperCase()} · DAY {f.day}
                         </div>
                       </>
@@ -163,7 +163,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <SectionLabel color={vibe.accent}>&#9998; Journal</SectionLabel>
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 30, color: mutedColor, opacity: 0.4, marginBottom: 8, lineHeight: 1 }}>&#9998;</div>
+                <div className="mono" style={{fontSize: 30, color: mutedColor, opacity: 0.4, marginBottom: 8, lineHeight: 1 }}>&#9998;</div>
                 <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: mutedColor, lineHeight: 1.5 }}>Today's journal prompt is waiting on the Today tab</div>
               </div>
             </Card>
@@ -175,7 +175,7 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
                 {journals.map((j, i) => (
                   <div key={i} style={{ borderBottom: i < journals.length - 1 ? `1px solid ${cardBorder}` : 'none', paddingBottom: i < journals.length - 1 ? 12 : 0 }}>
                     <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: textColor, lineHeight: 1.5 }}>{j.text}</div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: mutedColor, marginTop: 4, letterSpacing: '0.1em' }}>DAY {j.day}</div>
+                    <div className="mono" style={{fontSize: 9, color: mutedColor, marginTop: 4, letterSpacing: '0.1em' }}>DAY {j.day}</div>
                   </div>
                 ))}
               </div>

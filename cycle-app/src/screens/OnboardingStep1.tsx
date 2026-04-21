@@ -79,7 +79,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
 
         {/* Name */}
         <div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 4 }}>YOUR NAME</div>
+          <div className="mono" style={{fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 4 }}>YOUR NAME</div>
           <div className="field" style={{ background: 'white', border: '1.5px solid rgba(196,97,74,0.2)' }}>
             <input
               ref={inputRef} type="text" value={name}
@@ -92,7 +92,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
 
         {/* Treatment */}
         <div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 6 }}>YOUR TREATMENT</div>
+          <div className="mono" style={{fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 6 }}>YOUR TREATMENT</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {TREATMENTS.map(tr => {
               const sel = treatment === tr.id
@@ -126,7 +126,7 @@ const OnboardingStep1: React.FC<Props> = ({ onBack, onContinue, initialName, ini
         {/* Cycle Days */}
         {treatment && (
           <div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 6 }}>CYCLE LENGTH</div>
+            <div className="mono" style={{fontSize: 9, color: M, letterSpacing: '0.1em', marginBottom: 6 }}>CYCLE LENGTH</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1.5px solid rgba(196,97,74,0.15)', borderRadius: 10, overflow: 'hidden' }}>
                 <button onClick={() => setDays(d => Math.max(1, d - 1))} style={{ width: 40, height: 44, background: 'none', border: 'none', color: A, fontSize: 18, cursor: 'pointer' }}>−</button>

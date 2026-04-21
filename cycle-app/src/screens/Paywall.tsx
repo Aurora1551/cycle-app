@@ -71,7 +71,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
 
         {/* What you'll get */}
         <div style={{ background: 'rgba(196,97,74,0.04)', border: `1px solid rgba(196,97,74,0.1)`, borderRadius: 14, padding: '14px 16px', marginTop: 4 }}>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: A, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>What you'll get every day</div>
+          <div className="mono" style={{fontSize: 9, color: A, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>What you'll get every day</div>
           {[
             { emoji: '&#128172;', text: 'Personalised daily quote' },
             { emoji: '&#127925;', text: 'Curated music for your mood' },

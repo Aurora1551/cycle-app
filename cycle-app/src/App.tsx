@@ -71,6 +71,8 @@ function App() {
   const BYPASS_PAYWALL = import.meta.env.DEV || import.meta.env.VITE_BYPASS_PAYWALL === '1'
   const [isPremium, setIsPremium] = useState(() => BYPASS_PAYWALL || localStorage.getItem('cycle_premium') === '1')
   const [isPaused, setIsPaused] = useState(() => localStorage.getItem('cycle_paused') === '1')
+  const [showDisclaimer, setShowDisclaimer] = useState(() => !localStorage.getItem('cycle_disclaimer_ack'))
+  const ackDisclaimer = () => { localStorage.setItem('cycle_disclaimer_ack', '1'); setShowDisclaimer(false) }
   const [showWelcomeBack, setShowWelcomeBack] = useState(() => {
     // Show welcome back if user was paused and just returned
     if (localStorage.getItem('cycle_paused') === '1' && localStorage.getItem('cycle_pause_returning') === '1') {
@@ -303,6 +305,19 @@ function App() {
           <button onClick={resumeJourney} className="btn-primary" style={{ background: vibe.accent, marginTop: 12 }}>
             Continue my journey
           </button>
+        </div>
+      )}
+      {/* First-launch medical disclaimer — blocks splash until acknowledged */}
+      {showDisclaimer && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(28,15,12,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ background: '#FDF6F0', borderRadius: 16, maxWidth: 360, width: '100%', padding: '28px 24px', textAlign: 'center', boxShadow: '0 12px 40px rgba(0,0,0,0.25)' }}>
+            <div style={{ fontSize: 32, marginBottom: 10 }}>💛</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: 22, fontWeight: 700, color: '#1C0F0C', lineHeight: 1.25, marginBottom: 10 }}>Before you start</div>
+            <div style={{ fontFamily: "'Karla', sans-serif", fontSize: 14, color: '#3D1810', lineHeight: 1.55, marginBottom: 18 }}>
+              Cycle is for emotional support, not medical advice. Always consult your clinic for anything about your treatment, medication, or symptoms.
+            </div>
+            <button onClick={ackDisclaimer} className="btn-primary" style={{ background: '#C4614A' }}>I understand</button>
+          </div>
         </div>
       )}
       {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={restartJourney} onGift={() => setScreen('gift-flow')} />}
