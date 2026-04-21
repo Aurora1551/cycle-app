@@ -33,6 +33,14 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
   const { t, i18n } = useTranslation()
   const visible = useFadeIn()
   const [editMode, setEditMode] = useState<EditMode>(null)
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const toggleSection = (key: string) => setCollapsed(c => ({ ...c, [key]: !c[key] }))
+  const sectionHeader = (key: string, label: string) => (
+    <button onClick={() => toggleSection(key)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', minHeight: 32 }}>
+      <span className="mono-hint" style={{ color: mutedColor }}>{label}</span>
+      <span style={{ color: mutedColor, fontSize: 11, transition: 'transform 0.15s', transform: collapsed[key] ? 'rotate(-90deg)' : 'rotate(0deg)' }}>▾</span>
+    </button>
+  )
   const [editName, setEditName] = useState(data.name)
   const [editCycleDays, setEditCycleDays] = useState(data.cycleDays)
   const [editTreatment, setEditTreatment] = useState(data.treatment)
@@ -184,7 +192,8 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
       </div>
 
       <div className="flex-col gap-16" style={{ padding: '0 24px 120px' }}>
-        <div className="mono-hint" style={{ color: mutedColor }}>JOURNEY PERSONALISATION</div>
+        {sectionHeader('personalisation', 'JOURNEY PERSONALISATION')}
+        {!collapsed['personalisation'] && (
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {row('👤', t('settings.name'), data.name, () => { setEditName(data.name); setEditMode('name') })}
           {row('💊', t('settings.treatment'), t(`treatments.${data.treatment}`) || data.treatment, () => { setEditTreatment(data.treatment); setEditOtherText(''); setEditMode('treatment') })}
@@ -194,9 +203,11 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           {row('✨', t('settings.dailyComponents'), t('settings.nSelected', { n: data.components.length }), () => setEditMode('components'))}
           {(() => { const cl = LANGUAGES.find(l => i18n.language === l.code || i18n.language?.startsWith(l.code)) || LANGUAGES[0]; return row(`${cl.flag}`, t('settings.language'), cl.label, () => setEditMode('language')) })()}
         </Card>
+        )}
 
         {/* Music / Spotify section */}
-        <div className="mono-hint" style={{ color: mutedColor }}>MUSIC</div>
+        {sectionHeader('music', 'MUSIC')}
+        {!collapsed['music'] && (
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           {!spotifyConfigured ? (
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -251,9 +262,11 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </div>
           )}
         </Card>
+        )}
 
         {/* Dietary preferences */}
-        <div className="mono-hint" style={{ color: mutedColor }}>DIETARY PREFERENCES</div>
+        {sectionHeader('diet', 'DIETARY PREFERENCES')}
+        {!collapsed['diet'] && (
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {DIET_OPTIONS.map(opt => {
@@ -272,8 +285,10 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             })}
           </div>
         </Card>
+        )}
 
-        <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.notificationsSection')}</div>
+        {sectionHeader('notifications', t('settings.notificationsSection').toUpperCase())}
+        {!collapsed['notifications'] && (
         <Card cardBg={cardBg} cardBorder={cardBorder}>
           <div className="flex-between" style={{ marginBottom: 16 }}>
             <div>
@@ -319,6 +334,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           )}
 
         </Card>
+        )}
 
         {/* Past cycles & reflections */}
         {(() => {
@@ -336,7 +352,8 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           if (reflections.length === 0) return null
           return (
             <>
-              <div className="mono-hint" style={{ color: mutedColor }}>PAST CYCLES</div>
+              {sectionHeader('past', 'PAST CYCLES')}
+              {!collapsed['past'] && (
               <Card cardBg={cardBg} cardBorder={cardBorder}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {reflections.map((r: any, i: number) => (
@@ -354,11 +371,13 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
                   ))}
                 </div>
               </Card>
+              )}
             </>
           )
         })()}
 
-        <div className="mono-hint" style={{ color: mutedColor }}>{t('settings.account')}</div>
+        {sectionHeader('account', t('settings.account').toUpperCase())}
+        {!collapsed['account'] && (
         <Card cardBg={cardBg} cardBorder={cardBorder} className="card-flush">
           {/* Plan */}
           <div className="settings-row" style={{ borderBottom: `1px solid ${cardBorder}` }}>
@@ -440,6 +459,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </div>
           </button>
         </Card>
+        )}
 
         <div className="mono-xs text-center" style={{ color: mutedColor, marginTop: 8 }}>{t('settings.footer')}</div>
       </div>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day screen — emoji vs line-icons</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 24px; background: #EFE6DE; color: #1C0F0C; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; margin: 0 0 6px; }
+  .sub { color: #9B7B74; margin-bottom: 28px; font-size: 14px; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .col-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #9B7B74; margin-bottom: 8px; }
+  .col-label.current { color: #B86A3A; }
+  .col-label.proposed { color: #7FB5A0; }
+
+  /* Phone mock */
+  .phone { background: #FDF6F0; border-radius: 22px; padding: 18px 16px 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); max-width: 360px; margin: 0 auto; }
+  .phone.nurturing { background: #FDF0EC; }
+
+  .tagline { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; color: #C4614A; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
+  .title { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 28px; font-weight: 400; text-align: center; line-height: 1.2; color: #3D1810; margin-bottom: 4px; }
+  .subtitle { font-family: Karla, sans-serif; font-size: 12px; color: #C47A6A; font-weight: 300; text-align: center; margin-bottom: 14px; }
+  .today { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 20px; color: #3D1810; margin: 10px 0 6px 4px; }
+
+  .card { background: white; border: 1px solid rgba(196,97,74,0.12); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .day-card .row { display: flex; justify-content: space-between; align-items: center; }
+  .day-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #9B7B74; }
+  .day-num { font-family: Karla, sans-serif; font-weight: 400; font-size: 28px; color: #3D1810; opacity: 0.92; line-height: 1; margin: 2px 0; }
+  .day-of { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #9B7B74; }
+  .day-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 140px; }
+  .dot { width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 6px; color: #9B7B74; }
+  .dot.done { background: #C4614A; color: white; }
+  .dot.current { background: rgba(196,97,74,0.3); border: 1.5px solid #C4614A; color: #C4614A; }
+
+  .section-label { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .section-label .ico { display: inline-flex; align-items: center; justify-content: center; }
+  .section-label .emoji-ico { font-size: 12px; line-height: 1; }
+  .section-label .text { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; color: #C4614A; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .quote-text { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 700; font-size: 17px; line-height: 1.35; color: #3D1810; padding-left: 14px; position: relative; }
+  .quote-text::before { content: '"'; font-family: 'Cormorant Garamond', serif; font-size: 36px; color: rgba(196,97,74,0.15); position: absolute; top: 4px; left: -2px; line-height: 0.5; }
+  .quote-author { font-family: 'DM Mono', monospace; font-size: 9px; color: #C4614A; letter-spacing: 0.1em; margin-top: 6px; padding-left: 20px; }
+
+  .anthem-row { display: flex; align-items: center; gap: 10px; }
+  .anthem-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(196,97,74,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #C4614A; flex-shrink: 0; }
+  .anthem-title { font-family: Karla, sans-serif; font-size: 13px; font-weight: 600; color: #3D1810; }
+  .anthem-artist { font-family: Karla, sans-serif; font-size: 11px; color: #9B7B74; font-weight: 300; }
+  .spotify-btn { background: #1DB954; color: white; border: none; border-radius: 16px; padding: 5px 10px; font-size: 9px; font-weight: 700; }
+
+  .affirmation-card { background: linear-gradient(135deg, rgba(196,97,74,0.05) 0%, rgba(196,97,74,0.02) 100%); border: 1px solid rgba(196,97,74,0.12); text-align: center; padding: 16px 14px; border-radius: 14px; margin-bottom: 10px; }
+  .affirmation-card .text { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700; font-size: 18px; color: #C4614A; line-height: 1.35; padding: 6px 4px; }
+  .affirmation-card .hint { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(196,97,74,0.5); letter-spacing: 0.1em; margin-top: 4px; }
+
+  .fuel-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 5px; }
+  .fuel-emoji { font-size: 18px; width: 22px; text-align: center; }
+  .fuel-text { flex: 1; }
+  .fuel-name { font-family: Karla, sans-serif; font-weight: 600; font-size: 11px; color: #3D1810; }
+  .fuel-protein { font-family: 'DM Mono', monospace; font-size: 8px; color: #C4614A; opacity: 0.7; margin-top: 1px; }
+  .fuel-swap { font-family: 'DM Mono', monospace; font-size: 7px; color: #9B7B74; opacity: 0.5; padding: 4px 6px; }
+
+  .breathe-btn { width: 100%; background: linear-gradient(135deg, rgba(196,97,74,0.13), rgba(196,97,74,0.06)); color: #C4614A; border: 1px solid rgba(196,97,74,0.3); border-radius: 999px; padding: 11px 16px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+  .nav { display: flex; justify-content: space-around; padding-top: 12px; border-top: 1px solid rgba(196,97,74,0.12); margin-top: 14px; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .nav-item.active { color: #C4614A; }
+  .nav-item:not(.active) { color: #9B7B74; }
+  .nav-label { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .notes { background: white; padding: 16px 18px; border-radius: 12px; margin-top: 24px; font-size: 13px; border-left: 4px solid #7FB5A0; }
+  .notes h3 { margin: 0 0 6px; font-size: 14px; }
+  .notes p { margin: 4px 0; color: #3D1810; }
+  .notes ul { padding-left: 20px; font-size: 12px; }
+  .notes li { margin: 3px 0; }
+
+  /* Icon library for proposed side */
+  .icon-16 { width: 14px; height: 14px; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .icon-20 { width: 18px; height: 18px; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Day screen — emoji vs line-icons</h1>
+<div class="sub">Preview of audit item U1 (heavy emoji density). Fierce vibe, Day 3.</div>
+
+<div class="compare">
+
+  <!-- CURRENT -->
+  <div>
+    <div class="col-label current">● CURRENT</div>
+    <div class="phone">
+      <div class="tagline">DAY BY DAY, FIRE BY FIRE</div>
+      <div class="title">I've Got This</div>
+      <div class="subtitle">Your daily strength companion</div>
+
+      <div class="today">Today</div>
+
+      <div class="card day-card">
+        <div class="row">
+          <div>
+            <div class="day-label">YOU'RE ON DAY</div>
+            <div class="day-num">3</div>
+            <div class="day-of">OF 14 DAYS</div>
+          </div>
+          <div class="day-dots">
+            <div class="dot done">1</div><div class="dot done">2</div><div class="dot current">3</div><div class="dot">4</div><div class="dot">5</div><div class="dot">6</div><div class="dot">7</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <span class="emoji-ico">🔥</span>
+          <span class="text">TODAY'S FIRE</span>
+        </div>
+        <div class="quote-text">You are stronger than you feel in this moment.</div>
+        <div class="quote-author">— Glennon Doyle</div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <span class="emoji-ico">🎵</span>
+          <span class="text">TODAY'S ANTHEM</span>
+        </div>
+        <div class="anthem-row">
+          <div class="anthem-icon">🎵</div>
+          <div style="flex:1">
+            <div class="anthem-title">Fight Song</div>
+            <div class="anthem-artist">Rachel Platten</div>
+          </div>
+          <button class="spotify-btn">▶ Spotify</button>
+        </div>
+      </div>
+
+      <div class="affirmation-card">
+        <div class="section-label" style="justify-content: center">
+          <span class="emoji-ico">⚡</span>
+          <span class="text">SAY THIS TO YOURSELF</span>
+        </div>
+        <div class="text">I am doing something extraordinary.</div>
+        <div class="hint">BREATHE. REPEAT.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <span class="emoji-ico">🍳</span>
+          <span class="text">YOUR FUEL</span>
+        </div>
+        <div class="fuel-item"><div class="fuel-emoji">🐟</div><div class="fuel-text"><div class="fuel-name">Salmon with sweet potato</div><div class="fuel-protein">~30g PROTEIN</div></div><div class="fuel-swap">swap</div></div>
+        <div class="fuel-item"><div class="fuel-emoji">🍗</div><div class="fuel-text"><div class="fuel-name">Chicken &amp; quinoa bowl</div><div class="fuel-protein">~35g PROTEIN</div></div><div class="fuel-swap">swap</div></div>
+        <div class="fuel-item"><div class="fuel-emoji">🥣</div><div class="fuel-text"><div class="fuel-name">Overnight oats with chia</div><div class="fuel-protein">~18g PROTEIN</div></div><div class="fuel-swap">swap</div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <span class="emoji-ico">✨</span>
+          <span class="text">YOUR MOMENT</span>
+        </div>
+        <button class="breathe-btn"><span>✦</span> Breathe with me · 35s</button>
+      </div>
+
+      <div class="nav">
+        <div class="nav-item active"><span style="font-size: 18px">☀</span><span class="nav-label">Today</span></div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24" class="icon-20" style="stroke: #9B7B74"><rect x="3" y="4.5" width="18" height="17" rx="2"/><line x1="16" y1="2.5" x2="16" y2="6.5"/><line x1="8" y1="2.5" x2="8" y2="6.5"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="nav-label">Journey</span>
+        </div>
+        <div class="nav-item"><span style="font-size: 18px">⚙</span><span class="nav-label">Settings</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSED -->
+  <div>
+    <div class="col-label proposed">● PROPOSED (line icons)</div>
+    <div class="phone">
+      <div class="tagline">DAY BY DAY, FIRE BY FIRE</div>
+      <div class="title">I've Got This</div>
+      <div class="subtitle">Your daily strength companion</div>
+
+      <div class="today">Today</div>
+
+      <div class="card day-card">
+        <div class="row">
+          <div>
+            <div class="day-label">YOU'RE ON DAY</div>
+            <div class="day-num">3</div>
+            <div class="day-of">OF 14 DAYS</div>
+          </div>
+          <div class="day-dots">
+            <div class="dot done">1</div><div class="dot done">2</div><div class="dot current">3</div><div class="dot">4</div><div class="dot">5</div><div class="dot">6</div><div class="dot">7</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24" class="icon-16" style="stroke: #C4614A"><path d="M7 11V7a5 5 0 0 1 10 0v4"/><path d="M5 11h14l-1 10H6z"/></svg>
+          <span class="text">TODAY'S QUOTE</span>
+        </div>
+        <div class="quote-text">You are stronger than you feel in this moment.</div>
+        <div class="quote-author">— Glennon Doyle</div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24" class="icon-16" style="stroke: #C4614A"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <span class="text">TODAY'S ANTHEM</span>
+        </div>
+        <div class="anthem-row">
+          <div class="anthem-icon">
+            <svg viewBox="0 0 24 24" class="icon-20" style="stroke: #C4614A"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="anthem-title">Fight Song</div>
+            <div class="anthem-artist">Rachel Platten</div>
+          </div>
+          <button class="spotify-btn">▶ Spotify</button>
+        </div>
+      </div>
+
+      <div class="affirmation-card">
+        <div class="section-label" style="justify-content: center">
+          <svg viewBox="0 0 24 24" class="icon-16" style="stroke: #C4614A"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg>
+          <span class="text">SAY THIS TO YOURSELF</span>
+        </div>
+        <div class="text">I am doing something extraordinary.</div>
+        <div class="hint">BREATHE. REPEAT.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24" class="icon-16" style="stroke: #C4614A"><path d="M12 2a4 4 0 0 1 4 4c0 3-4 5-4 5s-4-2-4-5a4 4 0 0 1 4-4z"/><path d="M5 11a7 7 0 0 0 7 7 7 7 0 0 0 7-7"/><path d="M12 18v4"/></svg>
+          <span class="text">YOUR FUEL</span>
+        </div>
+        <div class="fuel-item"><div class="fuel-emoji">🐟</div><div class="fuel-text"><div class="fuel-name">Salmon with sweet potato</div><div class="fuel-protein">~30g PROTEIN</div></div><div class="fuel-swap">swap</div></div>
+        <div class="fuel-item"><div class="fuel-emoji">🍗</div><div class="fuel-text"><div class="fuel-name">Chicken &amp; quinoa bowl</div><div class="fuel-protein">~35g PROTEIN</div></div><div class="fuel-swap">swap</div></div>
+        <div class="fuel-item"><div class="fuel-emoji">🥣</div><div class="fuel-text"><div class="fuel-name">Overnight oats with chia</div><div class="fuel-protein">~18g PROTEIN</div></div><div class="fuel-swap">swap</div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24" class="icon-16" style="stroke: #C4614A"><path d="M9.5 2A6.5 6.5 0 0 1 16 8.5C16 12 13 14 12 14s-3-2-3-5.5A6.5 6.5 0 0 1 9.5 2z" transform="rotate(-10 12 8)"/><path d="M6 20c3-6 9-6 12 0"/><path d="M3 22h18"/></svg>
+          <span class="text">YOUR MOMENT</span>
+        </div>
+        <button class="breathe-btn">
+          <svg viewBox="0 0 24 24" class="icon-16" style="stroke: #C4614A"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9" opacity="0.4"/></svg>
+          Breathe with me · 35s
+        </button>
+      </div>
+
+      <div class="nav">
+        <div class="nav-item active">
+          <svg viewBox="0 0 24 24" class="icon-20" style="stroke: #C4614A"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>
+          <span class="nav-label">Today</span>
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24" class="icon-20" style="stroke: #9B7B74"><rect x="3" y="4.5" width="18" height="17" rx="2"/><line x1="16" y1="2.5" x2="16" y2="6.5"/><line x1="8" y1="2.5" x2="8" y2="6.5"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="nav-label">Journey</span>
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24" class="icon-20" style="stroke: #9B7B74"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="nav-label">Settings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h3>What changed</h3>
+  <ul>
+    <li><strong>Section labels:</strong> 🔥 🎵 ⚡ 🍳 ✨ → Feather-style line icons (quote marks, music notes, star, bowl, lotus)</li>
+    <li><strong>Card-label text:</strong> "TODAY'S FIRE" → "TODAY'S QUOTE" (vibe-specific flavour removed to let icons carry the meaning; some users found the per-vibe labels confusing)</li>
+    <li><strong>Breathing button:</strong> ✦ glyph → circular "breath ring" SVG — subtle and matches the breathing metaphor</li>
+    <li><strong>Anthem mini-tile:</strong> 🎵 emoji → stroke music-note icon with vibe accent colour</li>
+    <li><strong>Nav:</strong> ☀ sun character → stroked sun SVG; settings gear → stroked gear SVG. Matches the calendar icon we already have.</li>
+    <li><strong>Kept emoji:</strong> food emojis inside fuel rows (🐟 🍗 🥣) — these are genuinely informative (you can tell the food type at a glance) and not decorative. Same for the vibe-selection emojis on onboarding.</li>
+  </ul>
+  <p style="margin-top: 10px;"><strong>Trade-off:</strong> the current design is warmer and more expressive — emojis convey emotion fast. Line icons feel more premium/clinical. For a fertility companion, the warmer version may actually be the right call — emoji overload on <em>every</em> label is the issue, not any single emoji. A middle-ground option: keep the 💛 friend-note emoji and vibe-colour dots, but swap the 8 section-label emojis for icons.</p>
+  <p><strong>Recommendation:</strong> the middle-ground — icons for functional section labels, emojis reserved for decorative/emotional moments (friend-note heart, streak seedling, end-of-cycle orb).</p>
+</div>
+
+</div>
+</body>
+</html>
