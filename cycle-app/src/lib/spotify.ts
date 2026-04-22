@@ -18,7 +18,10 @@
 
 const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string || ''
 const SPOTIFY_REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string || `${window.location.origin}/auth/spotify/callback`
-const SPOTIFY_SCOPES = 'user-read-private user-read-email user-modify-playback-state streaming'
+// Minimum scopes needed — we only display the user's name and deep-link to tracks.
+// Dropped: user-read-email (unused), user-modify-playback-state + streaming (Premium-only, unused).
+// Existing users with the old broader grant are unaffected; their tokens stay valid.
+const SPOTIFY_SCOPES = 'user-read-private'
 
 // Debug: log what we got
 console.log('[Spotify] Client ID:', SPOTIFY_CLIENT_ID ? SPOTIFY_CLIENT_ID.substring(0, 8) + '...' : 'EMPTY')
@@ -168,6 +171,16 @@ export async function searchSpotifyTrack(userId: string, songTitle: string, song
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, query: `${songTitle} ${songArtist}` }),
     })
+    // Server tells us the user needs to reconnect (token revoked or expired beyond refresh)
+    if (res.status === 401) {
+      const data = await res.json().catch(() => ({}))
+      if (data.reauth) {
+        localStorage.setItem('spotify_connected', '0')
+        localStorage.removeItem('spotify_display_name')
+        localStorage.setItem('spotify_auth_error', 'Your Spotify session expired — reconnect to keep using it.')
+      }
+      return { found: false }
+    }
     return await res.json()
   } catch {
     return { found: false }

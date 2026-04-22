@@ -1291,6 +1291,11 @@ app.post('/api/spotify/search', async (req, res) => {
           spotifyDisplayName: tokens.spotifyDisplayName,
         })
         tokens = { ...tokens, accessToken: refreshData.access_token }
+      } else if (refreshData.error === 'invalid_grant') {
+        // Refresh token rejected — user revoked access on Spotify. Clear stored tokens.
+        console.warn(`[Spotify] Refresh token invalid for ${userId} — clearing.`)
+        deleteSpotifyTokens(userId)
+        return res.status(401).json({ error: 'reauth_required', reauth: true })
       }
     } catch (err) {
       console.error('[Spotify] Auto-refresh failed:', err.message)
@@ -1302,6 +1307,11 @@ app.post('/api/spotify/search', async (req, res) => {
       `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
       { headers: { Authorization: `Bearer ${tokens.accessToken}` } }
     )
+    // 401 from Spotify = access token rejected (edge case after external revocation)
+    if (searchRes.status === 401) {
+      deleteSpotifyTokens(userId)
+      return res.status(401).json({ error: 'reauth_required', reauth: true })
+    }
     const searchData = await searchRes.json()
     const track = searchData.tracks?.items?.[0]
 
