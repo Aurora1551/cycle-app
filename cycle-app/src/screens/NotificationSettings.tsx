@@ -64,7 +64,7 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
   }
 
   const spinnerBtn = (onClick: () => void, label: string) => (
-    <button onClick={onClick} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: mutedColor, padding: 4 }}>{label}</button>
+    <button onClick={onClick} className="btn-bare" style={{ fontSize: 16, color: mutedColor, padding: 4 }}>{label}</button>
   )
 
   const spinnerBox = (value: string) => (

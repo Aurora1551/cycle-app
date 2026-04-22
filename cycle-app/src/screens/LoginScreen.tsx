@@ -64,7 +64,7 @@ const LoginScreen: React.FC<Props> = ({ onBack, onSuccess, onSignUp }) => {
   return (
     <ScreenShell bg={bg} visible={visible}>
       <div style={{ padding: '20px 24px 0' }}>
-        <button onClick={onBack} className="body-font" style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 13, fontWeight: 500, color: mutedColor }}>
+        <button onClick={onBack} className="body-font btn-bare" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 0, fontSize: 13, fontWeight: 500, color: mutedColor }}>
           <span style={{ fontSize: 16 }}>‹</span> {t('back').replace('← ', '')}
         </button>
       </div>
@@ -104,7 +104,7 @@ const LoginScreen: React.FC<Props> = ({ onBack, onSuccess, onSignUp }) => {
         </button>
         <div className="text-center" style={{ fontSize: 12, color: mutedColor, lineHeight: 1.8 }}>
           {t('login.noAccount')}{' '}
-          <button onClick={onSignUp} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', color: accent, fontSize: 12, padding: 0, textDecoration: 'underline' }}>{t('login.signUp')}</button>
+          <button onClick={onSignUp} className="body-font btn-bare" style={{ color: accent, fontSize: 12, padding: 0, textDecoration: 'underline' }}>{t('login.signUp')}</button>
         </div>
       </div>
     </ScreenShell>

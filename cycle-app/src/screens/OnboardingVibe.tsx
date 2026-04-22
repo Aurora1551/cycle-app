@@ -79,7 +79,7 @@ const OnboardingVibe: React.FC<Props> = ({ onBack, onContinue, initialValue, onP
           className="btn-primary" style={{ background: selected ? accent : `${accent}44`, transition: 'background 0.4s ease' }}>
           {t('continue')}
         </button>
-        <button onClick={() => onContinue('calm')} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'rgba(253,246,240,0.35)', padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('calm')} className="body-font btn-bare" style={{ fontSize: 12, color: 'rgba(253,246,240,0.35)', padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </div>

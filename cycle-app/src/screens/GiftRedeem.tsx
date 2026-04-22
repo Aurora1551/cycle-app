@@ -79,7 +79,7 @@ const GiftRedeem: React.FC<Props> = ({ giftCode, senderName, message, onCreateAc
       </button>
       <div style={{ fontSize: 12, color: mutedColor, textAlign: 'center', lineHeight: 1.6 }}>
         Already have an account?{' '}
-        <button onClick={onLogin} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', color: accent, fontSize: 12, padding: 0, textDecoration: 'underline' }}>Log in</button>
+        <button onClick={onLogin} className="body-font btn-bare" style={{ color: accent, fontSize: 12, padding: 0, textDecoration: 'underline' }}>Log in</button>
       </div>
     </ScreenShell>
   )
@@ -87,7 +87,7 @@ const GiftRedeem: React.FC<Props> = ({ giftCode, senderName, message, onCreateAc
   return (
     <ScreenShell bg={bg} visible={visible}>
       <div style={{ padding: '20px 24px 0' }}>
-        <button onClick={() => setStep('welcome')} className="body-font" style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 13, fontWeight: 500, color: mutedColor }}>
+        <button onClick={() => setStep('welcome')} className="body-font btn-bare" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 0, fontSize: 13, fontWeight: 500, color: mutedColor }}>
           <span style={{ fontSize: 16 }}>‹</span> Back
         </button>
       </div>

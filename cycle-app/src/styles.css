@@ -41,6 +41,8 @@
 /* Utility: applies only the monospace family. Pair with inline size/color to migrate inline `fontFamily: "'DM Mono', monospace"` without changing visual output. */
 .mono { font-family:'DM Mono',monospace; }
 .body-font { font-family:'Karla',sans-serif; }
+/* Utility: strips native button chrome (used for link-style buttons). */
+.btn-bare { background:none; border:none; cursor:pointer; }
 
 /* Breathe-with-me button — subtle breathing pulse so it feels inviting rather than static. */
 @keyframes breathe-pulse {

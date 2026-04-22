@@ -216,7 +216,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
     <ScreenShell bg={vibe.bg} visible={visible}>
       <div style={{ padding: '20px 24px 16px' }}>
         <div className="flex-between" style={{ marginBottom: 8 }}>
-          <button onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
+          <button onClick={onBack} className="btn-bare" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
             <span style={{ fontSize: 16 }}>‹</span> {t('back').replace('← ', '')}
           </button>
         </div>
@@ -661,26 +661,26 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginBottom: 24 }}>
               {/* Hour */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <button onClick={() => setEditHour(editHour >= 12 ? 1 : editHour + 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: mutedColor, padding: 4 }}>▲</button>
+                <button onClick={() => setEditHour(editHour >= 12 ? 1 : editHour + 1)} className="btn-bare" style={{ fontSize: 16, color: mutedColor, padding: 4 }}>▲</button>
                 <div style={{
                   fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 32, color: textColor,
                   background: isDark ? 'rgba(255,255,255,0.06)' : `${vibe.accent}08`,
                   border: `1.5px solid ${vibe.accent}40`, borderRadius: 12, padding: '8px 16px', minWidth: 56, textAlign: 'center',
                 }}>{editHour}</div>
-                <button onClick={() => setEditHour(editHour <= 1 ? 12 : editHour - 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: mutedColor, padding: 4 }}>▼</button>
+                <button onClick={() => setEditHour(editHour <= 1 ? 12 : editHour - 1)} className="btn-bare" style={{ fontSize: 16, color: mutedColor, padding: 4 }}>▼</button>
               </div>
 
               <div style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 32, color: textColor }}>:</div>
 
               {/* Minute */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <button onClick={() => setEditMinute(editMinute >= 55 ? 0 : editMinute + 5)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: mutedColor, padding: 4 }}>▲</button>
+                <button onClick={() => setEditMinute(editMinute >= 55 ? 0 : editMinute + 5)} className="btn-bare" style={{ fontSize: 16, color: mutedColor, padding: 4 }}>▲</button>
                 <div style={{
                   fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontWeight: typo.headingWeight, fontSize: 32, color: textColor,
                   background: isDark ? 'rgba(255,255,255,0.06)' : `${vibe.accent}08`,
                   border: `1.5px solid ${vibe.accent}40`, borderRadius: 12, padding: '8px 16px', minWidth: 56, textAlign: 'center',
                 }}>{String(editMinute).padStart(2, '0')}</div>
-                <button onClick={() => setEditMinute(editMinute <= 0 ? 55 : editMinute - 5)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: mutedColor, padding: 4 }}>▼</button>
+                <button onClick={() => setEditMinute(editMinute <= 0 ? 55 : editMinute - 5)} className="btn-bare" style={{ fontSize: 16, color: mutedColor, padding: 4 }}>▼</button>
               </div>
 
               {/* AM/PM */}
@@ -706,7 +706,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         <div className="modal-overlay" style={{ position: 'fixed', inset: 0, zIndex: 100, background: vibe.bg, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <div style={{ maxWidth: 440, margin: '0 auto', padding: '20px 24px 40px' }}>
             <div className="flex-between" style={{ marginBottom: 24 }}>
-              <button onClick={() => setEditMode(null)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
+              <button onClick={() => setEditMode(null)} className="btn-bare" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
                 <span style={{ fontSize: 16 }}>‹</span> {t('back').replace('← ', '')}
               </button>
             </div>
@@ -753,7 +753,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
         <div className="modal-overlay" style={{ background: vibe.bg, overflowY: 'auto' }}>
           <div style={{ maxWidth: 440, margin: '0 auto', padding: '20px 24px 40px' }}>
             <div className="flex-between" style={{ marginBottom: 24 }}>
-              <button onClick={() => setEditMode(null)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
+              <button onClick={() => setEditMode(null)} className="btn-bare" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 0, fontFamily: typo.bodyFont, fontSize: 13, fontWeight: 500, color: vibe.accent }}>
                 <span style={{ fontSize: 16 }}>‹</span> {t('back').replace('← ', '')}
               </button>
             </div>

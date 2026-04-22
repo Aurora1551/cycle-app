@@ -762,7 +762,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
   // Consistent save + share row — always bottom-right of card
   const saveShareRow = (type: string, text: string, author?: string) => (
     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, marginTop: 10, alignItems: 'center' }}>
-      <button onClick={() => { toggleFavorite(type, text, author); track(`${type}_favorited`, { day_number: dayNumber }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '12px', minWidth: 44, minHeight: 44, transition: 'opacity 0.2s', lineHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <button onClick={() => { toggleFavorite(type, text, author); track(`${type}_favorited`, { day_number: dayNumber }) }} className="btn-bare" style={{ padding: '12px', minWidth: 44, minHeight: 44, transition: 'opacity 0.2s', lineHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {isFavorited(type) ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="#D4878F" stroke="#D4878F" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         ) : (
@@ -773,7 +773,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         const shareText = author ? `"${text}" — ${author}\n\nShared via Cycle` : `${text}\n\nShared via Cycle`
         if (navigator.share) { navigator.share({ text: shareText }).catch(() => {}) } else { window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank') }
         track(`${type}_shared`, { day_number: dayNumber })
-      }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: mutedColor, padding: '12px', minWidth: 44, minHeight: 44, lineHeight: 1, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      }} className="btn-bare" style={{ fontSize: 14, color: mutedColor, padding: '12px', minWidth: 44, minHeight: 44, lineHeight: 1, opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         &#10148;
       </button>
     </div>
@@ -888,7 +888,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
                   <div className="mono" style={{fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
-                <button onClick={() => swapAt(i, item.name)} className="mono" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
+                <button onClick={() => swapAt(i, item.name)} className="mono" className="btn-bare" style={{ fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
                   swap
                 </button>
               </div>
@@ -948,7 +948,6 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     <ScreenShell bg={vibe.bg} visible={visible} transition="opacity 0.5s ease" style={isPaused ? { filter: 'blur(6px)', opacity: 0.4, pointerEvents: 'none' as const } : undefined}>
       {/* Header — centered tagline, title, subtitle + settings icon top-right */}
       <div style={{ padding: '20px 22px 0', position: 'relative' }}>
-        <button onClick={onSettings} className="flex-center" style={{ position: 'absolute', top: 20, right: 22, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', fontSize: 14, zIndex: 1 }}>⚙️</button>
         <div style={{ textAlign: 'center' }}>
           {/* Tagline */}
           <div className="mono" style={{fontSize: 10, fontWeight: 500, color: vibe.accent, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8, textShadow: `0 0 8px ${vibe.accent}60` }}>
@@ -1103,8 +1102,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
               Save my progress — free
             </button>
             {/* Card 3: Go back */}
-            <button onClick={() => onGoToDay?.(3)} style={{
-              background: 'none', border: 'none', cursor: 'pointer',
+            <button onClick={() => onGoToDay?.(3)} className="btn-bare" style={{
               fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, padding: '8px',
               textDecoration: 'underline', textDecorationColor: `${mutedColor}40`,
             }}>
@@ -1186,7 +1184,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         <button onClick={onResume} style={{ background: vibe.accent, color: 'white', border: 'none', borderRadius: 14, padding: '14px 32px', fontFamily: typo.bodyFont, fontWeight: 700, fontSize: 14, cursor: 'pointer', marginTop: 8 }}>
           Resume my journey
         </button>
-        <button onClick={onSettings} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: typo.bodyFont, fontSize: 12, color: isDark ? 'rgba(253,246,240,0.35)' : '#9B7B74', marginTop: 4 }}>
+        <button onClick={onSettings} className="btn-bare" style={{ fontFamily: typo.bodyFont, fontSize: 12, color: isDark ? 'rgba(253,246,240,0.35)' : '#9B7B74', marginTop: 4 }}>
           Settings
         </button>
       </div>

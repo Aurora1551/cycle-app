@@ -92,7 +92,7 @@ const OnboardingTreatment: React.FC<Props> = ({ onBack, onContinue, initialValue
           className="btn-primary" style={{ background: canContinue ? A : 'rgba(196,97,74,0.3)' }}>
           {t('continue')}
         </button>
-        <button onClick={() => onContinue('ivf')} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue('ivf')} className="body-font btn-bare" style={{ fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </OnboardingLayout>

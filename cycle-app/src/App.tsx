@@ -82,7 +82,7 @@ function App() {
     }
     return false
   })
-  const [selectedPlan, setSelectedPlan] = useState<'one_cycle' | 'gift'>('one_cycle')
+  const [selectedPlan, setSelectedPlan] = useState<'one_cycle' | 'gift' | null>(null)
 
   const update = (patch: Partial<OnboardingData>) => {
     const next = { ...data, ...patch }
@@ -339,7 +339,7 @@ function App() {
         }}
       />}
       {screen === 'payment' && <PaymentScreen
-        plan={selectedPlan}
+        plan={selectedPlan || 'one_cycle'}
         onSuccess={plan => {
           if (plan === 'gift') { setScreen('gift-flow'); return }
           localStorage.setItem('cycle_premium', '1')

@@ -53,7 +53,6 @@ const Progress: React.FC<Props> = ({ data, dayNumber, onGoToDay, onSettings }) =
   return (
     <ScreenShell bg={vibe.bg} visible={true}>
       <div style={{ padding: '20px 22px 10px', position: 'relative' }}>
-        {onSettings && <button onClick={onSettings} className="flex-center" style={{ position: 'absolute', top: 20, right: 22, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', fontSize: 14, zIndex: 1 }}>⚙️</button>}
         <div className="mono-hint" style={{ color: mutedColor, marginBottom: 4, letterSpacing: '0.18em' }}>{t('progress.sectionLabel')}</div>
         <h1 className="heading-sm" style={{ fontFamily: typo.headingFont, fontWeight: typo.headingWeight, fontStyle: typo.headingStyle, color: textColor }}>{t('progress.heading')}</h1>
       </div>

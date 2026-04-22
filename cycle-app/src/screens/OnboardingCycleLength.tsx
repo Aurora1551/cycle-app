@@ -91,7 +91,7 @@ const OnboardingCycleLength: React.FC<Props> = ({ onBack, onContinue, initialVal
 
         <div className="spacer" />
         <button onClick={() => onContinue(days)} className="btn-primary" style={{ background: A }}>{t('continue')}</button>
-        <button onClick={() => onContinue(28)} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+        <button onClick={() => onContinue(28)} className="body-font btn-bare" style={{ fontSize: 12, color: M, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
           Skip for now
         </button>
       </OnboardingLayout>

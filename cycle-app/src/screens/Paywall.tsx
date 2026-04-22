@@ -34,7 +34,7 @@ const Paywall: React.FC<Props> = ({ onStartFree, onSelectPlan, onBack }) => {
   return (
     <div className="screen fade-in" style={{ background: '#FDF6F0', opacity: visible ? 1 : 0 }}>
       <div className="content" style={{ padding: '32px 24px 24px', gap: 12 }}>
-        {onBack && <button onClick={onBack} className="body-font" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 6px', minHeight: 44, fontSize: 13, fontWeight: 500, color: M }}><span style={{ fontSize: 16 }}>‹</span> Back</button>}
+        {onBack && <button onClick={onBack} className="body-font btn-bare" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 6px', minHeight: 44, fontSize: 13, fontWeight: 500, color: M }}><span style={{ fontSize: 16 }}>‹</span> Back</button>}
         <div className="step-label" style={{ color: A }}>{t('paywall.unlock')}</div>
         <h1 className="heading-lg" style={{ color: T }}>{t('paywall.choosePlan')}</h1>
         <p className="subtext" style={{ marginBottom: 4 }}>{t('paywall.subtext')}</p>
