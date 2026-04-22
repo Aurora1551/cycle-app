@@ -52,6 +52,12 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
       }),
     }).catch(() => {})
 
+    localStorage.setItem('notify_seen', '1')
+    onDone()
+  }
+
+  const handleSkip = () => {
+    localStorage.setItem('notify_seen', '1')
     onDone()
   }
 
@@ -125,7 +131,7 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
 
         <div className="spacer" />
         <PrimaryButton accent={vibe.accent} typo={typo} onClick={handleAllow}>{t('notifications.allow')}</PrimaryButton>
-        <GhostButton color={mutedColor} borderColor={cardBorder} typo={typo} onClick={onDone} style={{ marginBottom: 8 }}>{t('notifications.skip')}</GhostButton>
+        <GhostButton color={mutedColor} borderColor={cardBorder} typo={typo} onClick={handleSkip} style={{ marginBottom: 8 }}>{t('notifications.skip')}</GhostButton>
       </div>
     </ScreenShell>
   )
