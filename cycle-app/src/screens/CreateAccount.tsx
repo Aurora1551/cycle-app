@@ -43,14 +43,28 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
       return
     }
     setLoading(true); setError('')
-    // MOCK REGISTRATION: skip API calls, simulate success after brief delay
-    setTimeout(() => {
-      localStorage.setItem('cycle_account_email', email)
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        if (res.status === 409) setError('An account already exists for this email. Try logging in.')
+        else setError(data.error || 'Unable to create account. Please try again.')
+        setLoading(false)
+        return
+      }
+      localStorage.setItem('cycle_account_email', email.trim().toLowerCase())
       localStorage.setItem('cycle_is_guest', '0')
       track('account_created')
       setLoading(false)
       onSuccess()
-    }, 600)
+    } catch (err) {
+      setError('Unable to connect. Please try again.')
+      setLoading(false)
+    }
   }
 
   const fieldStyle: React.CSSProperties = { background: fieldBg, border: `1.5px solid ${fieldBorder}`, borderRadius: 12, padding: '12px 14px' }
