@@ -821,8 +821,11 @@ app.post('/api/login', async (req, res) => {
 // Password reset — stub for now. Generates a token and logs it to server console.
 // A real implementation would email the user the token via SES / SendGrid / etc.
 const resetTokens = new Map() // token -> { email, expiresAt }
-async function sendPasswordResetEmail(toEmail, token) {
-  const resetUrl = `${APP_URL}/reset-password?token=${token}`
+async function sendPasswordResetEmail(toEmail, token, baseUrl) {
+  // Prefer the caller's origin (whatever URL the user sees in the browser) so the
+  // link lands back in their app, not on the server's localhost.
+  const origin = baseUrl || APP_URL
+  const resetUrl = `${origin}/reset-password?token=${token}`
   if (!resend) {
     console.log(`[Auth] Reset link for ${toEmail}: ${resetUrl} (no Resend key; 30 min expiry)`)
     return { ok: true, dev: true }
@@ -867,7 +870,10 @@ app.post('/api/forgot-password', async (req, res) => {
   if (account) {
     const token = require('crypto').randomBytes(24).toString('hex')
     resetTokens.set(token, { email: normEmail, expiresAt: Date.now() + 30 * 60 * 1000 })
-    await sendPasswordResetEmail(normEmail, token)
+    // Use the browser's origin so the link works wherever they access the app from
+    // (Vite dev on a LAN IP, ngrok tunnel, prod domain, etc.)
+    const browserOrigin = req.headers.origin || req.headers.referer?.replace(/\/$/, '').replace(/\/[^/]*$/, '') || APP_URL
+    await sendPasswordResetEmail(normEmail, token, browserOrigin)
   }
   res.json({ success: true, message: 'If that email has an account, a reset link has been sent.' })
 })
