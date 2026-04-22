@@ -34,11 +34,24 @@ if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
 
 function getBestVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices()
-  const preferred = ['Samantha', 'Karen', 'Moira', 'Tessa', 'Google UK English Female', 'Microsoft Zira', 'Fiona']
-  for (const name of preferred) {
-    const match = voices.find(v => v.name.includes(name))
-    if (match) return match
+  // Prefer Mac "Premium" / "Enhanced" / "Neural" voices first — they sound
+  // dramatically more human than the default basic voices. Then fall back to
+  // standard names.
+  const tiers = [
+    // Tier 1: neural / premium on Mac + Chrome Neural / Google neural
+    ['Ava (Premium)', 'Zoe (Premium)', 'Allison (Premium)', 'Serena (Premium)', 'Samantha (Enhanced)', 'Karen (Enhanced)', 'Moira (Enhanced)', 'Google UK English Female', 'Microsoft Aria', 'Microsoft Jenny'],
+    // Tier 2: standard names (fallback if premium not installed)
+    ['Samantha', 'Karen', 'Moira', 'Tessa', 'Serena', 'Fiona', 'Microsoft Zira'],
+  ]
+  for (const tier of tiers) {
+    for (const name of tier) {
+      const match = voices.find(v => v.name === name) || voices.find(v => v.name.includes(name))
+      if (match) return match
+    }
   }
+  // Last resort: any English female-ish voice
+  const enFemale = voices.find(v => v.lang.startsWith('en') && /female|woman|samantha|karen|allison|zoe|serena/i.test(v.name))
+  if (enFemale) return enFemale
   return voices.find(v => v.lang.startsWith('en')) || null
 }
 
@@ -248,11 +261,29 @@ interface YourMomentProps {
   openingLine: string
   closingLine: string
   genres: string[]
+  dayNumber: number
   onComplete: () => void
   onStop: () => void
 }
 
-function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, onStop }: YourMomentProps) {
+// Soft, consistent opening phrasing keyed off the day number. We deliberately
+// build this client-side instead of using the AI-generated openingLine — the
+// AI tended to produce robotic "You, you are N days in..." phrasing.
+function buildOpening(dayNumber: number): string {
+  const base = "You're doing so well. Let's breathe together."
+  if (dayNumber === 1) return "Day one. Welcome in. Let's breathe together."
+  if (dayNumber <= 3) return `Day ${dayNumber}. ${base}`
+  if (dayNumber <= 7) return `Day ${dayNumber}. Keep going. Let's take a moment together.`
+  if (dayNumber <= 14) return `Day ${dayNumber}. Look how far you've come. Let's breathe.`
+  return `Day ${dayNumber}. You're almost there. Let's breathe together.`
+}
+
+function buildClosing(dayNumber: number): string {
+  if (dayNumber === 1) return "You did it. Tomorrow, we do this again."
+  return "Well done. Carry this with you."
+}
+
+function YourMoment({ vibe, typo, openingLine, closingLine, genres, dayNumber, onComplete, onStop }: YourMomentProps) {
   const { t } = useTranslation()
   const [stage, setStage] = useState<'opening' | 'breathing' | 'closing' | 'done'>('opening')
   const [phaseIdx, setPhaseIdx] = useState(0)
@@ -266,11 +297,15 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
   const progress = stage === 'breathing' ? elapsed / phase.duration : 0
   const circleScale = stage === 'breathing' ? phase.scale : stage === 'closing' || stage === 'done' ? 1.0 : 1.0
 
-  // Vibe phrases (use AI-generated if available, fallback to vibe defaults)
+  // Build opening/closing client-side from day number for consistent, warm phrasing.
+  // AI-generated openingLine / closingLine are accepted as escape hatches but the
+  // local template wins by default to avoid the "You, you are N days in..." output.
   const vibeKey = vibe.key || 'calm'
   const phrases = MOMENT_PHRASES[vibeKey] || MOMENT_PHRASES.calm
-  const displayOpening = openingLine || phrases.opening
-  const displayClosing = closingLine || phrases.closing
+  // Suppress the "openingLine/closingLine is unused" lint; keep in props for future.
+  void openingLine; void closingLine
+  const displayOpening = buildOpening(dayNumber)
+  const displayClosing = buildClosing(dayNumber) || phrases.closing
 
   const stopMoment = () => {
     stoppedRef.current = true
@@ -456,20 +491,20 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
           transform: `scale(${circleScale})`,
           transition: `transform ${phase.duration}s ease-in-out`,
         }} />
-        {/* Circular progress ring — sits just outside the orb */}
-        <svg width={200} height={200} style={{ position: 'absolute', transform: 'rotate(-90deg)' }} aria-hidden="true">
-          <circle cx={100} cy={100} r={ringRadius} fill="none" stroke={`${vibe.accent}22`} strokeWidth={3} />
+        {/* Circular progress ring — sits just outside the orb. zIndex:2 so it's visible above the glow. */}
+        <svg width={200} height={200} style={{ position: 'absolute', transform: 'rotate(-90deg)', zIndex: 2 }} aria-hidden="true">
+          <circle cx={100} cy={100} r={ringRadius} fill="none" stroke={`${vibe.accent}33`} strokeWidth={5} />
           <circle
             cx={100}
             cy={100}
             r={ringRadius}
             fill="none"
             stroke={vibe.accent}
-            strokeWidth={3}
+            strokeWidth={5}
             strokeLinecap="round"
             strokeDasharray={ringCircumference}
             strokeDashoffset={ringCircumference * (1 - overallProgress)}
-            style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+            style={{ transition: 'stroke-dashoffset 0.1s linear', filter: `drop-shadow(0 0 6px ${vibe.accent}88)` }}
           />
         </svg>
         {/* Main orb — tap anywhere to end */}
@@ -959,6 +994,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             openingLine={content?.breathingOpening || ''}
             closingLine={content?.breathingClosing || ''}
             genres={data.genres}
+            dayNumber={dayNumber}
             onComplete={() => track('breathing_completed', { day_number: dayNumber })}
             onStop={() => setMeditationStarted(false)}
           />

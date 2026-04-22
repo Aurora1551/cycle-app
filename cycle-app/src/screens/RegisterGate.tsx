@@ -46,9 +46,9 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           width: '100%', border: '1.5px solid rgba(196,97,74,0.2)', borderRadius: 14, padding: '16px',
           background: 'white', cursor: 'pointer', textAlign: 'left',
         }}>
-          <div className="body-font" style={{fontSize: 14, fontWeight: 700, color: '#1C0F0C', marginBottom: 4 }}>Save my progress</div>
+          <div className="body-font" style={{fontSize: 14, fontWeight: 700, color: '#1C0F0C', marginBottom: 4 }}>Save your progress — create account</div>
           <div className="body-font" style={{fontSize: 11, color: '#9B7B74', lineHeight: 1.4 }}>
-            Free account · upgrade whenever
+            Free · keeps your journal &amp; favourites across devices. Upgrade anytime.
           </div>
         </button>
 
@@ -57,7 +57,10 @@ const RegisterGate: React.FC<Props> = ({ onCreateAccount, onContinueGuest, onUnl
           width: '100%', border: '1px dashed rgba(155,123,116,0.25)', borderRadius: 14, padding: '14px',
           background: 'transparent', cursor: 'pointer', textAlign: 'left',
         }}>
-          <div className="body-font" style={{fontSize: 12, color: '#9B7B74' }}>Keep browsing my free days</div>
+          <div className="body-font" style={{fontSize: 12, color: '#9B7B74', fontWeight: 500, marginBottom: 2 }}>Keep browsing my free days</div>
+          <div className="body-font" style={{fontSize: 10, color: '#9B7B74', opacity: 0.7, lineHeight: 1.4 }}>
+            Without an account · progress stays on this device only
+          </div>
         </button>
       </div>
     </ScreenShell>

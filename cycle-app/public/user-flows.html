@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycle — User flows</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 1200px; margin: 0 auto; padding: 32px 24px; background: #EFE6DE; color: #1C0F0C; line-height: 1.55; }
+  h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; margin: 0 0 6px; }
+  .sub { color: #9B7B74; margin-bottom: 24px; font-size: 13px; }
+  h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; margin: 36px 0 10px; border-bottom: 1px solid #E8D8D0; padding-bottom: 6px; }
+  h3 { font-size: 14px; margin: 18px 0 8px; color: #3D1810; }
+
+  .flow { background: white; padding: 16px 18px; border-radius: 12px; overflow-x: auto; margin-bottom: 10px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; padding: 8px 0; }
+  .row .node { flex-shrink: 0; }
+  .sub-row { margin-left: 32px; border-left: 2px solid #E8D8D0; padding-left: 16px; }
+
+  .node {
+    background: #FFF; border: 1.5px solid #C4614A;
+    border-radius: 10px; padding: 8px 11px;
+    font-size: 11px; min-width: 110px; text-align: center; font-weight: 500;
+  }
+  .node small { display: block; font-size: 9px; font-weight: 400; color: #9B7B74; margin-top: 2px; letter-spacing: 0.04em; }
+  .node.entry { background: #C4614A; color: white; border-color: #C4614A; }
+  .node.onboarding { border-color: #D4956A; background: #FFF8F3; }
+  .node.paywall { border-color: #DC2626; background: #FFF0F0; color: #8B1515; }
+  .node.core { border-color: #0D1F2D; background: #E8EEF3; font-weight: 600; }
+  .node.account { border-color: #7FB5A0; background: #F0F5F2; }
+  .node.end { background: #120A2A; color: #F0EAF8; border-color: #120A2A; }
+  .node.entry small, .node.end small { color: rgba(255,255,255,0.65); }
+
+  .arrow { font-size: 14px; color: #C4614A; padding: 0 2px; flex-shrink: 0; font-weight: bold; }
+  .branch { font-size: 9px; color: #9B7B74; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 6px; font-weight: 600; }
+
+  .legend { background: white; padding: 11px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .legend span { padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+
+  .note { background: #FFF8F3; border-left: 4px solid #D4956A; padding: 10px 14px; font-size: 12px; border-radius: 6px; margin: 10px 0; color: #3D1810; }
+  .note strong { color: #B86A3A; }
+
+  .toc { background: white; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 12px; }
+  .toc a { color: #C4614A; text-decoration: none; margin-right: 14px; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<h1>Cycle — User flows</h1>
+<div class="sub">Every path from splash to core app · as of 2026-04-22</div>
+
+<div class="legend">
+  <span style="background:#C4614A;color:white;">Entry</span>
+  <span style="background:#FFF8F3;color:#D4956A;border:1px solid #D4956A;">Onboarding</span>
+  <span style="background:#F0F5F2;color:#7FB5A0;border:1px solid #7FB5A0;">Account</span>
+  <span style="background:#FFF0F0;color:#8B1515;border:1px solid #DC2626;">Paywall / gate</span>
+  <span style="background:#E8EEF3;color:#0D1F2D;border:1px solid #0D1F2D;">Core loop</span>
+  <span style="background:#120A2A;color:#F0EAF8;">Terminal</span>
+</div>
+
+<div class="toc">
+  <strong>Jump to:</strong>
+  <a href="#splash">Splash (entry)</a>
+  <a href="#begin">Begin journey</a>
+  <a href="#login">I have an account</a>
+  <a href="#signup">Create account</a>
+  <a href="#gift">Gift flow</a>
+  <a href="#daythree">Day 3 → paywall / register gate</a>
+  <a href="#matrix">Back-button matrix</a>
+</div>
+
+<h2 id="splash">1. Splash screen — entry point</h2>
+<div class="flow">
+  <div class="row">
+    <div class="node entry">Splash<small>4 buttons</small></div>
+    <span class="arrow">→</span>
+    <div class="node onboarding">"Begin"</div>
+    <span class="arrow">→</span>
+    <div class="node account">"Log in" (top-left)</div>
+    <span class="arrow">→</span>
+    <div class="node account">"Create account"</div>
+    <span class="arrow">→</span>
+    <div class="node onboarding">"Gift it to someone"</div>
+  </div>
+</div>
+
+<h2 id="begin">2. "Begin" — guest journey (no account needed)</h2>
+<div class="flow">
+  <div class="row">
+    <div class="node entry">Splash</div><span class="arrow">→</span>
+    <div class="node onboarding">step 1<small>name · treatment · days</small></div><span class="arrow">→</span>
+    <div class="node onboarding">step 2<small>vibe · components</small></div><span class="arrow">→</span>
+    <div class="node onboarding">onboarding-music<small>genres</small></div>
+  </div>
+  <div class="row">
+    <div class="node onboarding">notification-settings<small>time + content</small></div><span class="arrow">→</span>
+    <div class="node onboarding">summary<small>review your choices</small></div><span class="arrow">→</span>
+    <div class="node core">day 1 ← 2 ← 3<small>free content</small></div><span class="arrow">→</span>
+    <div class="node paywall">day 3 complete<br>→ Register Gate</div>
+  </div>
+  <div class="note"><strong>Note:</strong> guest's profile &amp; journal are stored in localStorage only. If they clear browser data, it's gone. That's why we gate at day 3 with "Save your progress — create account".</div>
+</div>
+
+<h2 id="login">3. "I have an account" / Log in</h2>
+<div class="flow">
+  <div class="row">
+    <div class="node entry">Splash</div><span class="arrow">→</span>
+    <div class="node account">Log in<small>email + password</small></div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">success</span>
+    <span class="arrow">→</span>
+    <div class="node core">day N<small>resume where they left off</small></div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">wrong pwd</span>
+    <span class="arrow">→</span>
+    <div class="node account">error<small>N attempts remaining</small></div>
+    <span class="arrow">→</span>
+    <div class="node account">5 wrong = locked<small>15 min</small></div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">"forgot password"</span>
+    <span class="arrow">→</span>
+    <div class="node account">enter email</div>
+    <span class="arrow">→</span>
+    <div class="node account">"check your email"<small>token logged server-side (no mail yet)</small></div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">"sign up" link</span>
+    <span class="arrow">→</span>
+    <div class="node account">Create account (see §4)</div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">back</span>
+    <span class="arrow">→</span>
+    <div class="node entry">Splash</div>
+  </div>
+</div>
+
+<h2 id="signup">4. "Create account" — 4 possible entry paths, 3 outcomes</h2>
+
+<h3>Entry paths (where the user came from)</h3>
+<div class="flow">
+  <div class="row"><span class="branch">from</span>
+    <div class="node entry">Splash</div><span class="arrow">→</span>
+    <div class="node account">Create account</div>
+    <span class="branch">back goes to →</span>
+    <div class="node entry">Splash</div>
+  </div>
+  <div class="row"><span class="branch">from</span>
+    <div class="node account">Login</div><span class="arrow">→</span>
+    <span class="branch">"sign up"</span>
+    <span class="arrow">→</span>
+    <div class="node account">Create account</div>
+    <span class="branch">back goes to →</span>
+    <div class="node account">Login</div>
+  </div>
+  <div class="row"><span class="branch">from</span>
+    <div class="node paywall">Paywall</div><span class="arrow">→</span>
+    <span class="branch">pick paid plan</span>
+    <span class="arrow">→</span>
+    <div class="node account">Create account</div>
+    <span class="branch">back goes to →</span>
+    <div class="node paywall">Paywall</div>
+  </div>
+  <div class="row"><span class="branch">from</span>
+    <div class="node paywall">Register Gate (day 3 gate)</div><span class="arrow">→</span>
+    <span class="branch">"save your progress"</span>
+    <span class="arrow">→</span>
+    <div class="node account">Create account</div>
+    <span class="branch">back goes to →</span>
+    <div class="node paywall">Register Gate</div>
+  </div>
+</div>
+
+<h3>After account creation — 3 outcomes</h3>
+<div class="flow">
+  <div class="row">
+    <div class="node account">Create account<small>success</small></div>
+    <span class="arrow">→</span>
+    <span class="branch">if no profile yet</span>
+    <span class="arrow">→</span>
+    <div class="node onboarding">onboarding-step1<small>build profile</small></div>
+  </div>
+  <div class="row">
+    <div class="node account">Create account<small>success</small></div>
+    <span class="arrow">→</span>
+    <span class="branch">if profile + paid plan picked</span>
+    <span class="arrow">→</span>
+    <div class="node paywall">payment (Stripe)</div>
+  </div>
+  <div class="row">
+    <div class="node account">Create account<small>success</small></div>
+    <span class="arrow">→</span>
+    <span class="branch">if profile but no plan</span>
+    <span class="arrow">→</span>
+    <div class="node paywall">Paywall<small>pick free days or £9.99</small></div>
+  </div>
+</div>
+
+<h2 id="gift">5. "Gift it to someone"</h2>
+<div class="flow">
+  <div class="row">
+    <div class="node entry">Splash</div><span class="arrow">→</span>
+    <div class="node onboarding">gift-flow<small>message + payment</small></div><span class="arrow">→</span>
+    <div class="node paywall">Stripe payment</div><span class="arrow">→</span>
+    <div class="node onboarding">share gift link</div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">recipient clicks gift link</span>
+    <span class="arrow">→</span>
+    <div class="node onboarding">gift-redeem<small>welcome + create account</small></div>
+    <span class="arrow">→</span>
+    <div class="node onboarding">onboarding-step1</div>
+  </div>
+</div>
+
+<h2 id="daythree">6. The critical moment — day 3 complete</h2>
+<div class="flow">
+  <div class="row">
+    <div class="node core">day 3 complete<small>guest user</small></div>
+    <span class="arrow">→</span>
+    <div class="node paywall">Register Gate<small>3 options</small></div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">option 1 — UNLOCK</span>
+    <span class="arrow">→</span>
+    <div class="node paywall">Paywall<small>£9.99</small></div>
+    <span class="arrow">→</span>
+    <div class="node account">Create account</div>
+    <span class="arrow">→</span>
+    <div class="node paywall">payment</div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">option 2 — SAVE PROGRESS</span>
+    <span class="arrow">→</span>
+    <div class="node account">Create account</div>
+    <span class="arrow">→</span>
+    <div class="node paywall">Paywall<small>choose free or paid</small></div>
+  </div>
+  <div class="row sub-row">
+    <span class="branch">option 3 — KEEP BROWSING</span>
+    <span class="arrow">→</span>
+    <div class="node core">day 3<small>stays as guest</small></div>
+  </div>
+  <div class="note"><strong>Copy update:</strong> option 2 now reads "Save your progress — create account" with subtext "Free · keeps your journal &amp; favourites across devices. Upgrade anytime." Option 3 reads "Keep browsing my free days" with "Without an account · progress stays on this device only" — makes the trade-off explicit.</div>
+</div>
+
+<h2 id="matrix">7. Back-button matrix (from Create account)</h2>
+<div class="flow">
+  <div style="font-size: 12px;">
+    <table style="border-collapse: collapse; width: 100%;">
+      <tr style="background: #FFF8F3; font-weight: 600;">
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Came from</td>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Back returns to</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Splash "Create account" button</td>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Splash</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Login → "Sign up" link</td>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Login</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Paywall → paid plan picked</td>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Paywall</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Register Gate (day 3) → "Save progress"</td>
+        <td style="padding: 8px; border: 1px solid #E8D8D0;">Register Gate ★ <em>(new this commit)</em></td>
+      </tr>
+    </table>
+  </div>
+  <div class="note">Before this commit, option 4 always sent the user back to Splash, which felt like "the app just forgot I was mid-journey". Now they return to the register-gate and can pick a different option without losing context.</div>
+</div>
+
+<div style="margin-top: 30px; padding: 14px; background: white; border-radius: 10px; text-align: center; font-size: 11px; color: #9B7B74;">
+  Generated 2026-04-22 · Source: <code>cycle-app/src/App.tsx</code>
+</div>
+
+</body>
+</html>

@@ -83,6 +83,8 @@ function App() {
     return false
   })
   const [selectedPlan, setSelectedPlan] = useState<'one_cycle' | 'gift' | null>(null)
+  // Where the user came from when entering create-account; controls the back button's destination.
+  const [createAccountFrom, setCreateAccountFrom] = useState<'splash' | 'paywall' | 'register-gate' | 'login' | 'day'>('splash')
 
   const update = (patch: Partial<OnboardingData>) => {
     const next = { ...data, ...patch }
@@ -252,8 +254,8 @@ function App() {
 
   return (
     <div style={{ width: '100%', minHeight: '100svh', display: 'flex', justifyContent: 'center', background: appBg, transition: 'background 0.5s ease' }}>
-      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-step1') }} onHaveAccount={() => setScreen('login')} onCreateAccount={() => setScreen('create-account')} onGift={() => setScreen('gift-flow')} />}
-      {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('create-account')} />}
+      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-step1') }} onHaveAccount={() => setScreen('login')} onCreateAccount={() => { setCreateAccountFrom('splash'); setScreen('create-account') }} onGift={() => setScreen('gift-flow')} />}
+      {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => { setCreateAccountFrom('login'); setScreen('create-account') }} />}
       {/* 3-step onboarding */}
       {screen === 'onboarding-step1' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
       {screen === 'onboarding-step2' && <OnboardingStep2 onBack={() => { setVibePreview(null); setScreen('onboarding-step1') }} onContinue={(vibeKey, components) => { update({ vibe: vibeKey, components }); setVibePreview(null); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-music') }} initialVibe={data.vibe || null} initialComponents={data.components} onPreview={setVibePreview} />}
@@ -272,7 +274,7 @@ function App() {
         setSelectedPlan(plan as 'one_cycle' | 'gift')
         setScreen('payment')
       }} />}
-      {screen === 'create-account' && <CreateAccount onBack={() => setScreen('splash')} onSuccess={() => {
+      {screen === 'create-account' && <CreateAccount onBack={() => setScreen(createAccountFrom)} onSuccess={() => {
         localStorage.setItem('cycle_is_guest', '0')
         const hasProfile = !!(data.name && data.vibe && data.components && data.genres && data.treatment && data.cycleDays)
         if (selectedPlan === 'gift') {
@@ -290,7 +292,7 @@ function App() {
         }
       }} onLogin={() => setScreen('login')} vibeBg={vibe?.bg} vibeAccent={vibe?.accent} profileData={data as OnboardingData} dayNumber={dayNumber} />}
       {screen === 'notification-settings' && data.name && data.vibe && data.components && <NotificationSettings data={data as OnboardingData} onBack={() => setScreen('onboarding-music')} onDone={() => setScreen('summary')} />}
-      {screen === 'register-gate' && <RegisterGate onCreateAccount={() => setScreen('create-account')} onContinueGuest={() => { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} cycleDays={data.cycleDays} />}
+      {screen === 'register-gate' && <RegisterGate onCreateAccount={() => { setCreateAccountFrom('register-gate'); setScreen('create-account') }} onContinueGuest={() => { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} cycleDays={data.cycleDays} />}
       {screen === 'day' && data.name && data.vibe && data.components && <DayScreen data={data as OnboardingData} dayNumber={dayNumber} isPremium={isPremium} isPaused={isPaused} onResume={resumeJourney} onDayComplete={() => { const isGuest = localStorage.getItem('cycle_is_guest') === '1'; const nextDay = dayNumber + 1; if (isGuest && nextDay > 3) { setScreen('register-gate'); return } if (!isPremium && nextDay > 3) { track('paywall_viewed'); setScreen('paywall'); return } advanceDay() }} onSettings={() => setScreen('settings')} onGoToDay={day => { if (!isPremium && day > 3) { track('paywall_viewed'); setScreen('paywall'); return } setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)) }} onUnlock={() => { track('paywall_viewed'); setScreen('paywall') }} onEndOfCycle={() => setScreen('end-of-cycle')} />}
       {screen === 'progress' && data.name && data.vibe && data.components && <Progress data={data as OnboardingData} dayNumber={dayNumber} onGoToDay={day => { setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen('day') }} onSettings={() => setScreen('settings')} />}
       {screen === 'settings' && data.name && data.vibe && data.components && <Settings data={data as OnboardingData} dayNumber={dayNumber} onUpdateData={update} onDeleteAccount={restartJourney} onLogout={restartJourney} onSignOut={signOut} onBack={() => setScreen('day')} isPaused={isPaused} onPause={pauseJourney} onResume={resumeJourney} isPremium={isPremium} onUpgrade={() => { track('paywall_viewed'); setScreen('paywall') }} />}
