@@ -389,8 +389,8 @@ Generate:
 3) An affirmation in first person starting with "I am" or "I have" that reflects what day she is on — Day 1 feels different to Day 8 so make it specific.
 4) A journal prompt specific to what she might be feeling on this exact day of fertility treatment — not generic wellness prompts.
 5) A gratitude prompt that is short and gentle.
-6) A breathing exercise opening line using her name, warm and specific to her day.
-7) A breathing exercise closing line using her name, different from the opening.
+6) A breathing exercise OPENING LINE: VERY short (max 12 words, 1-2 short sentences). Soft, warm, invitational. Acknowledge the day briefly then invite her to breathe. Example tone: "Day ${dayNumber}. You're doing so well. Let's breathe together." Do NOT start with her name alone — if you use her name, weave it in naturally. No commands, no pressure.
+7) A breathing exercise CLOSING LINE: VERY short (max 10 words). A tender affirming note that lands the exercise. Different from the opening.
 8) A friend note — a short warm personal message (2-3 sentences) written as if from her closest person, using her name and referencing Day ${dayNumber}. Match the vibe tone exactly.
 9) 2-3 high-protein food suggestions — easy, inspiring meals or snacks. For each item provide: name, a single food emoji, and approximate protein per serving (e.g. "~20g"). ${dietaryNote}Vary across the cycle. Frame as inspiration, not medical advice.
 

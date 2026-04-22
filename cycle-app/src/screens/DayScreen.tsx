@@ -66,9 +66,10 @@ function speak(text: string): Promise<void> {
     const doSpeak = () => {
       voicesLoaded = true
       const u = new SpeechSynthesisUtterance(text)
-      u.rate = 0.9
-      u.pitch = 0.95
-      u.volume = 1.0
+      // Softer, more meditative: slower pace + slightly lower pitch than default
+      u.rate = 0.82
+      u.pitch = 0.88
+      u.volume = 0.95
       const voice = getBestVoice()
       if (voice) {
         u.voice = voice
@@ -220,21 +221,25 @@ function createAmbientPad(): { start: () => void; swell: () => void; duck: () =>
   } catch { return null }
 }
 
-// --- "Your Moment" breathing: 1 breath cycle, ~35 seconds ---
-// Timeline: chime (0-3s) → inhale (3-10s, 7s) → hold (10-13s, 3s) → exhale (13-21s, 8s) → closing text (21-30s) → chime (30-33s) → done (35s)
+// --- "Your Moment" breathing: 2 gentle breath cycles, ~30 seconds total ---
+// Timeline: opening voice (0-4s) → 2× (inhale 5s + hold 2s + exhale 6s) = 26s → closing (~30s)
+// Ratio favours exhale (5:2:6) which triggers the parasympathetic response — more relaxing.
 const MOMENT_PHASES = [
-  { key: 'inhale', label: 'Breathe in slowly', duration: 7, scale: 1.4 },
-  { key: 'hold', label: 'Hold gently', duration: 3, scale: 1.4 },
-  { key: 'exhale', label: 'And release', duration: 8, scale: 1.0 },
+  { key: 'inhale', label: 'breathe in…', duration: 5, scale: 1.4 },
+  { key: 'hold', label: 'hold', duration: 2, scale: 1.4 },
+  { key: 'exhale', label: 'breathe out…', duration: 6, scale: 1.0 },
+  { key: 'inhale', label: 'breathe in…', duration: 5, scale: 1.4 },
+  { key: 'hold', label: 'hold', duration: 2, scale: 1.4 },
+  { key: 'exhale', label: 'breathe out…', duration: 6, scale: 1.0 },
 ] as const
 
-// Vibe-specific moment phrases
+// Vibe-specific moment phrases — kept short and warm. AI-generated lines override these when available.
 const MOMENT_PHRASES: Record<string, { opening: string; closing: string }> = {
-  fierce: { opening: 'Place your hand on your belly.\nYou are powerful.', closing: 'That strength lives in you.' },
-  nurturing: { opening: 'Rest your hand gently\nbelow your navel.', closing: 'You are held, always.' },
-  calm: { opening: 'Feel the stillness\nin your body.', closing: 'You are exactly where\nyou need to be.' },
-  lighthearted: { opening: 'Smile.\nTake one big breath with me.', closing: 'See? You\'ve got this.' },
-  spiritual: { opening: 'Place your hand on your heart.\nBe still.', closing: 'You are guided.\nTrust this.' },
+  fierce: { opening: "You're here. Let's breathe together.", closing: 'Strong. Steady. Yours.' },
+  nurturing: { opening: "You're here. Let's breathe together.", closing: "You're held. Always." },
+  calm: { opening: "You're here. Let's breathe together.", closing: "You are exactly where you need to be." },
+  lighthearted: { opening: "You're here. Let's breathe together.", closing: "See? You've got this." },
+  spiritual: { opening: "You're here. Let's breathe together.", closing: 'You are guided. Trust this.' },
 }
 
 interface YourMomentProps {
@@ -436,43 +441,54 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
   const elapsedTotal = MOMENT_PHASES.slice(0, phaseIdx).reduce((sum, p) => sum + p.duration, 0) + elapsed
   const overallProgress = elapsedTotal / totalDuration
 
+  // Circular progress — wraps around the orb as time elapses.
+  const ringRadius = 86
+  const ringCircumference = 2 * Math.PI * ringRadius
+
   return (
     <div className="flex-col" style={{ alignItems: 'center', gap: 16, padding: '24px 0' }}>
-      {/* Breathing orb — single, clean */}
-      <div style={{ position: 'relative', width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Breathing orb + circular progress ring */}
+      <div style={{ position: 'relative', width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {/* Outer glow */}
         <div style={{
-          position: 'absolute', inset: -20, borderRadius: '50%',
+          position: 'absolute', inset: -10, borderRadius: '50%',
           background: `radial-gradient(circle, ${vibe.accent}18 0%, transparent 70%)`,
           transform: `scale(${circleScale})`,
           transition: `transform ${phase.duration}s ease-in-out`,
         }} />
+        {/* Circular progress ring — sits just outside the orb */}
+        <svg width={200} height={200} style={{ position: 'absolute', transform: 'rotate(-90deg)' }} aria-hidden="true">
+          <circle cx={100} cy={100} r={ringRadius} fill="none" stroke={`${vibe.accent}22`} strokeWidth={3} />
+          <circle
+            cx={100}
+            cy={100}
+            r={ringRadius}
+            fill="none"
+            stroke={vibe.accent}
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeDasharray={ringCircumference}
+            strokeDashoffset={ringCircumference * (1 - overallProgress)}
+            style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+          />
+        </svg>
         {/* Main orb — tap anywhere to end */}
         <div onClick={stopMoment} style={{
-          width: 120, height: 120, borderRadius: '50%',
+          width: 140, height: 140, borderRadius: '50%',
           background: `radial-gradient(circle at 40% 40%, ${vibe.accent}80, ${vibe.accent}30)`,
           boxShadow: `0 0 ${circleScale > 1.2 ? 50 : 25}px ${vibe.accent}40`,
           transform: `scale(${circleScale})`,
           transition: `transform ${phase.duration}s ease-in-out, box-shadow ${phase.duration}s ease-in-out`,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-          cursor: 'pointer',
+          cursor: 'pointer', zIndex: 1,
         }}>
-          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.2 }}>
+          <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 15, color: 'rgba(255,255,255,0.9)', textAlign: 'center', lineHeight: 1.2 }}>
             {phase.label}
           </div>
-          <div style={{ fontFamily: typo.bodyFont, fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontWeight: 600 }}>
+          <div style={{ fontFamily: typo.bodyFont, fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontWeight: 500 }}>
             tap to end
           </div>
         </div>
-      </div>
-
-      {/* Subtle progress bar */}
-      <div style={{ width: '60%', height: 2, background: `${vibe.accent}15`, borderRadius: 1, overflow: 'hidden', marginTop: 8 }}>
-        <div style={{
-          width: `${overallProgress * 100}%`, height: '100%',
-          background: vibe.accent, borderRadius: 1,
-          transition: 'width 0.1s linear',
-        }} />
       </div>
     </div>
   )
