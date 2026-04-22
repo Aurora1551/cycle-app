@@ -63,15 +63,6 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
     </div>
   )
 
-  const dietSummary = (() => {
-    const active = dietPrefs.filter(d => d !== 'none')
-    if (!active.length) return 'None selected'
-    return DIET_OPTIONS.filter(o => active.includes(o.id)).map(o => o.label).join(' · ')
-  })()
-  const personalisationSummary = `${data.name} · ${t(`treatments.${data.treatment}`) || data.treatment} · ${data.cycleDays} days · ${t(`vibes.${data.vibe}`)}`
-  const musicSummary = !spotifyConfigured ? 'Spotify not configured' : spotifyConnected ? `Spotify · ${spotifyDisplayName || 'connected'}` : 'Spotify not connected'
-  const notifSummary = notifyEnabled ? `Daily at ${notifyHour}:${String(notifyMinute).padStart(2, '0')} ${notifyPeriod}` : 'Off'
-  const accountSummary = isPremium ? 'Full journey unlocked ✨' : 'Free plan · Days 1–3'
   const [editName, setEditName] = useState(data.name)
   const [editCycleDays, setEditCycleDays] = useState(data.cycleDays)
   const [editTreatment, setEditTreatment] = useState(data.treatment)
@@ -170,6 +161,17 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
   const [notifyHour, setNotifyHour] = useState(parsed.h12)
   const [notifyMinute, setNotifyMinute] = useState(parsed.m)
   const [notifyPeriod, setNotifyPeriod] = useState<'AM' | 'PM'>(parsed.p)
+
+  // Section summaries (computed after all state is declared)
+  const dietSummary = (() => {
+    const active = dietPrefs.filter(d => d !== 'none')
+    if (!active.length) return 'None selected'
+    return DIET_OPTIONS.filter(o => active.includes(o.id)).map(o => o.label).join(' · ')
+  })()
+  const personalisationSummary = `${data.name} · ${t(`treatments.${data.treatment}`) || data.treatment} · ${data.cycleDays} days · ${t(`vibes.${data.vibe}`)}`
+  const musicSummary = !spotifyConfigured ? 'Spotify not configured' : spotifyConnected ? `Spotify · ${spotifyDisplayName || 'connected'}` : 'Spotify not connected'
+  const notifSummary = notifyEnabled ? `Daily at ${notifyHour}:${String(notifyMinute).padStart(2, '0')} ${notifyPeriod}` : 'Off'
+  const accountSummary = isPremium ? 'Full journey unlocked ✨' : 'Free plan · Days 1–3'
 
   const to24hStr = (h: number, m: number, p: 'AM' | 'PM') => {
     let h24 = p === 'AM' ? (h === 12 ? 0 : h) : (h === 12 ? 12 : h + 12)
