@@ -1,10 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { OnboardingData } from '../types'
-import { resolveVibe, resolveTypo, deriveTheme } from '../lib/theme'
+import { resolveVibe } from '../lib/theme'
 import { NOTIFICATION_CONTENT } from '../lib/constants'
-import { useFadeIn } from '../hooks/useFadeIn'
-import { ScreenShell, Card, SectionLabel, PrimaryButton, GhostButton, BackButton } from '../components/ui'
 import { subscribeToPush, registerServiceWorker } from '../lib/push'
 import { getAppUserId } from '../lib/userId'
 
@@ -20,11 +18,12 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
   const [minute, setMinute] = useState(0)
   const [period, setPeriod] = useState<'AM' | 'PM'>('AM')
   const [notifyContent, setNotifyContent] = useState('surprise')
-  const visible = useFadeIn()
+  const [visible, setVisible] = useState(false)
 
-  const vibe = resolveVibe(data.vibe)
-  const typo = resolveTypo(data.vibe)
-  const { isDark, textColor, mutedColor, cardBg, cardBorder } = deriveTheme(vibe)
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t) }, [])
+
+  const vibeTheme = resolveVibe(data.vibe)
+  const { bg, accent, text, muted } = vibeTheme
 
   const to24h = () => {
     if (period === 'AM') return hour === 12 ? 0 : hour
@@ -38,20 +37,14 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
     localStorage.setItem('notify_time', timeStr)
     localStorage.setItem('notify_content', notifyContent)
 
-    // Register service worker and subscribe to push
     const uid = getAppUserId()
     await registerServiceWorker()
     await subscribeToPush(uid)
 
-    // Save the notify time to the server subscription
     fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: uid,
-        subscription: null, // Already saved by subscribeToPush
-        notifyTime: timeStr,
-      }),
+      body: JSON.stringify({ userId: uid, subscription: null, notifyTime: timeStr }),
     }).catch(() => {})
 
     localStorage.setItem('notify_seen', '1')
@@ -63,79 +56,89 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
     onDone()
   }
 
-  const spinnerBtn = (onClick: () => void, label: string) => (
-    <button onClick={onClick} className="btn-bare" style={{ fontSize: 16, color: mutedColor, padding: 4 }}>{label}</button>
-  )
-
-  const spinnerBox = (value: string) => (
-    <div className="mono" style={{
-      fontSize: 32, fontWeight: 700, color: textColor,
-      background: isDark ? 'rgba(255,255,255,0.06)' : `${vibe.accent}08`,
-      border: `1.5px solid ${vibe.accent}40`, borderRadius: 12, padding: '8px 16px', minWidth: 56, textAlign: 'center',
-    }}>{value}</div>
-  )
+  // Compact time-spinner ticker (matches the onboarding chip aesthetic)
+  const tickBtn = (onClick: () => void, label: string): React.CSSProperties => ({
+    width: 28, height: 24, padding: 0, cursor: 'pointer', color: muted, fontSize: 12, lineHeight: 1,
+  })
 
   return (
-    <ScreenShell bg={vibe.bg} visible={visible}>
-      <BackButton onClick={onBack} color={mutedColor} />
-      <div style={{ padding: '4px 24px 20px' }}>
-        <SectionLabel color={vibe.accent}>{t('notifications.sectionLabel')}</SectionLabel>
-        <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 24, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.2, margin: 0 }}>{t('notifications.heading')}</h1>
-        <p style={{ fontFamily: typo.bodyFont, fontWeight: typo.bodyWeight, fontSize: 13, color: mutedColor, lineHeight: 1.5, marginTop: 6 }}>{t('notifications.subtext')}</p>
+    <div className="screen fade-in" style={{ opacity: visible ? 1 : 0, background: bg }}>
+      <div className="progress-track" style={{ background: `${accent}22` }}>
+        <div className="progress-fill" style={{ width: '100%', background: `linear-gradient(90deg, ${accent}, ${accent}bb)` }} />
       </div>
+      <button onClick={onBack} className="btn-back" style={{ color: muted }}>{t('back')}</button>
 
-      <div className="flex-col gap-14" style={{ padding: '0 24px', flex: 1 }}>
-        <Card cardBg={cardBg} cardBorder={cardBorder}>
-          <SectionLabel color={vibe.accent}>{t('notifications.morningTime')}</SectionLabel>
-          <div style={{ fontFamily: typo.bodyFont, fontSize: 12, color: mutedColor, marginBottom: 12 }}>{t('notifications.recommend')}</div>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              {spinnerBtn(() => setHour(hour >= 12 ? 1 : hour + 1), '▲')}
-              {spinnerBox(String(hour))}
-              {spinnerBtn(() => setHour(hour <= 1 ? 12 : hour - 1), '▼')}
+      <div className="content" style={{ gap: 14 }}>
+        <div className="step-label" style={{ color: accent }}>{t('notifications.sectionLabel')}</div>
+        <h1 className="heading" style={{ color: text }}>{t('notifications.heading')}</h1>
+        <p className="subtext" style={{ color: muted, marginTop: -4 }}>{t('notifications.subtext')}</p>
+
+        {/* Time picker — compact, chip-style to match onboarding */}
+        <div>
+          <div className="mono-hint" style={{ color: muted, marginBottom: 10 }}>{t('notifications.morningTime')}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: `${accent}08`, border: `1.5px solid ${accent}30`, borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', borderRight: `1px solid ${accent}18` }}>
+                <button onClick={() => setHour(hour >= 12 ? 1 : hour + 1)} className="btn-bare flex-center" style={tickBtn(() => {}, '▲')}>▲</button>
+                <div className="mono" style={{ fontSize: 18, fontWeight: 600, color: text, padding: '2px 10px', textAlign: 'center', minWidth: 38 }}>{hour}</div>
+                <button onClick={() => setHour(hour <= 1 ? 12 : hour - 1)} className="btn-bare flex-center" style={tickBtn(() => {}, '▼')}>▼</button>
+              </div>
+              <div className="mono" style={{ fontSize: 18, color: muted, padding: '0 4px' }}>:</div>
+              <div style={{ display: 'flex', flexDirection: 'column', borderLeft: `1px solid ${accent}18`, borderRight: `1px solid ${accent}18` }}>
+                <button onClick={() => setMinute(minute >= 55 ? 0 : minute + 5)} className="btn-bare flex-center" style={tickBtn(() => {}, '▲')}>▲</button>
+                <div className="mono" style={{ fontSize: 18, fontWeight: 600, color: text, padding: '2px 10px', textAlign: 'center', minWidth: 38 }}>{String(minute).padStart(2, '0')}</div>
+                <button onClick={() => setMinute(minute <= 0 ? 55 : minute - 5)} className="btn-bare flex-center" style={tickBtn(() => {}, '▼')}>▼</button>
+              </div>
             </div>
-            <div className="mono" style={{fontSize: 32, fontWeight: 700, color: textColor }}>:</div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              {spinnerBtn(() => setMinute(minute >= 55 ? 0 : minute + 5), '▲')}
-              {spinnerBox(String(minute).padStart(2, '0'))}
-              {spinnerBtn(() => setMinute(minute <= 0 ? 55 : minute - 5), '▼')}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 8 }}>
-              {(['AM', 'PM'] as const).map(p => (
-                <button key={p} onClick={() => setPeriod(p)} className="mono" style={{
-                  background: period === p ? vibe.accent : 'transparent',
-                  border: `1.5px solid ${period === p ? vibe.accent : `${vibe.accent}40`}`,
-                  borderRadius: 10, padding: '8px 14px', fontSize: 14, fontWeight: 600,
-                  color: period === p ? 'white' : textColor, cursor: 'pointer', transition: 'all 0.15s',
-                }}>{p}</button>
-              ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {(['AM', 'PM'] as const).map(p => {
+                const sel = period === p
+                return (
+                  <button key={p} onClick={() => setPeriod(p)} className="mono" style={{
+                    background: sel ? accent : 'transparent',
+                    border: `1.5px solid ${sel ? accent : `${accent}33`}`,
+                    borderRadius: 10, padding: '5px 12px', fontSize: 11, fontWeight: 600,
+                    color: sel ? 'white' : muted, cursor: 'pointer', transition: 'all 0.15s',
+                  }}>{p}</button>
+                )
+              })}
             </div>
           </div>
-        </Card>
+          <div className="mono-sm" style={{ color: muted, marginTop: 8, fontSize: 11, opacity: 0.7 }}>{t('notifications.recommend')}</div>
+        </div>
 
-        <Card cardBg={cardBg} cardBorder={cardBorder}>
-          <SectionLabel color={vibe.accent}>{t('notifications.morningShows')}</SectionLabel>
-          <div className="flex-col gap-6">
-            {NOTIFICATION_CONTENT.map(opt => (
-              <button key={opt.id} onClick={() => setNotifyContent(opt.id)} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                background: notifyContent === opt.id ? `${vibe.accent}15` : 'transparent',
-                border: `1px solid ${notifyContent === opt.id ? vibe.accent : cardBorder}`,
-                borderRadius: 10, padding: '10px 12px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
-              }}>
-                <div className="radio" style={{ borderColor: notifyContent === opt.id ? vibe.accent : mutedColor, background: notifyContent === opt.id ? vibe.accent : 'transparent' }} />
-                <span style={{ fontFamily: typo.bodyFont, fontSize: 13, color: textColor, fontWeight: notifyContent === opt.id ? 600 : typo.bodyWeight }}>{t(`notifications.${({ quote: 'todaysQuote', affirmation: 'todaysAffirmation', song: 'todaysSong', surprise: 'surpriseMe' } as Record<string, string>)[opt.id] || opt.id}`)}</span>
-              </button>
-            ))}
+        <div style={{ height: 1, background: `${accent}20` }} />
+
+        {/* Content picker — chip style like onboarding music */}
+        <div>
+          <div className="mono-hint" style={{ color: muted, marginBottom: 10 }}>{t('notifications.morningShows')}</div>
+          <div className="flex-wrap">
+            {NOTIFICATION_CONTENT.map(opt => {
+              const sel = notifyContent === opt.id
+              const label = t(`notifications.${({ quote: 'todaysQuote', affirmation: 'todaysAffirmation', song: 'todaysSong', surprise: 'surpriseMe' } as Record<string, string>)[opt.id] || opt.id}`)
+              return (
+                <button key={opt.id} onClick={() => setNotifyContent(opt.id)} className="chip" style={{
+                  border: `1.5px solid ${sel ? accent : `${accent}33`}`,
+                  background: sel ? `${accent}14` : 'transparent',
+                  color: sel ? accent : muted,
+                }}>
+                  {label}
+                  {sel && <span style={{ fontSize: 10 }}>✓</span>}
+                </button>
+              )
+            })}
           </div>
-        </Card>
-
+        </div>
 
         <div className="spacer" />
-        <PrimaryButton accent={vibe.accent} typo={typo} onClick={handleAllow}>{t('notifications.allow')}</PrimaryButton>
-        <GhostButton color={mutedColor} borderColor={cardBorder} typo={typo} onClick={handleSkip} style={{ marginBottom: 8 }}>{t('notifications.skip')}</GhostButton>
+        <button onClick={handleAllow} className="btn-primary" style={{ background: accent }}>
+          {t('notifications.allow')}
+        </button>
+        <button onClick={handleSkip} className="body-font btn-bare" style={{ fontSize: 12, color: muted, padding: '12px 0', minHeight: 44, width: '100%', textAlign: 'center' }}>
+          {t('notifications.skip')}
+        </button>
       </div>
-    </ScreenShell>
+    </div>
   )
 }
 
