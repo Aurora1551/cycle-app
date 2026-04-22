@@ -1,38 +1,28 @@
 export const TREATMENT_LABELS: Record<string, string> = {
-  ttc: 'Trying to conceive',
-  'timed-intercourse': 'Timed intercourse',
-  'medicated-cycle': 'Medication cycle',
-  iui: 'IUI',
-  'donor-sperm': 'Donor sperm',
   ivf: 'IVF',
-  'mini-ivf': 'Mini IVF',
   icsi: 'ICSI',
+  iui: 'IUI',
   pgt: 'PGT (genetic testing)',
   'embryo-transfer': 'Embryo Transfer',
   fet: 'Frozen Embryo Transfer',
   'egg-freezing': 'Egg Freezing',
   'egg-donation': 'Egg Donation',
-  'reciprocal-ivf': 'Reciprocal IVF',
+  'medicated-cycle': 'Medication cycle',
   surrogacy: 'Surrogacy',
   preparing: 'Preparing',
   other: 'Other',
 }
 
 export const TREATMENT_EMOJIS: Record<string, string> = {
-  ttc: '🕊️',
-  'timed-intercourse': '⏱️',
-  'medicated-cycle': '💊',
-  iui: '🌱',
-  'donor-sperm': '💠',
   ivf: '💫',
-  'mini-ivf': '💎',
   icsi: '🔬',
+  iui: '🌱',
   pgt: '🧬',
   'embryo-transfer': '🌟',
   fet: '❄️',
   'egg-freezing': '🥚',
   'egg-donation': '🤝',
-  'reciprocal-ivf': '🤲',
+  'medicated-cycle': '💊',
   surrogacy: '💞',
   preparing: '🌿',
   other: '✨',
@@ -53,9 +43,8 @@ export const COMPONENT_ORDER = ['quote', 'anthem', 'affirmation', 'journal', 'gr
 
 // Default cycle length per treatment type (days). User can override in onboarding or Settings.
 export const TREATMENT_DEFAULTS: Record<string, number> = {
-  ttc: 28, 'timed-intercourse': 28, 'medicated-cycle': 21, iui: 28, 'donor-sperm': 28,
-  ivf: 18, 'mini-ivf': 14, icsi: 18, pgt: 18, 'embryo-transfer': 18, fet: 18,
-  'egg-freezing': 14, 'egg-donation': 14, 'reciprocal-ivf': 18, surrogacy: 28, preparing: 14,
+  ivf: 18, icsi: 18, iui: 28, pgt: 18, 'embryo-transfer': 18, fet: 18,
+  'egg-freezing': 14, 'egg-donation': 14, 'medicated-cycle': 21, surrogacy: 28, preparing: 14,
 }
 
 export const NOTIFICATION_TIMES = [

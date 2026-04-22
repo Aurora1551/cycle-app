@@ -11,29 +11,23 @@ interface Props {
 }
 
 const TREATMENTS = [
-  { id: 'ttc', emoji: '🕊️' },
-  { id: 'timed-intercourse', emoji: '⏱️' },
-  { id: 'medicated-cycle', emoji: '💊' },
-  { id: 'iui', emoji: '🌱' },
-  { id: 'donor-sperm', emoji: '💠' },
   { id: 'ivf', emoji: '💫' },
-  { id: 'mini-ivf', emoji: '💎' },
   { id: 'icsi', emoji: '🔬' },
+  { id: 'iui', emoji: '🌱' },
   { id: 'pgt', emoji: '🧬' },
   { id: 'embryo-transfer', emoji: '🌟' },
   { id: 'fet', emoji: '❄️' },
   { id: 'egg-freezing', emoji: '🥚' },
   { id: 'egg-donation', emoji: '🤝' },
-  { id: 'reciprocal-ivf', emoji: '🤲' },
+  { id: 'medicated-cycle', emoji: '💊' },
   { id: 'surrogacy', emoji: '💞' },
   { id: 'preparing', emoji: '🌿' },
   { id: 'other', emoji: '✨' },
 ]
 
 const TREATMENT_DEFAULTS: Record<string, number> = {
-  ttc: 28, 'timed-intercourse': 28, 'medicated-cycle': 21, iui: 28, 'donor-sperm': 28,
-  ivf: 18, 'mini-ivf': 14, icsi: 18, pgt: 18, 'embryo-transfer': 18, fet: 18,
-  'egg-freezing': 14, 'egg-donation': 14, 'reciprocal-ivf': 18, surrogacy: 28, preparing: 14,
+  ivf: 18, icsi: 18, iui: 28, pgt: 18, 'embryo-transfer': 18, fet: 18,
+  'egg-freezing': 14, 'egg-donation': 14, 'medicated-cycle': 21, surrogacy: 28, preparing: 14,
 }
 
 const A = '#C4614A', BG = '#FDF6F0', T = '#1C0F0C', M = '#9B7B74'

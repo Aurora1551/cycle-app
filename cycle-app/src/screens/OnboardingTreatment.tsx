@@ -9,20 +9,15 @@ interface Props {
 }
 
 const TREATMENTS = [
-  { id: 'ttc', emoji: '🕊️' },
-  { id: 'timed-intercourse', emoji: '⏱️' },
-  { id: 'medicated-cycle', emoji: '💊' },
-  { id: 'iui', emoji: '🌱' },
-  { id: 'donor-sperm', emoji: '💠' },
   { id: 'ivf', emoji: '💫' },
-  { id: 'mini-ivf', emoji: '💎' },
   { id: 'icsi', emoji: '🔬' },
+  { id: 'iui', emoji: '🌱' },
   { id: 'pgt', emoji: '🧬' },
   { id: 'embryo-transfer', emoji: '🌟' },
   { id: 'fet', emoji: '❄️' },
   { id: 'egg-freezing', emoji: '🥚' },
   { id: 'egg-donation', emoji: '🤝' },
-  { id: 'reciprocal-ivf', emoji: '🤲' },
+  { id: 'medicated-cycle', emoji: '💊' },
   { id: 'surrogacy', emoji: '💞' },
   { id: 'preparing', emoji: '🌿' },
   { id: 'other', emoji: '✨' },

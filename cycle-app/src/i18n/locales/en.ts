@@ -54,20 +54,15 @@ const en = {
 
     // Treatments
     treatments: {
-      ttc: 'Trying to conceive',
-      'timed-intercourse': 'Timed intercourse',
-      'medicated-cycle': 'Medication cycle',
-      iui: 'IUI',
-      'donor-sperm': 'Donor sperm',
       ivf: 'IVF',
-      'mini-ivf': 'Mini IVF',
       icsi: 'ICSI',
+      iui: 'IUI',
       pgt: 'PGT (genetic testing)',
       'embryo-transfer': 'Embryo Transfer',
       fet: 'Frozen Embryo Transfer (FET)',
       'egg-freezing': 'Egg Freezing',
       'egg-donation': 'Egg Donation',
-      'reciprocal-ivf': 'Reciprocal IVF',
+      'medicated-cycle': 'Medication cycle',
       surrogacy: 'Surrogacy',
       preparing: 'Preparing for a cycle',
       other: 'Other',
