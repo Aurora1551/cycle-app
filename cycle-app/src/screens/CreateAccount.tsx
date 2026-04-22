@@ -23,6 +23,7 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [emailExists, setEmailExists] = useState(false)
   const visible = useFadeIn()
 
   const dark = isDarkBg(vibeBg)
@@ -51,8 +52,13 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
       })
       const data = await res.json()
       if (!res.ok) {
-        if (res.status === 409) setError('An account already exists for this email. Try logging in.')
-        else setError(data.error || 'Unable to create account. Please try again.')
+        if (res.status === 409) {
+          setEmailExists(true)
+          setError('An account already exists for this email.')
+        } else {
+          setEmailExists(false)
+          setError(data.error || 'Unable to create account. Please try again.')
+        }
         setLoading(false)
         return
       }
@@ -91,7 +97,18 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
           <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t('createAccount.confirmPasswordPlaceholder')} style={inputStyle} onKeyDown={e => e.key === 'Enter' && handleEmailSignUp()} />
         </div>
 
-        {error && <div style={{ fontSize: 12, color: '#E8907A', background: 'rgba(232,144,122,0.1)', borderRadius: 8, padding: '8px 12px' }}>{error}</div>}
+        {error && (
+          <div style={{ fontSize: 12, color: '#E8907A', background: 'rgba(232,144,122,0.1)', borderRadius: 8, padding: '10px 12px', lineHeight: 1.5 }}>
+            {error}
+            {emailExists && (
+              <div style={{ marginTop: 6, color: mutedColor }}>
+                <button onClick={onLogin} className="btn-bare" style={{ color: vibeAccent, fontSize: 12, padding: 0, textDecoration: 'underline', fontWeight: 600 }}>Log in</button>
+                <span style={{ margin: '0 6px', opacity: 0.5 }}>·</span>
+                <button onClick={onLogin} className="btn-bare" style={{ color: vibeAccent, fontSize: 12, padding: 0, textDecoration: 'underline' }}>Forgot your password?</button>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="spacer" />
         <button onClick={handleEmailSignUp} disabled={loading || !email || !password || !confirmPassword}
