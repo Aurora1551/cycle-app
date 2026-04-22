@@ -25,6 +25,7 @@ import RegisterGate from './screens/RegisterGate'
 import PaymentScreen from './screens/PaymentScreen'
 import PaymentSuccess from './screens/PaymentSuccess'
 import GiftRedeem from './screens/GiftRedeem'
+import ResetPassword from './screens/ResetPassword'
 import type { OnboardingData, VibeKey } from './types'
 import { VIBES } from './types'
 import { track } from './lib/posthog'
@@ -33,7 +34,7 @@ import { handleSpotifyCallback, verifySpotifyState } from './lib/spotify'
 import { getAppUserId } from './lib/userId'
 
 type Screen =
-  | 'splash' | 'login'
+  | 'splash' | 'login' | 'reset-password'
   | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-music'
   | 'onboarding-name' | 'onboarding-treatment' | 'onboarding-cycle-length' | 'onboarding-components' | 'onboarding-vibe'
   | 'summary'
@@ -47,7 +48,7 @@ const NAV_SCREENS: Screen[] = ['day', 'progress', 'settings']
 
 function getAppBg(screen: Screen, vibe: VibeKey | null, preview: VibeKey | null): string {
   if (screen === 'splash') return '#FFFBF0'
-  if (screen === 'login' || screen === 'gift-redeem') return '#0E0E0E'
+  if (screen === 'login' || screen === 'gift-redeem' || screen === 'reset-password') return '#0E0E0E'
   if (screen === 'register-gate' || screen === 'onboarding-step1' || screen === 'onboarding-name' || screen === 'onboarding-treatment' || screen === 'onboarding-cycle-length') return '#FDF6F0'
   const activeVibe = preview || vibe
   if (ONBOARDING_VIBE_SCREENS.includes(screen) && activeVibe) {
@@ -83,6 +84,7 @@ function App() {
     return false
   })
   const [selectedPlan, setSelectedPlan] = useState<'one_cycle' | 'gift' | null>(null)
+  const [resetToken, setResetToken] = useState<string>('')
   // Where the user came from when entering create-account; controls the back button's destination.
   const [createAccountFrom, setCreateAccountFrom] = useState<'splash' | 'paywall' | 'register-gate' | 'login' | 'day'>('splash')
 
@@ -116,6 +118,16 @@ function App() {
     if (window.location.pathname.startsWith('/gift/redeem')) {
       setScreen('gift-redeem')
       return
+    }
+
+    // Handle password-reset link: /reset-password?token=...
+    if (window.location.pathname === '/reset-password') {
+      const token = new URLSearchParams(window.location.search).get('token')
+      if (token) {
+        setResetToken(token)
+        setScreen('reset-password')
+        return
+      }
     }
 
     // Handle Spotify OAuth callback
@@ -256,6 +268,7 @@ function App() {
     <div style={{ width: '100%', minHeight: '100svh', display: 'flex', justifyContent: 'center', background: appBg, transition: 'background 0.5s ease' }}>
       {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-step1') }} onHaveAccount={() => setScreen('login')} onCreateAccount={() => { setCreateAccountFrom('splash'); setScreen('create-account') }} onGift={() => setScreen('gift-flow')} />}
       {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => { setCreateAccountFrom('login'); setScreen('create-account') }} />}
+      {screen === 'reset-password' && <ResetPassword token={resetToken} onSuccess={() => { window.history.replaceState({}, '', '/'); setResetToken(''); setScreen('login') }} onBack={() => { window.history.replaceState({}, '', '/'); setResetToken(''); setScreen('splash') }} />}
       {/* 3-step onboarding */}
       {screen === 'onboarding-step1' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
       {screen === 'onboarding-step2' && <OnboardingStep2 onBack={() => { setVibePreview(null); setScreen('onboarding-step1') }} onContinue={(vibeKey, components) => { update({ vibe: vibeKey, components }); setVibePreview(null); track('onboarding_step_completed', { step: 2 }); setScreen('onboarding-music') }} initialVibe={data.vibe || null} initialComponents={data.components} onPreview={setVibePreview} />}
