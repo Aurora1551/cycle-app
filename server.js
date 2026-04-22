@@ -736,15 +736,66 @@ app.post('/api/register', async (req, res) => {
   res.json({ success: true, accountId: account.id, email })
 })
 
+// In-memory rate limit: max 5 failed login attempts per email per 15 minutes.
+// Not persistent — resets on server restart. Good enough for MVP.
+const loginAttempts = new Map() // email -> { count, firstAt, lockedUntil }
+const MAX_ATTEMPTS = 5
+const WINDOW_MS = 15 * 60 * 1000
+
+function checkLoginLimit(email) {
+  const now = Date.now()
+  const rec = loginAttempts.get(email)
+  if (!rec) return { allowed: true, remaining: MAX_ATTEMPTS }
+  if (rec.lockedUntil && now < rec.lockedUntil) {
+    return { allowed: false, retryAfter: Math.ceil((rec.lockedUntil - now) / 1000) }
+  }
+  if (now - rec.firstAt > WINDOW_MS) {
+    loginAttempts.delete(email)
+    return { allowed: true, remaining: MAX_ATTEMPTS }
+  }
+  return { allowed: rec.count < MAX_ATTEMPTS, remaining: Math.max(0, MAX_ATTEMPTS - rec.count) }
+}
+
+function recordLoginFailure(email) {
+  const now = Date.now()
+  const rec = loginAttempts.get(email)
+  if (!rec || now - rec.firstAt > WINDOW_MS) {
+    loginAttempts.set(email, { count: 1, firstAt: now, lockedUntil: 0 })
+    return
+  }
+  rec.count++
+  if (rec.count >= MAX_ATTEMPTS) {
+    rec.lockedUntil = now + WINDOW_MS
+  }
+}
+
+function clearLoginAttempts(email) { loginAttempts.delete(email) }
+
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' })
 
-  const account = getAccountByEmail(email)
-  if (!account) return res.status(401).json({ error: 'Invalid email or password' })
+  const normEmail = String(email).trim().toLowerCase()
+  const limit = checkLoginLimit(normEmail)
+  if (!limit.allowed) {
+    return res.status(429).json({ error: 'Too many failed attempts. Try again in a few minutes or reset your password.', retryAfter: limit.retryAfter, locked: true })
+  }
+
+  const account = getAccountByEmail(normEmail)
+  if (!account) {
+    recordLoginFailure(normEmail)
+    const after = checkLoginLimit(normEmail)
+    return res.status(401).json({ error: 'Invalid email or password', attemptsRemaining: after.remaining })
+  }
 
   const valid = await bcrypt.compare(password, account.password_hash)
-  if (!valid) return res.status(401).json({ error: 'Invalid email or password' })
+  if (!valid) {
+    recordLoginFailure(normEmail)
+    const after = checkLoginLimit(normEmail)
+    return res.status(401).json({ error: 'Invalid email or password', attemptsRemaining: after.remaining })
+  }
+
+  clearLoginAttempts(normEmail)
 
   // Load profile if linked
   let profile = null
@@ -753,6 +804,46 @@ app.post('/api/login', async (req, res) => {
   }
 
   res.json({ success: true, accountId: account.id, email: account.email, profile })
+})
+
+// Password reset — stub for now. Generates a token and logs it to server console.
+// A real implementation would email the user the token via SES / SendGrid / etc.
+const resetTokens = new Map() // token -> { email, expiresAt }
+app.post('/api/forgot-password', (req, res) => {
+  const { email } = req.body || {}
+  if (!email) return res.status(400).json({ error: 'Email required' })
+  const normEmail = String(email).trim().toLowerCase()
+  const account = getAccountByEmail(normEmail)
+  // Always respond the same way — don't leak which emails exist.
+  if (account) {
+    const token = require('crypto').randomBytes(24).toString('hex')
+    resetTokens.set(token, { email: normEmail, expiresAt: Date.now() + 30 * 60 * 1000 })
+    // TODO: send via email. For now, log to console so dev can copy the link.
+    console.log(`[Auth] Password reset token for ${normEmail}: ${token} (expires in 30 min)`)
+  }
+  res.json({ success: true, message: 'If that email has an account, a reset link has been sent.' })
+})
+
+app.post('/api/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body || {}
+  if (!token || !newPassword) return res.status(400).json({ error: 'Token and new password required' })
+  if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
+  const rec = resetTokens.get(token)
+  if (!rec || Date.now() > rec.expiresAt) {
+    resetTokens.delete(token)
+    return res.status(400).json({ error: 'Reset link is invalid or has expired' })
+  }
+  const account = getAccountByEmail(rec.email)
+  if (!account) {
+    resetTokens.delete(token)
+    return res.status(404).json({ error: 'Account not found' })
+  }
+  const passwordHash = await bcrypt.hash(newPassword, 10)
+  // Using better-sqlite3 prepared statement via db.js would be cleaner; inline here for now.
+  db.prepare('UPDATE accounts SET password_hash = ? WHERE email = ?').run(passwordHash, rec.email)
+  resetTokens.delete(token)
+  clearLoginAttempts(rec.email)
+  res.json({ success: true })
 })
 
 app.post('/api/link-profile', (req, res) => {
