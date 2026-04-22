@@ -277,6 +277,7 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
 
   // Init audio + opening sequence
   useEffect(() => {
+    console.log('[Meditation] YourMoment mounted, starting sequence. openingLine:', JSON.stringify(displayOpening))
     padRef.current = createAmbientPad()
     chimeRef.current = createChime()
 
@@ -287,11 +288,14 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
 
     // Speak opening phrase after chime settles, then transition to breathing
     const run = async () => {
+      console.log('[Meditation] Waiting 2.5s for chime...')
       await new Promise(r => setTimeout(r, 2500))
+      console.log('[Meditation] 2.5s done. stopped?', stoppedRef.current)
       if (stoppedRef.current) return
       // Duck ambient pad so voice is clearly heard
       padRef.current?.duck()
       const textToSpeak = displayOpening.replace(/\n/g, '. ')
+      console.log('[Meditation] About to call speak() with:', JSON.stringify(textToSpeak))
       // Use the wrapper, which handles voices-not-loaded-yet + timeouts
       await speak(textToSpeak)
       console.log('[Meditation] Speech done, transitioning to breathing')
@@ -923,7 +927,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
-          <button onClick={() => { unlockSpeech(); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} className="breathe-btn" style={{ width: '100%', background: vibe.accent, color: 'white', border: 'none', borderRadius: 999, padding: '18px 24px', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', marginTop: 8, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: `0 6px 20px ${vibe.accent}55` }}>
+          <button onClick={() => { console.log('[Breathe] Button clicked'); unlockSpeech(); console.log('[Breathe] unlockSpeech done, mounting YourMoment...'); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} className="breathe-btn" style={{ width: '100%', background: vibe.accent, color: 'white', border: 'none', borderRadius: 999, padding: '18px 24px', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', marginTop: 8, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: `0 6px 20px ${vibe.accent}55` }}>
             <span style={{ fontSize: 16, lineHeight: 1 }}>✦</span>
             <span>Breathe with me <span style={{ opacity: 0.7, fontSize: 13 }}>· 35s</span></span>
           </button>
