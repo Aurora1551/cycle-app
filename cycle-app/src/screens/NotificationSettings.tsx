@@ -6,6 +6,7 @@ import { NOTIFICATION_CONTENT } from '../lib/constants'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, Card, SectionLabel, PrimaryButton, GhostButton, BackButton } from '../components/ui'
 import { subscribeToPush, registerServiceWorker } from '../lib/push'
+import { getAppUserId } from '../lib/userId'
 
 interface Props {
   data: OnboardingData
@@ -38,15 +39,16 @@ const NotificationSettings: React.FC<Props> = ({ data, onBack, onDone }) => {
     localStorage.setItem('notify_content', notifyContent)
 
     // Register service worker and subscribe to push
+    const uid = getAppUserId()
     await registerServiceWorker()
-    await subscribeToPush(data.name)
+    await subscribeToPush(uid)
 
     // Save the notify time to the server subscription
     fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        userId: data.name,
+        userId: uid,
         subscription: null, // Already saved by subscribeToPush
         notifyTime: timeStr,
       }),

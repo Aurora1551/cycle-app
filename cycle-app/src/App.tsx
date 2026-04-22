@@ -30,6 +30,7 @@ import { VIBES } from './types'
 import { track } from './lib/posthog'
 import { saveProfile } from './lib/db'
 import { handleSpotifyCallback, verifySpotifyState } from './lib/spotify'
+import { getAppUserId } from './lib/userId'
 
 type Screen =
   | 'splash' | 'login'
@@ -138,11 +139,7 @@ function App() {
           localStorage.setItem('spotify_auth_error', 'Connection failed — security check failed. Please try again.')
           sessionStorage.removeItem('spotify_code_verifier')
         } else {
-          const saved = localStorage.getItem(DATA_KEY)
-          let userId = 'default'
-          if (saved) {
-            try { userId = JSON.parse(saved).name || 'default' } catch {}
-          }
+          const userId = getAppUserId()
           handleSpotifyCallback(spotifyCode, userId).then(result => {
             if (result.success) {
               localStorage.setItem('spotify_connected', '1')

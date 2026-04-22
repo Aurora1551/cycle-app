@@ -10,6 +10,7 @@ import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell, Card, SectionLabel } from '../components/ui'
 import { track } from '../lib/posthog'
 import { searchSpotifyTrack, getSpotifyStatus } from '../lib/spotify'
+import { getAppUserId } from '../lib/userId'
 
 interface Props {
   data: OnboardingData
@@ -62,50 +63,52 @@ function speak(text: string): Promise<void> {
     if (!('speechSynthesis' in window)) { console.warn('[Speech] Not supported'); resolve(); return }
     if (!text || !text.trim()) { resolve(); return }
 
-    // Ensure voices are loaded
+    const doSpeak = () => {
+      voicesLoaded = true
+      const u = new SpeechSynthesisUtterance(text)
+      u.rate = 0.9
+      u.pitch = 0.95
+      u.volume = 1.0
+      const voice = getBestVoice()
+      if (voice) {
+        u.voice = voice
+        u.lang = voice.lang
+        console.log('[Speech] Using voice:', voice.name, voice.lang)
+      } else {
+        u.lang = 'en-US'
+        console.warn('[Speech] No preferred voice, using browser default')
+      }
+      const fallback = setTimeout(() => { console.warn('[Speech] Timeout fallback'); clearInterval(pump); resolve() }, text.length * 120 + 6000)
+      u.onstart = () => console.log('[Speech] Started')
+      u.onend = () => { clearTimeout(fallback); clearInterval(pump); console.log('[Speech] Done'); resolve() }
+      u.onerror = e => { clearTimeout(fallback); clearInterval(pump); console.error('[Speech] Error:', e); resolve() }
+      // Don't cancel() first — on some Mac browsers that can swallow the next utterance.
+      window.speechSynthesis.speak(u)
+      // Chrome pauses speech after ~15s of continuous speaking. This pump keeps it alive.
+      const pump = setInterval(() => {
+        if (!window.speechSynthesis.speaking) { clearInterval(pump); return }
+        window.speechSynthesis.pause()
+        window.speechSynthesis.resume()
+      }, 10000)
+      console.log('[Speech] Speaking:', text.substring(0, 40) + '...')
+    }
+
     const voices = window.speechSynthesis.getVoices()
-    if (voices.length === 0) {
-      // Try loading voices and retry
-      console.log('[Speech] No voices yet, waiting...')
+    if (voices.length > 0) {
+      doSpeak()
+    } else {
+      console.log('[Speech] Voices not loaded yet, waiting...')
       const onVoices = () => {
         window.speechSynthesis.removeEventListener('voiceschanged', onVoices)
-        voicesLoaded = true
         doSpeak()
       }
       window.speechSynthesis.addEventListener('voiceschanged', onVoices)
-      // Fallback if event never fires
+      // Fallback if the voiceschanged event never fires (some browsers)
       setTimeout(() => {
         window.speechSynthesis.removeEventListener('voiceschanged', onVoices)
-        voicesLoaded = true
         doSpeak()
-      }, 1000)
-      return
+      }, 800)
     }
-
-    function doSpeak() {
-      // Cancel anything queued, then speak after a tick
-      window.speechSynthesis.cancel()
-      setTimeout(() => {
-        const u = new SpeechSynthesisUtterance(text)
-        u.rate = 0.75
-        u.pitch = 0.85
-        u.volume = 1.0
-        const voice = getBestVoice()
-        if (voice) {
-          u.voice = voice
-          console.log('[Speech] Using voice:', voice.name)
-        } else {
-          console.warn('[Speech] No suitable voice found, using default')
-        }
-        const fallback = setTimeout(() => { console.warn('[Speech] Timeout fallback'); resolve() }, text.length * 150 + 5000)
-        u.onend = () => { clearTimeout(fallback); console.log('[Speech] Done'); resolve() }
-        u.onerror = (e) => { clearTimeout(fallback); console.error('[Speech] Error:', e); resolve() }
-        window.speechSynthesis.speak(u)
-        console.log('[Speech] Speaking:', text.substring(0, 40) + '...')
-      }, 200)
-    }
-
-    doSpeak()
   })
 }
 
@@ -655,7 +658,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     try {
       const res = await fetch('/api/generate-day', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: data.name, treatment: TREATMENT_LABELS[data.treatment] || data.treatment, dayNumber, totalDays: data.cycleDays, vibe: data.vibe, genres: data.genres, userId: data.name, language: localStorage.getItem('cycle_language') || 'en', dietaryPrefs: (() => { try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] } })() }),
+        body: JSON.stringify({ name: data.name, treatment: TREATMENT_LABELS[data.treatment] || data.treatment, dayNumber, totalDays: data.cycleDays, vibe: data.vibe, genres: data.genres, userId: getAppUserId(), language: localStorage.getItem('cycle_language') || 'en', dietaryPrefs: (() => { try { return JSON.parse(localStorage.getItem('cycle_diet_prefs') || '[]') } catch { return [] } })() }),
       })
       const body = await res.json()
       if (!res.ok || body.error) {
@@ -708,7 +711,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
     setShowCelebration(true)
     spawnConfetti()
     track('day_marked_done', { day_number: dayNumber })
-    fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, completed: true }) }).catch(() => {})
+    fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getAppUserId(), dayNumber, completed: true }) }).catch(() => {})
     // Auto-advance to next day after celebration
     setTimeout(() => {
       setShowCelebration(false)
@@ -718,7 +721,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
 
   const unmarkDone = () => {
     localStorage.removeItem(`cycle_day_${dayNumber}_done`)
-    fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, completed: false }) }).catch(() => {})
+    fetch('/api/day-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getAppUserId(), dayNumber, completed: false }) }).catch(() => {})
     setDayDone(false)
   }
 
@@ -729,7 +732,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       : [...favorites, { type, text, author, day: dayNumber }]
     setFavorites(next)
     localStorage.setItem('cycle_favorites', JSON.stringify(next))
-    fetch('/api/favorite', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, dayNumber, type, content: exists ? null : text, author }) }).catch(() => {})
+    fetch('/api/favorite', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getAppUserId(), dayNumber, type, content: exists ? null : text, author }) }).catch(() => {})
   }
 
   const isFavorited = (type: string) => favorites.some(f => f.type === type && f.day === dayNumber)
@@ -796,7 +799,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         if (spotifyConnected && spotifyTrack) {
           e.preventDefault()
           track('spotify_track_opened', { song: content?.songTitle || '', artist: content?.songArtist || '' })
-          fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, event: 'spotify_tap', data: JSON.stringify({ song: content?.songTitle, artist: content?.songArtist, day: dayNumber }) }) }).catch(() => {})
+          fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getAppUserId(), event: 'spotify_tap', data: JSON.stringify({ song: content?.songTitle, artist: content?.songArtist, day: dayNumber }) }) }).catch(() => {})
           const appLink = spotifyTrack.trackUri
           const webLink = spotifyTrack.trackUrl
           const start = Date.now()
@@ -1152,7 +1155,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
             <button onClick={() => {
               setShowSpotifyPopup(false)
               track('song_played', { day_number: dayNumber })
-              fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: data.name, event: 'spotify_tap', data: JSON.stringify({ song: content?.songTitle, artist: content?.songArtist, day: dayNumber }) }) }).catch(() => {})
+              fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getAppUserId(), event: 'spotify_tap', data: JSON.stringify({ song: content?.songTitle, artist: content?.songArtist, day: dayNumber }) }) }).catch(() => {})
               window.open(spotifySearchUrl, '_blank')
             }} style={{
               width: '100%', background: 'transparent', border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
