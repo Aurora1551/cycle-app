@@ -289,26 +289,8 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
       // Duck ambient pad so voice is clearly heard
       padRef.current?.duck()
       const textToSpeak = displayOpening.replace(/\n/g, '. ')
-      console.log('[Meditation] About to speak:', textToSpeak)
-      console.log('[Meditation] speechSynthesis available:', 'speechSynthesis' in window)
-      console.log('[Meditation] voices:', window.speechSynthesis?.getVoices()?.length)
-      // Test: try speaking directly without the wrapper to rule out speak() issues
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-        const testU = new SpeechSynthesisUtterance(textToSpeak)
-        testU.rate = 0.75
-        testU.pitch = 0.85
-        testU.volume = 1.0
-        const v = window.speechSynthesis.getVoices()
-        console.log('[Meditation] Available voices:', v.map(x => x.name).join(', '))
-        if (v.length > 0) testU.voice = v.find(x => x.lang.startsWith('en')) || v[0]
-        window.speechSynthesis.speak(testU)
-        console.log('[Meditation] Direct speak fired')
-        await new Promise(r => { testU.onend = r; testU.onerror = () => { console.error('[Meditation] Speech error'); r(undefined) }; setTimeout(r, textToSpeak.length * 150 + 5000) })
-      } else {
-        console.error('[Meditation] No speechSynthesis — this browser does not support it')
-        await new Promise(r => setTimeout(r, 2000))
-      }
+      // Use the wrapper, which handles voices-not-loaded-yet + timeouts
+      await speak(textToSpeak)
       console.log('[Meditation] Speech done, transitioning to breathing')
       padRef.current?.unduck()
       if (stoppedRef.current) return
@@ -938,8 +920,9 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
-          <button onClick={() => { unlockSpeech(); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} style={{ width: '100%', background: `linear-gradient(135deg, ${vibe.accent}22, ${vibe.accent}10)`, color: vibe.accent, border: `1px solid ${vibe.accent}30`, borderRadius: 999, padding: '14px 20px', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', marginTop: 4, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <span style={{ fontSize: 14, opacity: 0.85 }}>✦</span> Breathe with me · 35s
+          <button onClick={() => { unlockSpeech(); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} className="breathe-btn" style={{ width: '100%', background: vibe.accent, color: 'white', border: 'none', borderRadius: 999, padding: '18px 24px', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', marginTop: 8, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: `0 6px 20px ${vibe.accent}55` }}>
+            <span style={{ fontSize: 16, lineHeight: 1 }}>✦</span>
+            <span>Breathe with me <span style={{ opacity: 0.7, fontSize: 13 }}>· 35s</span></span>
           </button>
         ) : (
           <YourMoment

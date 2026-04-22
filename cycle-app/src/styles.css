@@ -41,6 +41,15 @@
 /* Utility: applies only the monospace family. Pair with inline size/color to migrate inline `fontFamily: "'DM Mono', monospace"` without changing visual output. */
 .mono { font-family:'DM Mono',monospace; }
 .body-font { font-family:'Karla',sans-serif; }
+
+/* Breathe-with-me button — subtle breathing pulse so it feels inviting rather than static. */
+@keyframes breathe-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+.breathe-btn { animation: breathe-pulse 3.2s ease-in-out infinite; transition: transform .15s ease, box-shadow .2s ease; }
+.breathe-btn:hover { animation-play-state: paused; transform: scale(1.03); }
+.breathe-btn:active { transform: scale(0.98); }
 .step-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); }
 .mono-hint  { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
 .mono-sm    { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; }
