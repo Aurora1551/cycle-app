@@ -277,6 +277,11 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, onComplete, 
 
   // Init audio + opening sequence
   useEffect(() => {
+    // React 19 Strict Mode mounts -> unmounts -> remounts in dev. The cleanup
+    // below sets stoppedRef.current = true; we need to reset it to false on
+    // every mount, otherwise the second mount runs with stopped already set
+    // and the speech step bails out.
+    stoppedRef.current = false
     console.log('[Meditation] YourMoment mounted, starting sequence. openingLine:', JSON.stringify(displayOpening))
     padRef.current = createAmbientPad()
     chimeRef.current = createChime()
