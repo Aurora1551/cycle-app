@@ -1231,9 +1231,10 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         }}
       >‹</button>
       {/* Mark Day done / sparkle celebration / toggle undo */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       {showCelebration ? (
         <div style={{
-          flex: 1, height: 48, borderRadius: 14,
+          width: '100%', maxWidth: 200, height: 48, borderRadius: 14,
           background: `${vibe.accent}20`,
           border: `1.5px solid ${vibe.accent}40`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -1245,7 +1246,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         <button
           onClick={unmarkDone}
           style={{
-            flex: 1, height: 48, borderRadius: 14,
+            width: '100%', maxWidth: 200, height: 48, borderRadius: 14,
             background: `${vibe.accent}15`,
             color: vibe.accent,
             border: `1.5px solid ${vibe.accent}30`,
@@ -1261,7 +1262,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
         <button
           onClick={markDone}
           style={{
-            flex: 1, height: 48, borderRadius: 14,
+            width: '100%', maxWidth: 200, height: 48, borderRadius: 14,
             background: vibe.accent,
             color: 'white',
             border: 'none',
@@ -1273,6 +1274,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
           Done &#10003;
         </button>
       )}
+      </div>
       {/* Right arrow */}
       <button
         onClick={() => {
