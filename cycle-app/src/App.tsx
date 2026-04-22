@@ -254,7 +254,7 @@ function App() {
 
   return (
     <div style={{ width: '100%', minHeight: '100svh', display: 'flex', justifyContent: 'center', background: appBg, transition: 'background 0.5s ease' }}>
-      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-step1') }} onHaveAccount={() => setScreen('login')} onGift={() => setScreen('gift-flow')} />}
+      {screen === 'splash' && <SplashScreen onBegin={() => { localStorage.setItem('cycle_is_guest', '1'); if (!localStorage.getItem('cycle_guest_start')) localStorage.setItem('cycle_guest_start', new Date().toISOString()); setScreen('onboarding-step1') }} onHaveAccount={() => setScreen('login')} onCreateAccount={() => setScreen('create-account')} onGift={() => setScreen('gift-flow')} />}
       {screen === 'login' && <LoginScreen onBack={() => setScreen('splash')} onSuccess={(profile, day) => { setData(profile); localStorage.setItem(DATA_KEY, JSON.stringify(profile)); localStorage.setItem('cycle_is_guest', '0'); setDayNumber(day); localStorage.setItem(DAY_KEY, String(day)); setScreen(day > (profile.cycleDays || 28) ? 'end-of-cycle' : 'day') }} onSignUp={() => setScreen('onboarding-step1')} />}
       {/* 3-step onboarding */}
       {screen === 'onboarding-step1' && <OnboardingStep1 onBack={() => setScreen('splash')} onContinue={(name, treatment, cycleDays) => { update({ name, treatment, cycleDays }); track('onboarding_step_completed', { step: 1 }); setScreen('onboarding-step2') }} initialName={data.name} initialTreatment={data.treatment} initialCycleDays={data.cycleDays} />}
