@@ -6,6 +6,18 @@ const bcrypt = require('bcryptjs')
 const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan, saveMood, saveFavorite, saveDayCompletion, logEvent, logApiCost, savePushSubscription, deletePushSubscription, getPushSubscriptionsDueAt } = require('./db')
 const webpush = require('web-push')
 
+// --- Resend (transactional email) ---
+const { Resend } = require('resend')
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+const RESEND_FROM = process.env.RESEND_FROM || 'Cycle <onboarding@resend.dev>'
+const APP_URL = process.env.APP_URL || 'http://localhost:5173'
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
+if (!resend) {
+  console.warn('[Email] RESEND_API_KEY not set — password-reset emails will only log to console.')
+} else {
+  console.log(`[Email] Resend configured. From: ${RESEND_FROM}, App URL: ${APP_URL}`)
+}
+
 const app = express()
 app.use(cors({ origin: '*' }))
 
@@ -809,7 +821,44 @@ app.post('/api/login', async (req, res) => {
 // Password reset — stub for now. Generates a token and logs it to server console.
 // A real implementation would email the user the token via SES / SendGrid / etc.
 const resetTokens = new Map() // token -> { email, expiresAt }
-app.post('/api/forgot-password', (req, res) => {
+async function sendPasswordResetEmail(toEmail, token) {
+  const resetUrl = `${APP_URL}/reset-password?token=${token}`
+  if (!resend) {
+    console.log(`[Auth] Reset link for ${toEmail}: ${resetUrl} (no Resend key; 30 min expiry)`)
+    return { ok: true, dev: true }
+  }
+  try {
+    const html = `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#FDF6F0;color:#1C0F0C;">
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Cycle</div>
+        </div>
+        <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.2;margin:0 0 12px;">Reset your password</h1>
+        <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 20px;">You asked to reset the password for your Cycle account. Click the button below to choose a new one.</p>
+        <p style="text-align:center;margin:28px 0;"><a href="${resetUrl}" style="display:inline-block;background:#C4614A;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px;">Reset my password</a></p>
+        <p style="font-size:13px;color:#9B7B74;line-height:1.6;margin:20px 0;">This link expires in 30 minutes. If you didn't request this, you can safely ignore this email — your password won't change.</p>
+        <p style="font-size:11px;color:#9B7B74;margin-top:32px;">If the button doesn't work, paste this into your browser:<br/><span style="word-break:break-all;color:#C4614A;">${resetUrl}</span></p>
+      </div>
+    `
+    const { data, error } = await resend.emails.send({
+      from: RESEND_FROM,
+      to: toEmail,
+      subject: 'Reset your Cycle password',
+      html,
+    })
+    if (error) {
+      console.error('[Email] Resend send error:', error)
+      return { ok: false, error }
+    }
+    console.log(`[Email] Reset email queued for ${toEmail} (Resend id: ${data?.id})`)
+    return { ok: true }
+  } catch (err) {
+    console.error('[Email] Failed to send reset email:', err.message)
+    return { ok: false, error: err.message }
+  }
+}
+
+app.post('/api/forgot-password', async (req, res) => {
   const { email } = req.body || {}
   if (!email) return res.status(400).json({ error: 'Email required' })
   const normEmail = String(email).trim().toLowerCase()
@@ -818,8 +867,7 @@ app.post('/api/forgot-password', (req, res) => {
   if (account) {
     const token = require('crypto').randomBytes(24).toString('hex')
     resetTokens.set(token, { email: normEmail, expiresAt: Date.now() + 30 * 60 * 1000 })
-    // TODO: send via email. For now, log to console so dev can copy the link.
-    console.log(`[Auth] Password reset token for ${normEmail}: ${token} (expires in 30 min)`)
+    await sendPasswordResetEmail(normEmail, token)
   }
   res.json({ success: true, message: 'If that email has an account, a reset link has been sent.' })
 })
