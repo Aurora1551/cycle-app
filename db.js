@@ -152,6 +152,21 @@ db.exec(`
     status TEXT NOT NULL DEFAULT 'succeeded',
     purchased_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS gifts (
+    code TEXT PRIMARY KEY,
+    buyer_email TEXT NOT NULL,
+    recipient_email TEXT NOT NULL,
+    recipient_name TEXT,
+    message TEXT,
+    stripe_payment_id TEXT UNIQUE,
+    amount INTEGER NOT NULL DEFAULT 999,
+    currency TEXT NOT NULL DEFAULT 'gbp',
+    status TEXT NOT NULL DEFAULT 'paid',
+    redeemed_at TEXT,
+    redeemed_by_email TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `)
 
 console.log('[DB] SQLite database ready at', DB_PATH)
@@ -236,6 +251,13 @@ const stmts = {
   `),
   getPurchaseByStripeId: db.prepare('SELECT * FROM purchases WHERE stripe_payment_id = ?'),
   updateAccountPlan: db.prepare('UPDATE accounts SET plan = @plan WHERE email = @email'),
+
+  insertGift: db.prepare(`
+    INSERT INTO gifts (code, buyer_email, recipient_email, recipient_name, message, stripe_payment_id, amount, currency, status)
+    VALUES (@code, @buyerEmail, @recipientEmail, @recipientName, @message, @stripePaymentId, @amount, @currency, @status)
+  `),
+  getGiftByCode: db.prepare('SELECT * FROM gifts WHERE code = ?'),
+  markGiftRedeemed: db.prepare('UPDATE gifts SET redeemed_at = datetime(\'now\'), redeemed_by_email = @email WHERE code = @code AND redeemed_at IS NULL'),
 }
 
 // --- Exported functions ---
@@ -418,6 +440,29 @@ function getPushSubscriptionsDueAt(time) {
   return db.prepare('SELECT * FROM push_subscriptions WHERE notify_time = ?').all(time)
 }
 
+function saveGift(gift) {
+  stmts.insertGift.run({
+    code: gift.code,
+    buyerEmail: gift.buyerEmail,
+    recipientEmail: gift.recipientEmail,
+    recipientName: gift.recipientName || null,
+    message: gift.message || null,
+    stripePaymentId: gift.stripePaymentId,
+    amount: gift.amount || 999,
+    currency: gift.currency || 'gbp',
+    status: gift.status || 'paid',
+  })
+}
+
+function getGiftByCode(code) {
+  return stmts.getGiftByCode.get(code) || null
+}
+
+function redeemGift(code, email) {
+  const info = stmts.markGiftRedeemed.run({ code, email })
+  return info.changes > 0
+}
+
 function logApiCost(service, model, inputTokens, outputTokens, estimatedCostUsd, userId, metadata) {
   db.prepare(`INSERT INTO api_costs (service, model, input_tokens, output_tokens, estimated_cost_usd, user_id, metadata) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
     service, model, inputTokens || 0, outputTokens || 0, estimatedCostUsd || 0, userId || null, metadata ? JSON.stringify(metadata) : null
@@ -441,6 +486,9 @@ module.exports = {
   savePurchase,
   getPurchaseByStripeId,
   updateAccountPlan,
+  saveGift,
+  getGiftByCode,
+  redeemGift,
   saveMood,
   saveFavorite,
   saveDayCompletion,

@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const bcrypt = require('bcryptjs')
-const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan, saveMood, saveFavorite, saveDayCompletion, logEvent, logApiCost, savePushSubscription, deletePushSubscription, getPushSubscriptionsDueAt } = require('./db')
+const { db, saveProfile, getProfile, getDayContent, saveDayContent, saveJournal, deleteUser, getAccountByEmail, createAccount, linkProfileToAccount, saveSpotifyTokens, getSpotifyTokens, deleteSpotifyTokens, savePurchase, getPurchaseByStripeId, updateAccountPlan, saveGift, getGiftByCode, redeemGift, saveMood, saveFavorite, saveDayCompletion, logEvent, logApiCost, savePushSubscription, deletePushSubscription, getPushSubscriptionsDueAt } = require('./db')
 const webpush = require('web-push')
 
 // --- Resend (transactional email) ---
@@ -821,6 +821,88 @@ app.post('/api/login', async (req, res) => {
 // Password reset — stub for now. Generates a token and logs it to server console.
 // A real implementation would email the user the token via SES / SendGrid / etc.
 const resetTokens = new Map() // token -> { email, expiresAt }
+async function sendGiftRecipientEmail(toEmail, recipientName, buyerEmail, message, code, baseUrl) {
+  const origin = baseUrl || APP_URL
+  const redeemUrl = `${origin}/gift/redeem?code=${code}`
+  if (!resend) {
+    console.log(`[Gift] Redeem link for ${toEmail}: ${redeemUrl}`)
+    return { ok: true, dev: true }
+  }
+  const greeting = recipientName ? `Hello ${recipientName},` : 'Hello,'
+  const msgBlock = message
+    ? `<div style="background:rgba(196,97,74,0.05);border-left:3px solid #C4614A;padding:14px 18px;border-radius:6px;margin:18px 0;font-style:italic;font-size:14px;color:#3D1810;line-height:1.6;">"${String(message).replace(/</g, '&lt;').replace(/"/g, '&quot;')}"</div>`
+    : ''
+  const html = `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#FDF6F0;color:#1C0F0C;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Cycle</div>
+      </div>
+      <div style="text-align:center;font-size:48px;margin:18px 0;">🎁</div>
+      <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.25;margin:0 0 12px;text-align:center;">Someone gifted you a Cycle</h1>
+      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;">${greeting}</p>
+      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;"><strong>${String(buyerEmail).replace(/</g, '&lt;')}</strong> has gifted you Cycle — a daily companion through fertility treatment. Eighteen days of personalised content, quotes, music, breathing exercises and a space to journal.</p>
+      ${msgBlock}
+      <p style="text-align:center;margin:28px 0;"><a href="${redeemUrl}" style="display:inline-block;background:#C4614A;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px;">Start my journey</a></p>
+      <p style="font-size:13px;color:#9B7B74;line-height:1.6;margin:20px 0;">If the button doesn't work, paste this into your browser:<br/><span style="word-break:break-all;color:#C4614A;">${redeemUrl}</span></p>
+      <p style="font-size:11px;color:#9B7B74;margin-top:28px;">Your gift has already been paid for — no card needed.</p>
+    </div>
+  `
+  try {
+    const { data, error } = await resend.emails.send({
+      from: RESEND_FROM,
+      to: toEmail,
+      subject: `${buyerEmail} gifted you a Cycle 🎁`,
+      html,
+    })
+    if (error) { console.error('[Gift] Recipient email error:', error); return { ok: false, error } }
+    console.log(`[Gift] Recipient email queued for ${toEmail} (${data?.id})`)
+    return { ok: true }
+  } catch (err) {
+    console.error('[Gift] Recipient email failed:', err.message)
+    return { ok: false, error: err.message }
+  }
+}
+
+async function sendGiftBuyerReceipt(toEmail, recipientEmail, recipientName, amountInPence) {
+  if (!resend) {
+    console.log(`[Gift] Buyer receipt logged only (no Resend). to=${toEmail}, recipient=${recipientEmail}`)
+    return { ok: true, dev: true }
+  }
+  const amount = `£${(amountInPence / 100).toFixed(2)}`
+  const html = `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#FDF6F0;color:#1C0F0C;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Cycle</div>
+      </div>
+      <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.25;margin:0 0 12px;">Your gift is on its way 💛</h1>
+      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;">Thank you for gifting a Cycle. We've sent an email to <strong>${recipientName ? `${String(recipientName).replace(/</g, '&lt;')} (${recipientEmail})` : recipientEmail}</strong> with a link to redeem their 18 days.</p>
+      <div style="background:rgba(196,97,74,0.05);border:1px solid rgba(196,97,74,0.15);border-radius:10px;padding:16px 18px;margin:20px 0;">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:#9B7B74;letter-spacing:0.12em;margin-bottom:8px;">RECEIPT</div>
+        <table style="width:100%;font-size:14px;color:#3D1810;">
+          <tr><td style="padding:3px 0;">Gift of Cycle (1 full cycle)</td><td style="text-align:right;padding:3px 0;">${amount}</td></tr>
+          <tr style="border-top:1px solid rgba(196,97,74,0.15);"><td style="padding:8px 0 3px;font-weight:600;">Total charged</td><td style="text-align:right;padding:8px 0 3px;font-weight:600;">${amount}</td></tr>
+        </table>
+      </div>
+      <p style="font-size:13px;color:#9B7B74;line-height:1.6;margin:16px 0;">They haven't redeemed it yet? No rush — the gift doesn't expire. You can remind them any time.</p>
+      <p style="font-size:11px;color:#9B7B74;margin-top:28px;">Stripe will also send its own official receipt separately. Questions: hello@cycle.app</p>
+    </div>
+  `
+  try {
+    const { data, error } = await resend.emails.send({
+      from: RESEND_FROM,
+      to: toEmail,
+      subject: 'Your Cycle gift is on its way',
+      html,
+    })
+    if (error) { console.error('[Gift] Buyer email error:', error); return { ok: false, error } }
+    console.log(`[Gift] Buyer receipt queued for ${toEmail} (${data?.id})`)
+    return { ok: true }
+  } catch (err) {
+    console.error('[Gift] Buyer email failed:', err.message)
+    return { ok: false, error: err.message }
+  }
+}
+
 async function sendPasswordResetEmail(toEmail, token, baseUrl) {
   // Prefer the caller's origin (whatever URL the user sees in the browser) so the
   // link lands back in their app, not on the server's localhost.
@@ -934,6 +1016,96 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
 app.get('/api/stripe/config', (_, res) => {
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY || '' })
+})
+
+// --- Gift endpoints ---
+
+app.post('/api/gift/create-intent', async (req, res) => {
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured' })
+  const { buyerEmail, recipientEmail, recipientName, message } = req.body || {}
+  if (!buyerEmail || !recipientEmail) return res.status(400).json({ error: 'Buyer and recipient email required' })
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 999,
+      currency: 'gbp',
+      receipt_email: String(buyerEmail).trim(),
+      metadata: {
+        type: 'gift',
+        buyer_email: String(buyerEmail).trim().toLowerCase(),
+        recipient_email: String(recipientEmail).trim().toLowerCase(),
+        recipient_name: recipientName ? String(recipientName).slice(0, 120) : '',
+        message: message ? String(message).slice(0, 500) : '',
+      },
+    })
+    console.log(`[Gift] Intent ${paymentIntent.id} buyer=${buyerEmail} -> recipient=${recipientEmail}`)
+    res.json({ clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id })
+  } catch (err) {
+    console.error('[Gift] Intent creation failed:', err.message)
+    res.status(500).json({ error: 'Unable to start payment. Try again.' })
+  }
+})
+
+app.post('/api/gift/confirm', async (req, res) => {
+  const { paymentIntentId } = req.body || {}
+  if (!paymentIntentId) return res.status(400).json({ error: 'paymentIntentId required' })
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured' })
+  try {
+    const pi = await stripe.paymentIntents.retrieve(paymentIntentId)
+    if (pi.status !== 'succeeded') return res.status(400).json({ error: `Payment not completed (${pi.status})` })
+    if (pi.metadata?.type !== 'gift') return res.status(400).json({ error: 'Not a gift payment' })
+
+    // Idempotent: if we already have a gift for this payment intent, return it.
+    const existing = db.prepare('SELECT * FROM gifts WHERE stripe_payment_id = ?').get(paymentIntentId)
+    if (existing) {
+      return res.json({ success: true, code: existing.code, recipientEmail: existing.recipient_email })
+    }
+
+    const code = require('crypto').randomBytes(16).toString('hex')
+    const buyerEmail = pi.metadata.buyer_email
+    const recipientEmail = pi.metadata.recipient_email
+    const recipientName = pi.metadata.recipient_name || null
+    const message = pi.metadata.message || null
+    saveGift({
+      code, buyerEmail, recipientEmail, recipientName, message,
+      stripePaymentId: paymentIntentId, amount: pi.amount, currency: pi.currency,
+    })
+
+    const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '').replace(/\/[^/]*$/, '') || APP_URL
+    await Promise.all([
+      sendGiftRecipientEmail(recipientEmail, recipientName, buyerEmail, message, code, origin),
+      sendGiftBuyerReceipt(buyerEmail, recipientEmail, recipientName, pi.amount),
+    ])
+
+    res.json({ success: true, code, recipientEmail })
+  } catch (err) {
+    console.error('[Gift] Confirm failed:', err.message)
+    res.status(500).json({ error: 'Unable to finalise gift. Your card was not charged twice — contact support if in doubt.' })
+  }
+})
+
+app.get('/api/gift/lookup/:code', (req, res) => {
+  const gift = getGiftByCode(req.params.code)
+  if (!gift) return res.status(404).json({ valid: false, error: 'Gift code not found' })
+  if (gift.status !== 'paid') return res.status(400).json({ valid: false, error: 'Gift not paid' })
+  res.json({
+    valid: true,
+    redeemed: !!gift.redeemed_at,
+    recipientName: gift.recipient_name,
+    buyerEmail: gift.buyer_email,
+    message: gift.message,
+  })
+})
+
+app.post('/api/gift/redeem', (req, res) => {
+  const { code, email } = req.body || {}
+  if (!code || !email) return res.status(400).json({ error: 'code and email required' })
+  const gift = getGiftByCode(code)
+  if (!gift) return res.status(404).json({ error: 'Gift not found' })
+  if (gift.status !== 'paid') return res.status(400).json({ error: 'Gift not paid' })
+  if (gift.redeemed_at) return res.status(409).json({ error: 'Gift already redeemed' })
+  const ok = redeemGift(code, String(email).trim().toLowerCase())
+  if (!ok) return res.status(409).json({ error: 'Gift already redeemed' })
+  res.json({ success: true })
 })
 
 app.post('/api/purchase/confirm', (req, res) => {

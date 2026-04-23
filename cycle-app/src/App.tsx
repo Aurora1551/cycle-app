@@ -242,6 +242,24 @@ function App() {
     setScreen('splash')
   }
 
+  // Start a new cycle for the same user — preserves account + profile, resets
+  // day counter and premium flag (per-cycle pricing). They'll hit the paywall
+  // at Day 4 of the new cycle.
+  const startNewCycle = () => {
+    localStorage.removeItem(DAY_KEY)
+    localStorage.removeItem('cycle_favorites')
+    localStorage.removeItem('cycle_premium')
+    localStorage.removeItem('notify_seen')
+    Object.keys(localStorage).filter(k => k.startsWith('cycle_mood_day')).forEach(k => localStorage.removeItem(k))
+    Object.keys(localStorage).filter(k => k.startsWith('cycle_content_')).forEach(k => localStorage.removeItem(k))
+    clearDayDoneKeys()
+    setIsPremium(BYPASS_PAYWALL)
+    setSelectedPlan(null)
+    setDayNumber(1)
+    track('cycle_restarted')
+    setScreen('day')
+  }
+
   const restartJourney = () => {
     localStorage.removeItem(DATA_KEY)
     localStorage.removeItem(DAY_KEY)
@@ -250,6 +268,10 @@ function App() {
     localStorage.removeItem('cycle_register_dismissed')
     localStorage.removeItem('cycle_account_email')
     localStorage.removeItem('cycle_favorites')
+    // Per-cycle pricing: premium flag is per-cycle, not lifetime.
+    localStorage.removeItem('cycle_premium')
+    setIsPremium(BYPASS_PAYWALL)
+    setSelectedPlan(null)
     // Clear mood keys
     Object.keys(localStorage).filter(k => k.startsWith('cycle_mood_day')).forEach(k => localStorage.removeItem(k))
     clearDayDoneKeys()
@@ -337,7 +359,7 @@ function App() {
           </div>
         </div>
       )}
-      {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={restartJourney} onGift={() => setScreen('gift-flow')} />}
+      {screen === 'end-of-cycle' && data.name && data.vibe && data.components && <EndOfCycle data={data as OnboardingData} onStartNewCycle={startNewCycle} onGift={() => setScreen('gift-flow')} />}
       {screen === 'gift-flow' && <GiftFlow onBack={() => setScreen('splash')} onDone={() => { const hasProfile = data.name && data.vibe; if (hasProfile) { setDayNumber(3); localStorage.setItem(DAY_KEY, '3'); setScreen('day') } else { setScreen('splash') } }} vibeAccent={vibe?.accent} vibeBg={vibe?.bg} />}
       {screen === 'gift-redeem' && <GiftRedeem
         giftCode={new URLSearchParams(window.location.search).get('code') || ''}

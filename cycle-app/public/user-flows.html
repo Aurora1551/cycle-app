@@ -87,8 +87,9 @@
   <a href="#login">2. Log in</a>
   <a href="#create">3. Create account (from splash)</a>
   <a href="#gate">4. Day 3 Register Gate</a>
-  <a href="#gift">5. Gift flow</a>
-  <a href="#back">6. Back-button from Create Account</a>
+  <a href="#gift">5. Gift flow (real payment + emails)</a>
+  <a href="#newcycle">6. End of cycle → pay again</a>
+  <a href="#back">7. Back-button from Create Account</a>
 </div>
 
 <!-- FLOW 1: BEGIN -->
@@ -484,8 +485,8 @@
 <div class="note-box"><strong>New copy on Gate option 2:</strong> "Save your progress — create account" with subtext "Free · keeps your journal &amp; favourites across devices. Upgrade anytime." Option 3 subtext: "Without an account · progress stays on this device only" — makes the contrast with option 2 explicit.</div>
 
 <!-- FLOW 5: GIFT -->
-<h2 id="gift">5. Gift flow — someone else buys it for me</h2>
-<div class="lead">Gift-giver pays; gift-recipient redeems a link.</div>
+<h2 id="gift">5. Gift flow — real Stripe payment + emails (★ updated)</h2>
+<div class="lead">Giver pays via Stripe, gets a receipt email. Recipient gets a redeem link.</div>
 
 <div class="flow-row">
   <div class="phone cream" style="position:relative;"><div class="phone-label">Splash</div>
@@ -498,48 +499,188 @@
   </div>
   <div class="arrow-lbl"><span>gift</span><span class="arrow">→</span></div>
 
-  <div class="phone" style="position:relative;"><div class="phone-label">Gift flow (3 steps)</div>
-    <div style="text-align:center; font-size:30px; margin:14px 0 6px;">🎁</div>
-    <div class="hdr" style="text-align:center;">Gift a cycle</div>
-    <div style="font-size:9px; color:#9B7B74; margin:6px 0;">For someone going through fertility treatment</div>
+  <div class="phone" style="position:relative;"><div class="phone-label">Compose</div>
+    <div class="step-lbl">A GIFT OF CARE</div>
+    <div class="hdr">Gift a Cycle</div>
     <div class="field">Their name</div>
-    <div class="field">Your message</div>
+    <div class="field">friend@example.com</div>
+    <div class="field">you@example.com (receipt)</div>
+    <div class="field" style="min-height:42px;">"I'm thinking of you."</div>
     <div style="flex:1"></div>
     <div class="primary-btn">Continue to payment</div>
+  </div>
+  <div class="arrow-lbl"><span>→ create intent</span><span class="arrow">→</span></div>
+
+  <div class="phone" style="position:relative;"><div class="phone-label">Stripe Elements</div>
+    <div class="step-lbl">PAYMENT</div>
+    <div class="hdr">Complete your gift</div>
+    <div style="font-size:8px; color:#9B7B74; margin-bottom:6px;">For Aurora — £9.99 · 18 days of Cycle</div>
+    <div style="background:white; border:1px solid rgba(0,0,0,0.1); border-radius:10px; padding:10px; margin:8px 0;">
+      <div style="font-size:8px; color:#9B7B74;">CARD / APPLE PAY / GOOGLE PAY</div>
+      <div style="height:36px; background:#F5F5F5; border-radius:6px; margin-top:4px;"></div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Pay £9.99</div>
+    <div style="font-size:7px; color:#9B7B74; text-align:center; margin-top:4px;">Secured by Stripe</div>
+  </div>
+  <div class="arrow-lbl"><span>success</span><span class="arrow">→</span></div>
+
+  <div class="phone cream" style="position:relative;"><div class="phone-label">Confirmation</div>
+    <div style="text-align:center; font-size:44px; margin:14px 0 6px;">💛</div>
+    <div class="hdr" style="text-align:center; font-size:18px;">Gift sent!</div>
+    <div style="font-size:9px; color:#9B7B74; text-align:center; line-height:1.5; padding:0 10px;">Link emailed to <strong style="color:#1C0F0C;">friend@example.com</strong>. Receipt sent to <strong style="color:#1C0F0C;">you@example.com</strong>.</div>
+    <div class="card-mini" style="text-align:center; margin-top:10px;">
+      <div style="font-size:7px; color:#9B7B74; letter-spacing:0.12em;">SENT TO</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:700; color:#1C0F0C;">Aurora</div>
+      <div style="font-size:8px; color:#9B7B74;">friend@example.com</div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Done</div>
+  </div>
+</div>
+
+<div class="note-box"><strong>Emails sent (Resend):</strong>
+<ul style="margin:4px 0 0; padding-left:18px; font-size:12px;">
+  <li><strong>Recipient</strong>: "buyer@example.com gifted you a Cycle 🎁" with redeem button → <code>/gift/redeem?code=&lt;hex&gt;</code></li>
+  <li><strong>Buyer</strong>: "Your Cycle gift is on its way" — branded Cycle receipt</li>
+  <li><strong>Stripe</strong> also automatically sends its own tax-compliant receipt to the buyer's email (passed via <code>receipt_email</code>)</li>
+</ul>
+</div>
+
+<h3>Recipient side — redeeming the gift</h3>
+<div class="flow-row">
+  <div class="phone" style="background:white; position:relative;"><div class="phone-label">Email inbox</div>
+    <div style="text-align:center; font-size:28px; margin:14px 0 6px;">📬</div>
+    <div style="font-family:'DM Mono',monospace; font-size:7px; color:#9B7B74; margin-bottom:4px;">FROM onboarding@resend.dev</div>
+    <div style="font-size:11px; font-weight:600; margin-bottom:10px;">buyer@example.com gifted you a Cycle 🎁</div>
+    <div style="font-size:9px; color:#3D1810; line-height:1.5;">Hello Aurora, buyer@example.com has gifted you Cycle...</div>
+    <div style="background:rgba(196,97,74,0.05); border-left:2px solid #C4614A; padding:6px 10px; font-size:9px; font-style:italic; margin:8px 0;">"I'm thinking of you."</div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Start my journey</div>
+  </div>
+  <div class="arrow-lbl"><span>click</span><span class="arrow">→</span></div>
+
+  <div class="phone dark" style="position:relative;"><div class="phone-label">Gift Redeem — server validates code</div>
+    <div style="text-align:center; font-size:44px; margin:14px 0;">🎁</div>
+    <div class="hdr" style="color:#FDF6F0; text-align:center; font-size:16px;">Someone gifted you<br/>a Cycle</div>
+    <div style="font-size:9px; color:rgba(255,255,255,0.5); text-align:center;">From <span style="color:#C4614A;">buyer@example.com</span></div>
+    <div class="card-mini" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); margin-top:10px;"><div style="font-style:italic; text-align:center; font-size:9px;">"I'm thinking of you."</div></div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Create your account</div>
+    <div style="font-size:8px; text-align:center; margin-top:6px; color:rgba(255,255,255,0.5);">Have an account? <span style="color:#C4614A;">Log in</span></div>
+  </div>
+  <div class="arrow-lbl"><span>create<br>account</span><span class="arrow">→</span></div>
+
+  <div class="phone dark" style="position:relative;"><div class="phone-label">Register + redeem</div>
+    <div class="step-lbl" style="color:#C4614A;">YOUR GIFT AWAITS</div>
+    <div class="hdr" style="color:#FDF6F0; font-size:16px;">Create your account</div>
+    <div class="field">email</div>
+    <div class="field">password (8+ chars)</div>
+    <div class="field">confirm password</div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Start your journey</div>
+    <div style="font-size:8px; color:rgba(255,255,255,0.4); text-align:center; margin-top:4px;">No payment — this is a gift</div>
+  </div>
+  <div class="arrow-lbl"><span>/api/register<br/>+/api/gift/redeem</span><span class="arrow">→</span></div>
+
+  <div class="phone" style="background:#FDF0EC; position:relative;"><div class="phone-label">Day 1 — premium</div>
+    <div style="text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px;">I Am Loved</div>
+      <div class="day-num" style="margin-top:10px;">1</div>
+    </div>
+    <div class="card-mini" style="margin-top:8px;"><div class="label">🌸 TODAY'S LIGHT</div></div>
+    <div class="card-mini"><div class="label">🎵 TODAY'S MELODY</div></div>
+    <div style="flex:1"></div>
+    <div class="bottom-nav"><div class="nav-item active"><span>☀</span><span>Today</span></div><div class="nav-item"><span>▦</span><span>Journey</span></div><div class="nav-item"><span>⚙</span><span>Settings</span></div></div>
+  </div>
+</div>
+
+<div class="note-box"><strong>What the server does:</strong>
+<ol style="margin:4px 0 0; padding-left:18px; font-size:12px;">
+  <li><code>POST /api/gift/create-intent</code> — creates Stripe PaymentIntent, returns client secret</li>
+  <li>Client confirms payment inline with Stripe Elements</li>
+  <li><code>POST /api/gift/confirm</code> — generates gift code, writes to <code>gifts</code> table, sends both emails</li>
+  <li>Recipient clicks link → <code>GET /api/gift/lookup/:code</code> validates</li>
+  <li>Recipient creates account → <code>POST /api/register</code> + <code>POST /api/gift/redeem</code> marks it consumed (once only)</li>
+</ol>
+</div>
+
+<!-- FLOW 7: END OF CYCLE / NEW CYCLE -->
+<h2 id="newcycle">6. End of cycle → start another (★ new — per-cycle pricing)</h2>
+<div class="lead">Finishing a paid cycle no longer gives free access to the next one. Premium flag is per-cycle.</div>
+
+<div class="flow-row">
+  <div class="phone" style="background:#FDF0EC; position:relative;"><div class="phone-label">Day 18 — cycle complete</div>
+    <div style="text-align:center;">
+      <div style="font-family:'DM Mono',monospace; font-size:6px; color:#C4614A; letter-spacing:0.2em; margin-bottom:3px;">DAY BY DAY, HELD BY LOVE</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px;">I Am Loved</div>
+    </div>
+    <div class="card-mini" style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+      <div><div style="font-size:6px; color:#9B7B74;">YOU'RE ON DAY</div><div class="day-num">18</div><div style="font-size:6px; color:#9B7B74;">OF 18 DAYS</div></div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="background:#C4614A; color:white; text-align:center; padding:5px; border-radius:10px; font-size:9px; margin:4px 8px;">Done ✓</div>
+    <div class="bottom-nav"><div class="nav-item active"><span>☀</span><span>Today</span></div><div class="nav-item"><span>▦</span><span>Journey</span></div><div class="nav-item"><span>⚙</span><span>Settings</span></div></div>
+  </div>
+  <div class="arrow-lbl"><span>Done ✓</span><span class="arrow">→</span></div>
+
+  <div class="phone" style="background:#FDF0EC; position:relative;"><div class="phone-label">End of Cycle celebration</div>
+    <div style="text-align:center; margin:12px 0;">
+      <div style="width:50px; height:50px; border-radius:50%; background:radial-gradient(circle, #F5D690, #D4A030); margin:0 auto; box-shadow:0 0 20px rgba(212,160,48,0.5);"></div>
+    </div>
+    <div class="step-lbl">THE FULL CYCLE</div>
+    <div class="hdr it" style="font-style:italic; text-align:center;">Aurora, you did it</div>
+    <div style="font-size:9px; color:#9B7B74; text-align:center; line-height:1.5;">18 days of showing up for yourself.</div>
+    <div class="card-mini" style="margin-top:8px;"><div class="label">YOUR REFLECTION (OPTIONAL)</div><div style="min-height:40px; font-size:8px; color:#9B7B74;">How was it?...</div></div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Start a new cycle</div>
+    <div style="font-size:7px; color:#9B7B74; text-align:center; margin-top:4px;">Gift to a friend · Share on WhatsApp</div>
+  </div>
+  <div class="arrow-lbl"><span>start<br/>new</span><span class="arrow">→</span></div>
+
+  <div class="phone" style="background:#FDF0EC; position:relative;"><div class="phone-label">Day 1 of new cycle<br/>(free days 1-3)</div>
+    <div style="text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px;">I Am Loved</div>
+    </div>
+    <div class="card-mini" style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+      <div><div style="font-size:6px; color:#9B7B74;">YOU'RE ON DAY</div><div class="day-num">1</div></div>
+      <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; max-width:84px;">
+        <div style="width:10px; height:10px; border-radius:50%; background:rgba(196,97,74,0.3); border:1.5px solid #C4614A;"></div>
+        <div style="width:10px; height:10px; border-radius:50%; background:rgba(0,0,0,0.06);"></div>
+        <div style="width:10px; height:10px; border-radius:50%; background:rgba(0,0,0,0.06);"></div>
+      </div>
+    </div>
+    <div style="font-size:8px; color:#9B7B74; text-align:center; margin-top:8px; font-style:italic;">Premium flag cleared · days 1-3 free again</div>
+    <div style="flex:1"></div>
+    <div class="bottom-nav"><div class="nav-item active"><span>☀</span><span>Today</span></div><div class="nav-item"><span>▦</span><span>Journey</span></div><div class="nav-item"><span>⚙</span><span>Settings</span></div></div>
+  </div>
+  <div class="arrow-lbl"><span>day 3<br/>complete</span><span class="arrow">→</span></div>
+
+  <div class="phone cream" style="position:relative;"><div class="phone-label">Paywall</div>
+    <div class="step-lbl">UNLOCK</div>
+    <div class="hdr">Choose your plan</div>
+    <div class="card-mini" style="margin-top:8px; background:#1C0F0C; color:white; border-color:#C4614A;"><div style="font-weight:700; font-size:10px;">One cycle · 18 days</div><div style="font-size:8px; opacity:0.7;">£9.99 · best value</div></div>
+    <div class="card-mini"><div style="font-weight:600; font-size:9px;">Gift someone a cycle</div><div style="font-size:7px; color:#9B7B74;">£9.99</div></div>
+    <div style="flex:1"></div>
+    <div class="primary-btn">Start my journey</div>
   </div>
   <div class="arrow-lbl"><span>pay</span><span class="arrow">→</span></div>
 
   <div class="phone" style="position:relative;"><div class="phone-label">Stripe payment</div>
     <div class="hdr">Payment</div>
-    <div class="field">Card number</div>
-    <div class="field">MM/YY · CVC</div>
+    <div style="background:white; border:1px solid rgba(0,0,0,0.1); border-radius:10px; padding:10px; margin:8px 0;">
+      <div style="height:36px; background:#F5F5F5; border-radius:6px;"></div>
+    </div>
     <div style="flex:1"></div>
     <div class="primary-btn">Pay £9.99</div>
-  </div>
-  <div class="arrow-lbl"><span>done</span><span class="arrow">→</span></div>
-
-  <div class="phone" style="position:relative;"><div class="phone-label">Gift link</div>
-    <div style="text-align:center; font-size:36px; margin:12px 0;">🎁</div>
-    <div class="hdr" style="text-align:center;">Gift sent</div>
-    <div style="font-size:9px; color:#9B7B74; text-align:center; margin:6px 0;">Share this link with your person</div>
-    <div class="card-mini" style="font-size:7px; word-break:break-all;">cycle.app/gift?code=ABC</div>
-    <div style="flex:1"></div>
-    <div class="primary-btn">Copy link</div>
-  </div>
-  <div class="arrow-lbl"><span>recipient<br>clicks link</span><span class="arrow">→</span></div>
-
-  <div class="phone dark" style="position:relative;"><div class="phone-label">Gift Redeem</div>
-    <div style="text-align:center; font-size:36px; margin:14px 0;">🎁</div>
-    <div class="hdr" style="color:#FDF6F0; text-align:center; font-size:16px;">Someone gifted you a Cycle</div>
-    <div style="font-size:9px; color:rgba(255,255,255,0.5); text-align:center; margin:6px 0;">From <span style="color:#C4614A;">Aurora</span></div>
-    <div class="card-mini" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);"><div style="font-style:italic; text-align:center; font-size:9px;">"I'm thinking of you."</div></div>
-    <div style="flex:1"></div>
-    <div class="primary-btn">Create your account</div>
+    <div class="ghost-btn">→ back to Day 4 unlocked</div>
   </div>
 </div>
 
-<!-- FLOW 6: BACK BUTTON -->
-<h2 id="back">6. Where "back" on Create Account takes you (fix this commit)</h2>
+<div class="note-box"><strong>Key change:</strong> <code>startNewCycle()</code> in App.tsx now clears <code>cycle_premium</code>, day counter, favourites, cached content, and mood entries — but keeps the user's profile and account. They go through the normal guest flow again, hit day 4 → paywall → pay again for the new cycle. Matches the current "£9.99 per cycle" marketing.</div>
+
+<!-- FLOW: BACK BUTTON -->
+<h2 id="back">7. Where "back" on Create Account takes you</h2>
 <div class="lead">Before: always Splash. Now: back to wherever you came from.</div>
 
 <div style="background:white; padding:14px; border-radius:10px; font-size:12px; margin:8px 0;">

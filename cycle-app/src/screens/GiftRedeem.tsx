@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useFadeIn } from '../hooks/useFadeIn'
 import { ScreenShell } from '../components/ui'
 import { track } from '../lib/posthog'
@@ -18,7 +18,22 @@ const GiftRedeem: React.FC<Props> = ({ giftCode, senderName, message, onCreateAc
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'welcome' | 'register'>('welcome')
+  const [giftValid, setGiftValid] = useState<null | boolean>(null)
+  const [giftInfo, setGiftInfo] = useState<{ buyerEmail?: string; recipientName?: string; message?: string; redeemed?: boolean }>({})
   const visible = useFadeIn()
+
+  // Validate gift code server-side on mount
+  useEffect(() => {
+    if (!giftCode) { setGiftValid(false); return }
+    fetch(`/api/gift/lookup/${encodeURIComponent(giftCode)}`)
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok || !data.valid) { setGiftValid(false); return }
+        setGiftValid(true)
+        setGiftInfo({ buyerEmail: data.buyerEmail, recipientName: data.recipientName, message: data.message, redeemed: data.redeemed })
+      })
+      .catch(() => setGiftValid(false))
+  }, [giftCode])
 
   const bg = '#0E0E0E'
   const accent = '#C4614A'
@@ -30,14 +45,39 @@ const GiftRedeem: React.FC<Props> = ({ giftCode, senderName, message, onCreateAc
   const fieldStyle: React.CSSProperties = { background: fieldBg, border: `1.5px solid ${fieldBorder}`, borderRadius: 12, padding: '12px 14px' }
   const inputStyle: React.CSSProperties = { width: '100%', background: 'transparent', border: 'none', outline: 'none', fontFamily: "'Karla', sans-serif", fontSize: 15, color: textColor, caretColor: accent }
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!email || !password) return
-    if (password !== confirmPassword) { setError('Passwords don\'t match'); return }
+    if (password !== confirmPassword) { setError("Passwords don't match"); return }
     if (password.length < 8) { setError('Password must be at least 8 characters'); return }
     setLoading(true); setError('')
-    // MOCK: simulate registration success
-    setTimeout(() => {
-      localStorage.setItem('cycle_account_email', email)
+    try {
+      // 1. Create account
+      const regRes = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      })
+      const regData = await regRes.json()
+      if (!regRes.ok) {
+        if (regRes.status === 409) setError('An account already exists for this email. Log in first, then redeem.')
+        else setError(regData.error || 'Could not create account. Please try again.')
+        setLoading(false)
+        return
+      }
+      // 2. Redeem the gift against this account
+      const redeemRes = await fetch('/api/gift/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: giftCode, email: email.trim().toLowerCase() }),
+      })
+      const redeemData = await redeemRes.json()
+      if (!redeemRes.ok) {
+        setError(redeemData.error || 'Gift could not be redeemed, but your account was created. Try logging in.')
+        setLoading(false)
+        return
+      }
+      // 3. Mark premium + account state
+      localStorage.setItem('cycle_account_email', email.trim().toLowerCase())
       localStorage.setItem('cycle_is_guest', '0')
       localStorage.setItem('cycle_premium', '1')
       localStorage.setItem('cycle_plan', 'gift_redeemed')
@@ -46,8 +86,38 @@ const GiftRedeem: React.FC<Props> = ({ giftCode, senderName, message, onCreateAc
       track('account_created')
       setLoading(false)
       onCreateAccount()
-    }, 600)
+    } catch {
+      setError('Network error. Please try again.')
+      setLoading(false)
+    }
   }
+
+  // Invalid / unknown gift code
+  if (giftValid === false) return (
+    <ScreenShell bg={bg} visible={visible} style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: 28 }}>
+      <div style={{ fontSize: 48 }}>🔒</div>
+      <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 700, color: textColor, textAlign: 'center', margin: 0, lineHeight: 1.2 }}>Gift not found</h1>
+      <p className="subtext text-center" style={{ color: mutedColor, lineHeight: 1.6, fontSize: 13 }}>This gift link is invalid or has already been used. Ask the sender to check the link, or sign up as a regular user.</p>
+      <button onClick={onLogin} className="btn-primary" style={{ background: accent, width: '100%' }}>Go to log in</button>
+    </ScreenShell>
+  )
+
+  // Still loading the validation
+  if (giftValid === null) return (
+    <ScreenShell bg={bg} visible={visible} style={{ alignItems: 'center', justifyContent: 'center', padding: 28 }}>
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 18, color: mutedColor, fontStyle: 'italic' }}>Checking your gift…</div>
+    </ScreenShell>
+  )
+
+  // Already redeemed — can't redeem twice
+  if (giftInfo.redeemed) return (
+    <ScreenShell bg={bg} visible={visible} style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: 28 }}>
+      <div style={{ fontSize: 48 }}>✓</div>
+      <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 700, color: textColor, textAlign: 'center', margin: 0, lineHeight: 1.2 }}>This gift is already redeemed</h1>
+      <p className="subtext text-center" style={{ color: mutedColor, lineHeight: 1.6, fontSize: 13 }}>If that was you, log in to continue your journey. Otherwise, contact <span style={{ color: accent }}>{giftInfo.buyerEmail}</span>.</p>
+      <button onClick={onLogin} className="btn-primary" style={{ background: accent, width: '100%' }}>Log in</button>
+    </ScreenShell>
+  )
 
   if (step === 'welcome') return (
     <ScreenShell bg={bg} visible={visible} style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: 28 }}>
