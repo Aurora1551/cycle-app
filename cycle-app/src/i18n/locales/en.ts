@@ -98,9 +98,9 @@ const en = {
 
     // Summary
     summary: {
-      allSet: 'All set',
-      readyForYou: 'Ready for you, {{name}}.',
-      heresYourJourney: "Here's your journey",
+      allSet: 'READY TO BEGIN',
+      readyForYou: 'Your journey is ready,',
+      heresYourJourney: "Here's what you've chosen. You can still edit anything.",
       day1Preview: '✦ Day 1 preview',
       previewQuote: '"She believed she could, so she did."',
       previewSong: 'Bichota',
@@ -109,8 +109,8 @@ const en = {
       dailyContent: 'Daily content',
       vibe: 'Vibe',
       music: 'Music',
-      beginFree: 'Begin free · Day 1 →',
-      unlockFull: 'Unlock full journey · from £9.99',
+      beginFree: 'Start Day 1 →',
+      unlockFull: 'Unlock full journey · £9.99',
       freeDaysHint: '3 days free · no card needed',
     },
 

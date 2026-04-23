@@ -10,9 +10,10 @@ interface Props {
   data: OnboardingData
   onStartFree: () => void
   onUnlock: () => void
+  onBack: () => void
 }
 
-const Summary: React.FC<Props> = ({ data, onStartFree, onUnlock }) => {
+const Summary: React.FC<Props> = ({ data, onStartFree, onUnlock, onBack }) => {
   const { t } = useTranslation()
   const visible = useFadeIn(80)
   const vibe = resolveVibe(data.vibe)
@@ -23,12 +24,14 @@ const Summary: React.FC<Props> = ({ data, onStartFree, onUnlock }) => {
   return (
     <ScreenShell bg={vibe.bg} visible={visible} transition="opacity 0.5s ease">
       <div className="progress-track" style={{ background: `${vibe.accent}25` }}>
-        <div className="progress-fill" style={{ width: '96%', background: `linear-gradient(90deg, ${vibe.accent}, ${vibe.accent}88)` }} />
+        <div className="progress-fill" style={{ width: '100%', background: `linear-gradient(90deg, ${vibe.accent}, ${vibe.accent}88)` }} />
       </div>
+
+      <button onClick={onBack} className="btn-back" style={{ color: mutedColor }}>{t('back')}</button>
 
       <div className="content" style={{ gap: 14 }}>
         <div className="step-label" style={{ color: vibe.accent }}>{t('summary.allSet')}</div>
-        <h1 style={{ fontFamily: typo.headingFont, fontSize: 32, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, fontStyle: typo.headingStyle, margin: 0 }}>
+        <h1 style={{ fontFamily: typo.headingFont, fontSize: 30, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, fontStyle: typo.headingStyle, margin: 0 }}>
           {t('summary.readyForYou', { name: '' })}<br /><span style={{ color: vibe.accent }}>{data.name}.</span>
         </h1>
         <p className="subtext" style={{ color: mutedColor }}>{t('summary.heresYourJourney')}</p>
@@ -65,6 +68,7 @@ const Summary: React.FC<Props> = ({ data, onStartFree, onUnlock }) => {
         <div className="spacer" />
         <button onClick={onStartFree} className="btn-primary" style={{ background: vibe.accent }}>{t('summary.beginFree')}</button>
         <button onClick={onUnlock} className="btn-ghost" style={{ color: vibe.accent, border: `1px solid ${vibe.accent}50` }}>{t('summary.unlockFull')}</button>
+        <div style={{ fontSize: 10, color: mutedColor, textAlign: 'center', opacity: 0.7, marginTop: 2 }}>Want to change something? Tap back.</div>
         <div className="mono-xs text-center" style={{ color: mutedColor }}>{t('summary.freeDaysHint')}</div>
       </div>
     </ScreenShell>

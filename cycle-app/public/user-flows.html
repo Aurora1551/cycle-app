@@ -90,6 +90,7 @@
   <a href="#gift">5. Gift flow (real payment + emails)</a>
   <a href="#newcycle">6. End of cycle → pay again</a>
   <a href="#back">7. Back-button from Create Account</a>
+  <a href="#breathe-options">8. Breathe button — design options</a>
 </div>
 
 <!-- FLOW 1: BEGIN -->
@@ -774,6 +775,100 @@
   <tr><td style="padding:8px; border:1px solid #E8D8D0;">Day 3 Register Gate → Save progress</td><td style="padding:8px; border:1px solid #E8D8D0;"><strong>Register Gate ★</strong></td></tr>
 </table>
 </div>
+
+<h2 id="breathe-options">8. Breathe-with-me button — design options</h2>
+<div class="lead">Current button (A) pulses and has a soft glow. Feedback: "too shiny vs the rest and it fades out." Here are 6 alternatives to pick from, sitting on a Day-card background for context.</div>
+
+<style>
+  .breathe-panel { background:#FDF0EC; border:1px solid rgba(196,97,74,0.12); border-radius:16px; padding:18px; margin-bottom:12px; }
+  .breathe-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; color:#C4614A; margin-bottom:4px; }
+  .breathe-card-hdr { display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+  .breathe-card-hdr .ico { font-size:11px; }
+  .breathe-card-hdr .txt { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; color:#C4614A; }
+  .breathe-row { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
+  .bb-base { width:100%; padding:18px 24px; font-size:15px; font-weight:500; cursor:pointer; font-family:'Cormorant Garamond', Georgia, serif; font-style:italic; border-radius:999px; display:flex; align-items:center; justify-content:center; gap:10px; letter-spacing:0.02em; border:none; }
+
+  @keyframes bb-pulse-scale { 0%,100% { transform:scale(1); } 50% { transform:scale(1.025); } }
+  @keyframes bb-pulse-opacity { 0%,100% { opacity:1; } 50% { opacity:0.92; } }
+  @keyframes bb-pulse-shadow { 0%,100% { box-shadow: 0 0 0 rgba(196,97,74,0.0); } 50% { box-shadow: 0 0 18px rgba(196,97,74,0.35); } }
+  @keyframes bb-shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+
+  .bb-a { background:#C4614A; color:white; box-shadow:0 6px 20px rgba(196,97,74,0.55); animation: bb-pulse-scale 3.2s ease-in-out infinite; }
+  .bb-b { background:#C4614A; color:white; }
+  .bb-c { background: rgba(196,97,74,0.12); color:#C4614A; border:1.5px solid rgba(196,97,74,0.35); }
+  .bb-d { background: rgba(196,97,74,0.08); color:#C4614A; border:1.5px solid rgba(196,97,74,0.25); animation: bb-pulse-opacity 3.6s ease-in-out infinite; }
+  .bb-e { background:#C4614A; color:white; animation: bb-pulse-shadow 3.6s ease-in-out infinite; }
+  .bb-f { background: linear-gradient(90deg, #C4614A, #D4956A, #C4614A); background-size:200% 100%; color:white; animation: bb-shimmer 6s linear infinite; }
+  .bb-g { background: transparent; color:#C4614A; border:1.5px solid #C4614A; }
+</style>
+
+<!-- OPTION A (CURRENT) -->
+<div class="breathe-panel">
+  <div class="breathe-label">A · CURRENT — solid + glow + scale pulse</div>
+  <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+  <button class="bb-base bb-a"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+  <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Solid accent, big glow shadow, scale 1→1.025 pulse. Pro: impossible to miss. Con: feels pushy on a tranquil page.</div>
+</div>
+
+<div class="breathe-row">
+
+  <!-- B: Flat solid, no effects -->
+  <div class="breathe-panel">
+    <div class="breathe-label">B · QUIET SOLID — no animation, no glow</div>
+    <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+    <button class="bb-base bb-b"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+    <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Same solid colour and italic text. No shadow, no pulse. Calmest, still clearly primary.</div>
+  </div>
+
+  <!-- C: Soft tint -->
+  <div class="breathe-panel">
+    <div class="breathe-label">C · SOFT TINT — accent wash + thin border</div>
+    <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+    <button class="bb-base bb-c"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+    <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Low-opacity accent with matching border. Looks like a "chip" you'd tap — matches the other tinted cards. No animation.</div>
+  </div>
+
+  <!-- D: Subtle breathing opacity -->
+  <div class="breathe-panel">
+    <div class="breathe-label">D · TINT + opacity breathing (no scale)</div>
+    <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+    <button class="bb-base bb-d"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+    <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Same soft tint as C, with a very gentle opacity pulse (1.0 ↔ 0.92) on a 3.6s rhythm — feels like breath itself, no growing/shrinking.</div>
+  </div>
+
+  <!-- E: Solid with subtle glow-only pulse -->
+  <div class="breathe-panel">
+    <div class="breathe-label">E · SOLID + halo pulse (no scale)</div>
+    <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+    <button class="bb-base bb-e"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+    <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Solid colour, and the glow expands-contracts (halo only, button itself doesn't move). Keeps "alive" but without the shrinking-button effect you saw.</div>
+  </div>
+
+  <!-- F: Gradient shimmer -->
+  <div class="breathe-panel">
+    <div class="breathe-label">F · GRADIENT SHIMMER</div>
+    <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+    <button class="bb-base bb-f"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+    <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Very slow horizontal gradient movement. Bit more decorative. Can feel premium but also gimmicky — use with caution.</div>
+  </div>
+
+  <!-- G: Outlined only -->
+  <div class="breathe-panel">
+    <div class="breathe-label">G · OUTLINE ONLY — ghost button</div>
+    <div class="breathe-card-hdr"><span class="ico">✨</span><span class="txt">YOUR MOMENT</span></div>
+    <button class="bb-base bb-g"><span style="font-size:16px;">✦</span><span>Breathe with me <span style="opacity:0.7; font-size:13px;">· 35s</span></span></button>
+    <div style="font-size:11px; color:#9B7B74; margin-top:8px; line-height:1.5;">Transparent, just the accent border + accent text. Quietest of all. Reads as "secondary" though, not primary action.</div>
+  </div>
+
+</div>
+
+<div class="note-box" style="margin-top:14px;"><strong>My recommendation: D (tint + opacity breathing).</strong>
+<ul style="margin:4px 0 0; padding-left:18px;">
+  <li>Matches the rest of the page (no louder than the other cards)</li>
+  <li>Still has a subtle "alive" rhythm tied to breath — which is the whole metaphor</li>
+  <li>No shrinking/growing, so it doesn't "fade out" the way A does</li>
+</ul>
+Say which letter you want (A–G) and I'll ship it.</div>
 
 <div style="margin-top:30px; padding:14px; background:white; border-radius:10px; text-align:center; font-size:11px; color:#9B7B74;">Generated 2026-04-22 · Mockups only — actual app UI may differ in small details</div>
 
