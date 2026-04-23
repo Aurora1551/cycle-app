@@ -91,6 +91,9 @@ const GiftFlow: React.FC<Props> = ({ onBack, onDone, vibeAccent = '#C4614A', vib
   const [recipientEmail, setRecipientEmail] = useState('')
   const [message, setMessage] = useState('')
   const [buyerEmail, setBuyerEmail] = useState(() => localStorage.getItem('cycle_account_email') || '')
+  const [buyerName, setBuyerName] = useState(() => {
+    try { return (JSON.parse(localStorage.getItem('cycle_onboarding_data') || '{}').name as string) || '' } catch { return '' }
+  })
   const [step, setStep] = useState<Step>('compose')
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
@@ -122,6 +125,7 @@ const GiftFlow: React.FC<Props> = ({ onBack, onDone, vibeAccent = '#C4614A', vib
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           buyerEmail: buyerEmail.trim().toLowerCase(),
+          buyerName: buyerName.trim(),
           recipientEmail: recipientEmail.trim().toLowerCase(),
           recipientName: recipientName.trim(),
           message: message.trim(),
@@ -197,21 +201,30 @@ const GiftFlow: React.FC<Props> = ({ onBack, onDone, vibeAccent = '#C4614A', vib
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: 13, color: textColor, lineHeight: 1.5 }}>Know someone going through fertility treatment? 18 days of daily content, journaling, and breathing — paid for by you, enjoyed by them.</div>
         </div>
 
+        {/* About the recipient */}
+        <div className="mono-hint" style={{ color: mutedColor, marginTop: 4 }}>FOR THEM</div>
         <div className="flex-col" style={{ gap: 4 }}>
-          <div className="field-label" style={{ color: mutedColor }}>Their name</div>
-          <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} placeholder="Their first name" className="body-font" style={inputStyle} />
+          <div className="field-label" style={{ color: mutedColor }}>Their first name</div>
+          <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} placeholder="Aurora" className="body-font" style={inputStyle} />
         </div>
         <div className="flex-col" style={{ gap: 4 }}>
           <div className="field-label" style={{ color: mutedColor }}>Their email</div>
           <input type="email" value={recipientEmail} onChange={e => setRecipientEmail(e.target.value)} placeholder="friend@example.com" className="body-font" style={inputStyle} />
         </div>
         <div className="flex-col" style={{ gap: 4 }}>
-          <div className="field-label" style={{ color: mutedColor }}>Your email (for receipt)</div>
-          <input type="email" value={buyerEmail} onChange={e => setBuyerEmail(e.target.value)} placeholder="you@example.com" className="body-font" style={inputStyle} />
-        </div>
-        <div className="flex-col" style={{ gap: 4 }}>
           <div className="field-label" style={{ color: mutedColor }}>Your message (optional)</div>
           <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="I'm thinking of you." rows={3} className="body-font" style={{ ...inputStyle, resize: 'vertical' }} />
+        </div>
+
+        {/* About the buyer */}
+        <div className="mono-hint" style={{ color: mutedColor, marginTop: 10 }}>FROM YOU</div>
+        <div className="flex-col" style={{ gap: 4 }}>
+          <div className="field-label" style={{ color: mutedColor }}>Your first name</div>
+          <input type="text" value={buyerName} onChange={e => setBuyerName(e.target.value)} placeholder="So we can tell them who it's from" className="body-font" style={inputStyle} />
+        </div>
+        <div className="flex-col" style={{ gap: 4 }}>
+          <div className="field-label" style={{ color: mutedColor }}>Your email (for receipt)</div>
+          <input type="email" value={buyerEmail} onChange={e => setBuyerEmail(e.target.value)} placeholder="you@example.com" className="body-font" style={inputStyle} />
         </div>
 
         {intentError && <div style={{ fontSize: 12, color: '#E8907A', background: 'rgba(232,144,122,0.1)', borderRadius: 8, padding: '10px 12px' }}>{intentError}</div>}

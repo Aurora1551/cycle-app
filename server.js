@@ -821,7 +821,7 @@ app.post('/api/login', async (req, res) => {
 // Password reset — stub for now. Generates a token and logs it to server console.
 // A real implementation would email the user the token via SES / SendGrid / etc.
 const resetTokens = new Map() // token -> { email, expiresAt }
-async function sendGiftRecipientEmail(toEmail, recipientName, buyerEmail, message, code, baseUrl) {
+async function sendGiftRecipientEmail(toEmail, recipientName, buyerDisplay, buyerShort, message, code, baseUrl) {
   const origin = baseUrl || APP_URL
   const redeemUrl = `${origin}/gift/redeem?code=${code}`
   if (!resend) {
@@ -840,7 +840,7 @@ async function sendGiftRecipientEmail(toEmail, recipientName, buyerEmail, messag
       <div style="text-align:center;font-size:48px;margin:18px 0;">🎁</div>
       <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.25;margin:0 0 12px;text-align:center;">Someone gifted you a Cycle</h1>
       <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;">${greeting}</p>
-      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;"><strong>${String(buyerEmail).replace(/</g, '&lt;')}</strong> has gifted you Cycle — a daily companion through fertility treatment. Eighteen days of personalised content, quotes, music, breathing exercises and a space to journal.</p>
+      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;"><strong>${String(buyerDisplay).replace(/</g, '&lt;')}</strong> has gifted you Cycle — a daily companion through fertility treatment. Eighteen days of personalised content, quotes, music, breathing exercises and a space to journal.</p>
       ${msgBlock}
       <p style="text-align:center;margin:28px 0;"><a href="${redeemUrl}" style="display:inline-block;background:#C4614A;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px;">Start my journey</a></p>
       <p style="font-size:13px;color:#9B7B74;line-height:1.6;margin:20px 0;">If the button doesn't work, paste this into your browser:<br/><span style="word-break:break-all;color:#C4614A;">${redeemUrl}</span></p>
@@ -851,7 +851,7 @@ async function sendGiftRecipientEmail(toEmail, recipientName, buyerEmail, messag
     const { data, error } = await resend.emails.send({
       from: RESEND_FROM,
       to: toEmail,
-      subject: `${buyerEmail} gifted you a Cycle 🎁`,
+      subject: `${buyerShort} gifted you a Cycle 🎁`,
       html,
     })
     if (error) { console.error('[Gift] Recipient email error:', error); return { ok: false, error } }
@@ -1022,7 +1022,7 @@ app.get('/api/stripe/config', (_, res) => {
 
 app.post('/api/gift/create-intent', async (req, res) => {
   if (!stripe) return res.status(500).json({ error: 'Stripe is not configured' })
-  const { buyerEmail, recipientEmail, recipientName, message } = req.body || {}
+  const { buyerEmail, buyerName, recipientEmail, recipientName, message } = req.body || {}
   if (!buyerEmail || !recipientEmail) return res.status(400).json({ error: 'Buyer and recipient email required' })
   try {
     const paymentIntent = await stripe.paymentIntents.create({
@@ -1032,6 +1032,7 @@ app.post('/api/gift/create-intent', async (req, res) => {
       metadata: {
         type: 'gift',
         buyer_email: String(buyerEmail).trim().toLowerCase(),
+        buyer_name: buyerName ? String(buyerName).slice(0, 120) : '',
         recipient_email: String(recipientEmail).trim().toLowerCase(),
         recipient_name: recipientName ? String(recipientName).slice(0, 120) : '',
         message: message ? String(message).slice(0, 500) : '',
@@ -1062,6 +1063,7 @@ app.post('/api/gift/confirm', async (req, res) => {
 
     const code = require('crypto').randomBytes(16).toString('hex')
     const buyerEmail = pi.metadata.buyer_email
+    const buyerName = pi.metadata.buyer_name || null
     const recipientEmail = pi.metadata.recipient_email
     const recipientName = pi.metadata.recipient_name || null
     const message = pi.metadata.message || null
@@ -1071,8 +1073,9 @@ app.post('/api/gift/confirm', async (req, res) => {
     })
 
     const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '').replace(/\/[^/]*$/, '') || APP_URL
+    const buyerDisplay = buyerName ? `${buyerName} (${buyerEmail})` : buyerEmail
     await Promise.all([
-      sendGiftRecipientEmail(recipientEmail, recipientName, buyerEmail, message, code, origin),
+      sendGiftRecipientEmail(recipientEmail, recipientName, buyerDisplay, buyerName || buyerEmail, message, code, origin),
       sendGiftBuyerReceipt(buyerEmail, recipientEmail, recipientName, pi.amount),
     ])
 
