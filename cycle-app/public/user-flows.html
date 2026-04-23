@@ -486,7 +486,62 @@
 
 <!-- FLOW 5: GIFT -->
 <h2 id="gift">5. Gift flow — real Stripe payment + emails (★ updated)</h2>
-<div class="lead">Giver pays via Stripe, gets a receipt email. Recipient gets a redeem link.</div>
+<div class="lead">Giver pays via Stripe, gets a receipt email. Recipient gets a redeem link. Buyer does not need to be logged in — we capture their details on the Compose form.</div>
+
+<h3>The Compose screen — what we ask the buyer for</h3>
+<div style="background:white; border-radius:12px; padding:20px; margin:12px 0 20px; display:flex; gap:28px; align-items:flex-start; overflow-x:auto;">
+
+  <!-- Large Compose mockup -->
+  <div class="phone" style="flex-shrink:0; width:300px; height:auto; min-height:600px; padding-bottom:20px;">
+    <div style="font-size:9px; color:#9B7B74; margin-bottom:8px;">‹ back</div>
+    <div style="font-family:'DM Mono',monospace; font-size:8px; color:#C4614A; letter-spacing:0.15em; margin-bottom:2px;">A GIFT OF CARE</div>
+    <h1 style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:700; margin:0 0 6px;">Gift a Cycle</h1>
+
+    <div style="background:rgba(196,97,74,0.08); border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:9px 12px; margin:6px 0 12px;">
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11px; color:#1C0F0C; line-height:1.4;">Know someone going through fertility treatment? 18 days of daily content, journaling, and breathing — paid for by you, enjoyed by them.</div>
+    </div>
+
+    <div style="font-family:'DM Mono',monospace; font-size:8px; color:#9B7B74; letter-spacing:0.14em;">FOR THEM</div>
+    <div style="background:white; border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:8px 10px; margin:5px 0;"><div style="font-size:7px; color:#9B7B74; letter-spacing:0.08em;">THEIR FIRST NAME</div><div style="font-size:11px; color:#1C0F0C; margin-top:2px;">Aurora</div></div>
+    <div style="background:white; border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:8px 10px; margin:5px 0;"><div style="font-size:7px; color:#9B7B74; letter-spacing:0.08em;">THEIR EMAIL</div><div style="font-size:11px; color:#1C0F0C; margin-top:2px;">aurora@example.com</div></div>
+    <div style="background:white; border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:8px 10px; margin:5px 0;"><div style="font-size:7px; color:#9B7B74; letter-spacing:0.08em;">YOUR MESSAGE (OPTIONAL)</div><div style="font-size:11px; color:#1C0F0C; margin-top:2px; min-height:28px;">"I'm thinking of you. Every day."</div></div>
+
+    <div style="font-family:'DM Mono',monospace; font-size:8px; color:#9B7B74; letter-spacing:0.14em; margin-top:14px;">FROM YOU</div>
+    <div style="background:white; border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:8px 10px; margin:5px 0;"><div style="font-size:7px; color:#9B7B74; letter-spacing:0.08em;">YOUR FIRST NAME</div><div style="font-size:11px; color:#1C0F0C; margin-top:2px;">Kate</div></div>
+    <div style="background:white; border:1px solid rgba(196,97,74,0.2); border-radius:10px; padding:8px 10px; margin:5px 0;"><div style="font-size:7px; color:#9B7B74; letter-spacing:0.08em;">YOUR EMAIL (FOR RECEIPT)</div><div style="font-size:11px; color:#1C0F0C; margin-top:2px;">kate@example.com</div></div>
+
+    <div style="margin-top:14px; background:#C4614A; color:white; text-align:center; padding:10px; border-radius:12px; font-size:12px; font-weight:600;">Continue to payment</div>
+    <div style="font-size:9px; color:#9B7B74; text-align:center; margin-top:6px;">£9.99 · one-time · Stripe-secured</div>
+  </div>
+
+  <!-- Annotations -->
+  <div style="flex:1; min-width:280px;">
+    <h4 style="margin:0 0 10px; font-family:Georgia,serif; font-size:16px;">What the buyer fills in</h4>
+    <div style="background:#FFF8F3; border-left:3px solid #D4956A; padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:12px;">
+      <strong style="color:#B86A3A;">FOR THEM</strong> — who the gift is for
+      <ul style="margin:4px 0 0; padding-left:18px;">
+        <li><strong>Their first name</strong> — used to personalise the email greeting ("Hello Aurora,") and shown on the Confirmation screen</li>
+        <li><strong>Their email</strong> — where the redeem link is delivered</li>
+        <li><strong>Your message</strong> (optional) — quoted in the recipient email, limited to 500 chars</li>
+      </ul>
+    </div>
+    <div style="background:#F0F5F2; border-left:3px solid #7FB5A0; padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:12px;">
+      <strong style="color:#5B8B72;">FROM YOU</strong> — who the gift is from
+      <ul style="margin:4px 0 0; padding-left:18px;">
+        <li><strong>Your first name</strong> — used as the "from" in the recipient email subject and body. Without it the email reads "kate@example.com gifted you a Cycle". With it, "Kate gifted you a Cycle 🎁".</li>
+        <li><strong>Your email</strong> — passed to Stripe as <code>receipt_email</code> (Stripe auto-sends a tax-compliant receipt), and used by us to send the branded Cycle receipt via Resend.</li>
+      </ul>
+    </div>
+    <div style="background:white; border:1px solid #E8D8D0; padding:10px 14px; border-radius:6px; font-size:12px; color:#3D1810;">
+      <strong>Buyer is not logged in:</strong> all four FROM YOU + FOR THEM fields are empty and must be typed.<br/>
+      <strong>Buyer is logged in:</strong> Your first name and Your email prefill from their Cycle account. They can still edit.
+    </div>
+    <div style="background:white; border:1px solid #E8D8D0; padding:10px 14px; border-radius:6px; font-size:12px; color:#3D1810; margin-top:10px;">
+      <strong>Continue to payment</strong> is disabled unless <em>Their email</em> AND <em>Your email</em> are both filled. Name + message are optional (we fall back to email when name is missing).
+    </div>
+  </div>
+
+</div>
 
 <div class="flow-row">
   <div class="phone cream" style="position:relative;"><div class="phone-label">Splash</div>
