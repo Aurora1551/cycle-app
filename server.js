@@ -735,17 +735,93 @@ function getFallbackContent(dayNumber, name) {
 
 // --- Auth endpoints ---
 
+// Founder offer: first N accounts get a free cycle (premium without paying).
+// Tracks via accounts.plan = 'founder'. After the limit is hit, new accounts
+// are normal free-tier users and hit the paywall at Day 4.
+const FOUNDER_LIMIT = 150
+
 app.post('/api/register', async (req, res) => {
   const { email, password, profileId } = req.body
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' })
   if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
 
-  const existing = getAccountByEmail(email)
+  const normEmail = String(email).trim().toLowerCase()
+  const existing = getAccountByEmail(normEmail)
   if (existing) return res.status(409).json({ error: 'Account already exists' })
 
   const passwordHash = await bcrypt.hash(password, 10)
-  const account = createAccount(email, passwordHash, profileId || null)
-  res.json({ success: true, accountId: account.id, email })
+  const account = createAccount(normEmail, passwordHash, profileId || null)
+
+  // Decide founder status atomically: count accounts now (after insert) and if
+  // we're within the limit, mark this one as founder.
+  const totalAccounts = db.prepare('SELECT COUNT(*) as c FROM accounts').get().c
+  let isFounder = false
+  if (totalAccounts <= FOUNDER_LIMIT) {
+    db.prepare("UPDATE accounts SET plan = 'founder' WHERE email = ?").run(normEmail)
+    isFounder = true
+    console.log(`[Founder] ${normEmail} is founder #${totalAccounts}/${FOUNDER_LIMIT}`)
+  }
+
+  res.json({
+    success: true,
+    accountId: account.id,
+    email: normEmail,
+    plan: isFounder ? 'founder' : 'free',
+    isFounder,
+    founderNumber: isFounder ? totalAccounts : null,
+    foundersRemaining: Math.max(0, FOUNDER_LIMIT - totalAccounts),
+  })
+})
+
+// Public endpoint: how many founder slots are left? Used by splash to show
+// the offer badge.
+app.get('/api/founders/remaining', (_, res) => {
+  const totalAccounts = db.prepare('SELECT COUNT(*) as c FROM accounts').get().c
+  res.json({ remaining: Math.max(0, FOUNDER_LIMIT - totalAccounts), limit: FOUNDER_LIMIT })
+})
+
+// Cost tracking for the admin
+app.get('/api/admin/costs', (_, res) => {
+  try {
+    const aiCosts = db.prepare(`
+      SELECT
+        COUNT(*) as calls,
+        SUM(input_tokens) as in_tokens,
+        SUM(output_tokens) as out_tokens,
+        SUM(estimated_cost_usd) as total_usd
+      FROM api_costs
+    `).get()
+    const purchases = db.prepare(`
+      SELECT COUNT(*) as count, SUM(amount) as total_pence
+      FROM purchases WHERE status = 'succeeded'
+    `).get()
+    const gifts = db.prepare(`
+      SELECT COUNT(*) as count, SUM(amount) as total_pence
+      FROM gifts WHERE status = 'paid'
+    `).get()
+    const founders = db.prepare("SELECT COUNT(*) as count FROM accounts WHERE plan = 'founder'").get().count
+    const freeAccounts = db.prepare("SELECT COUNT(*) as count FROM accounts WHERE plan = 'free' OR plan IS NULL").get().count
+    res.json({
+      ai: {
+        calls: aiCosts.calls || 0,
+        inputTokens: aiCosts.in_tokens || 0,
+        outputTokens: aiCosts.out_tokens || 0,
+        estimatedCostUsd: Number((aiCosts.total_usd || 0).toFixed(4)),
+      },
+      revenue: {
+        directPurchases: { count: purchases.count || 0, totalPence: purchases.total_pence || 0 },
+        giftPurchases: { count: gifts.count || 0, totalPence: gifts.total_pence || 0 },
+        totalPence: (purchases.total_pence || 0) + (gifts.total_pence || 0),
+      },
+      accounts: {
+        founders,
+        free: freeAccounts,
+        foundersRemaining: Math.max(0, FOUNDER_LIMIT - (founders + freeAccounts)),
+      },
+    })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // In-memory rate limit: max 5 failed login attempts per email per 15 minutes.

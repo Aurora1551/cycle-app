@@ -14,11 +14,19 @@ interface SplashScreenProps {
 const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onCreateAccount, onGift }) => {
   const [visible, setVisible] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
+  const [foundersRemaining, setFoundersRemaining] = useState<number | null>(null)
   const { t, i18n } = useTranslation()
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80)
     return () => clearTimeout(t)
+  }, [])
+
+  // Pull founder slot count so we can show the offer banner.
+  useEffect(() => {
+    fetch('/api/founders/remaining').then(r => r.json()).then(d => {
+      if (typeof d.remaining === 'number') setFoundersRemaining(d.remaining)
+    }).catch(() => {})
   }, [])
 
   const currentLang = LANGUAGES.find(l => i18n.language === l.code || i18n.language?.startsWith(l.code)) || LANGUAGES[0]
@@ -99,6 +107,22 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onHaveAccount, onC
 
       {/* Spacer pushes buttons to bottom */}
       <div style={{ flex: 1 }} />
+
+      {/* Founder offer banner — only when slots remain */}
+      {foundersRemaining !== null && foundersRemaining > 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(196,97,74,0.12), rgba(212,149,106,0.12))',
+          border: '1px solid rgba(196,97,74,0.3)',
+          borderRadius: 12, padding: '10px 14px', marginBottom: 12,
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+        }}>
+          <span style={{ fontSize: 18 }}>🌟</span>
+          <div style={{ flex: 1 }}>
+            <div className="body-font" style={{ fontSize: 12, fontWeight: 600, color: '#1C0F0C' }}>Founder access — free first cycle</div>
+            <div className="body-font" style={{ fontSize: 10, color: '#9B7B74', marginTop: 1 }}>{foundersRemaining} of 150 spots left · create account to claim</div>
+          </div>
+        </div>
+      )}
 
       {/* Begin button pinned to bottom */}
       <button onClick={onBegin} className="btn-primary" style={{ background: '#C4614A', marginBottom: 12, width: '100%' }}>

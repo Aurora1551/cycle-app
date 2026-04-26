@@ -64,7 +64,14 @@ const CreateAccount: React.FC<Props> = ({ onBack, onSuccess, onLogin, vibeBg = '
       }
       localStorage.setItem('cycle_account_email', email.trim().toLowerCase())
       localStorage.setItem('cycle_is_guest', '0')
-      track('account_created')
+      // Founders get free premium for their first cycle
+      if (data.isFounder) {
+        localStorage.setItem('cycle_premium', '1')
+        localStorage.setItem('cycle_plan', 'founder')
+        track('founder_account_created', { founder_number: data.founderNumber || 0 })
+      } else {
+        track('account_created')
+      }
       setLoading(false)
       onSuccess()
     } catch (err) {
