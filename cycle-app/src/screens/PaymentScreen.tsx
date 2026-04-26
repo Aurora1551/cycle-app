@@ -72,7 +72,7 @@ const CheckoutForm: React.FC<{
     if (result.error) {
       setError(result.error.message || 'Payment failed. Please try again.')
       setLoading(false)
-      track('payment_failed', { plan, error: result.error.message })
+      track('payment_failed', { plan, error: result.error.message || 'unknown' })
     }
     // If no error, Stripe redirects to return_url
   }

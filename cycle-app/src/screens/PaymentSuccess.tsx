@@ -82,7 +82,7 @@ const PaymentSuccess: React.FC<Props> = ({ onComplete, vibeBg = '#1C0F0C', vibeA
       } else {
         setStatus('error')
         setErrorMsg(t('payment.statusFailed'))
-        track('payment_status_failed', { status: paymentIntent?.status })
+        track('payment_status_failed', { status: paymentIntent?.status || 'unknown' })
       }
     })
   }, [onComplete, t])

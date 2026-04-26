@@ -975,7 +975,7 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
                   <div style={{ fontFamily: typo.bodyFont, fontWeight: 600, fontSize: 13, color: textColor }}>{item.name}</div>
                   <div className="mono" style={{fontSize: 9, color: vibe.accent, marginTop: 2, opacity: 0.7 }}>{item.protein} PROTEIN</div>
                 </div>
-                <button onClick={() => swapAt(i, item.name)} className="mono" className="btn-bare" style={{ fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
+                <button onClick={() => swapAt(i, item.name)} className="mono btn-bare" style={{ fontSize: 8, color: mutedColor, minHeight: 44, padding: '8px 12px', opacity: 0.5, letterSpacing: '0.05em', display: 'flex', alignItems: 'center' }} title="Show me another">
                   swap
                 </button>
               </div>

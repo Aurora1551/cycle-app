@@ -19,7 +19,10 @@ if (!resend) {
 }
 
 const app = express()
-app.use(cors({ origin: '*' }))
+// Production: lock CORS to the configured origin. Defaults to wildcard for dev.
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*'
+app.use(cors({ origin: CORS_ORIGIN }))
+console.log(`[CORS] Allowing origin: ${CORS_ORIGIN}`)
 
 // --- Stripe setup ---
 const Stripe = require('stripe')
@@ -1316,9 +1319,10 @@ app.post('/api/journal', (req, res) => {
 // --- Delete account ---
 
 app.post('/api/delete-account', (req, res) => {
-  const { userId } = req.body
+  const { userId, email } = req.body
   try {
-    deleteUser(userId || 'default')
+    deleteUser(userId || 'default', email)
+    console.log(`[Delete] Account fully deleted: userId=${userId}, email=${email || 'none'}`)
     res.json({ ok: true })
   } catch (err) {
     console.error('[ERROR] deleteUser:', err.message)
