@@ -44,14 +44,25 @@
 /* Utility: strips native button chrome (used for link-style buttons). */
 .btn-bare { background:none; border:none; cursor:pointer; }
 
-/* Breathe-with-me button — subtle breathing pulse so it feels inviting rather than static. */
-@keyframes breathe-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.025); }
+/* Breathe-with-me button — Option E: solid button stays still; halo pulses around it. */
+.breathe-btn { position: relative; isolation: isolate; max-width: 240px; margin: 8px auto 0; transition: transform .15s ease; }
+.breathe-btn::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: var(--bb-halo, rgba(196,97,74,0.55));
+  z-index: -1;
+  filter: blur(14px);
+  animation: breathe-halo 3.6s ease-in-out infinite;
+  pointer-events: none;
 }
-.breathe-btn { animation: breathe-pulse 3.2s ease-in-out infinite; transition: transform .15s ease, box-shadow .2s ease; }
-.breathe-btn:hover { animation-play-state: paused; transform: scale(1.03); }
+@keyframes breathe-halo {
+  0%, 100% { transform: scale(0.92); opacity: 0; }
+  50% { transform: scale(1.08); opacity: 0.5; }
+}
 .breathe-btn:active { transform: scale(0.98); }
+.breathe-btn:hover::after { animation-play-state: paused; }
 .step-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); }
 .mono-hint  { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
 .mono-sm    { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; }

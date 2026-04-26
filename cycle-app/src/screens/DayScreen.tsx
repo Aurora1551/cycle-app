@@ -983,9 +983,9 @@ const DayScreen: React.FC<Props> = ({ data, dayNumber, isPremium, isPaused, onRe
       <Card key={component} cardBg={cardBg} cardBorder={cardBorder}>
         <SectionLabel color={vibe.accent}>&#10024; YOUR MOMENT</SectionLabel>
         {!meditationStarted ? (
-          <button onClick={() => { console.log('[Breathe] Button clicked'); unlockSpeech(); console.log('[Breathe] unlockSpeech done, mounting YourMoment...'); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} className="breathe-btn" style={{ width: '100%', background: vibe.accent, color: 'white', border: 'none', borderRadius: 999, padding: '18px 24px', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', marginTop: 8, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: `0 6px 20px ${vibe.accent}55` }}>
-            <span style={{ fontSize: 16, lineHeight: 1 }}>✦</span>
-            <span>Breathe with me <span style={{ opacity: 0.7, fontSize: 13 }}>· 35s</span></span>
+          <button onClick={() => { console.log('[Breathe] Button clicked'); unlockSpeech(); console.log('[Breathe] unlockSpeech done, mounting YourMoment...'); setMeditationStarted(true); track('meditation_started', { day_number: dayNumber }) }} className="breathe-btn" style={{ background: vibe.accent, color: 'white', border: 'none', borderRadius: 999, padding: '14px 26px', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: typo.headingFont, fontStyle: 'italic', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, ['--bb-halo' as never]: `${vibe.accent}88` }}>
+            <span style={{ fontSize: 15, lineHeight: 1 }}>✦</span>
+            <span>Breathe with me <span style={{ opacity: 0.75, fontSize: 12 }}>· 35s</span></span>
           </button>
         ) : (
           <YourMoment
