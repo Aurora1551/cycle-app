@@ -1,6 +1,6 @@
 const fr = {
   translation: {
-    appName: 'Cycle',
+    appName: 'Calida',
     tagline: 'Force quotidienne pour ton parcours',
     begin: 'Commencer →',
     or: 'ou',

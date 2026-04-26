@@ -353,7 +353,7 @@ function App() {
             <div style={{ fontSize: 32, marginBottom: 10 }}>💛</div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: 22, fontWeight: 700, color: '#1C0F0C', lineHeight: 1.25, marginBottom: 10 }}>Before you start</div>
             <div className="body-font" style={{fontSize: 14, color: '#3D1810', lineHeight: 1.55, marginBottom: 18 }}>
-              Cycle is for emotional support, not medical advice. Always consult your clinic for anything about your treatment, medication, or symptoms.
+              Calida is for emotional support, not medical advice. Always consult your clinic for anything about your treatment, medication, or symptoms.
             </div>
             <button onClick={ackDisclaimer} className="btn-primary" style={{ background: '#C4614A' }}>I understand</button>
           </div>

@@ -835,12 +835,12 @@ async function sendGiftRecipientEmail(toEmail, recipientName, buyerDisplay, buye
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#FDF6F0;color:#1C0F0C;">
       <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Cycle</div>
+        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Calida</div>
       </div>
       <div style="text-align:center;font-size:48px;margin:18px 0;">🎁</div>
-      <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.25;margin:0 0 12px;text-align:center;">Someone gifted you a Cycle</h1>
+      <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.25;margin:0 0 12px;text-align:center;">Someone gifted you Calida</h1>
       <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;">${greeting}</p>
-      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;"><strong>${String(buyerDisplay).replace(/</g, '&lt;')}</strong> has gifted you Cycle — a daily companion through fertility treatment. Eighteen days of personalised content, quotes, music, breathing exercises and a space to journal.</p>
+      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;"><strong>${String(buyerDisplay).replace(/</g, '&lt;')}</strong> has gifted you Calida — a daily companion through fertility treatment. Eighteen days of personalised content, quotes, music, breathing exercises and a space to journal.</p>
       ${msgBlock}
       <p style="text-align:center;margin:28px 0;"><a href="${redeemUrl}" style="display:inline-block;background:#C4614A;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px;">Start my journey</a></p>
       <p style="font-size:13px;color:#9B7B74;line-height:1.6;margin:20px 0;">If the button doesn't work, paste this into your browser:<br/><span style="word-break:break-all;color:#C4614A;">${redeemUrl}</span></p>
@@ -851,7 +851,7 @@ async function sendGiftRecipientEmail(toEmail, recipientName, buyerDisplay, buye
     const { data, error } = await resend.emails.send({
       from: RESEND_FROM,
       to: toEmail,
-      subject: `${buyerShort} gifted you a Cycle 🎁`,
+      subject: `${buyerShort} gifted you Calida 🎁`,
       html,
     })
     if (error) { console.error('[Gift] Recipient email error:', error); return { ok: false, error } }
@@ -872,14 +872,14 @@ async function sendGiftBuyerReceipt(toEmail, recipientEmail, recipientName, amou
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#FDF6F0;color:#1C0F0C;">
       <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Cycle</div>
+        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Calida</div>
       </div>
       <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.25;margin:0 0 12px;">Your gift is on its way 💛</h1>
-      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;">Thank you for gifting a Cycle. We've sent an email to <strong>${recipientName ? `${String(recipientName).replace(/</g, '&lt;')} (${recipientEmail})` : recipientEmail}</strong> with a link to redeem their 18 days.</p>
+      <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 12px;">Thank you for gifting Calida. We've sent an email to <strong>${recipientName ? `${String(recipientName).replace(/</g, '&lt;')} (${recipientEmail})` : recipientEmail}</strong> with a link to redeem their 18 days.</p>
       <div style="background:rgba(196,97,74,0.05);border:1px solid rgba(196,97,74,0.15);border-radius:10px;padding:16px 18px;margin:20px 0;">
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:#9B7B74;letter-spacing:0.12em;margin-bottom:8px;">RECEIPT</div>
         <table style="width:100%;font-size:14px;color:#3D1810;">
-          <tr><td style="padding:3px 0;">Gift of Cycle (1 full cycle)</td><td style="text-align:right;padding:3px 0;">${amount}</td></tr>
+          <tr><td style="padding:3px 0;">Calida — gift (1 full cycle)</td><td style="text-align:right;padding:3px 0;">${amount}</td></tr>
           <tr style="border-top:1px solid rgba(196,97,74,0.15);"><td style="padding:8px 0 3px;font-weight:600;">Total charged</td><td style="text-align:right;padding:8px 0 3px;font-weight:600;">${amount}</td></tr>
         </table>
       </div>
@@ -891,7 +891,7 @@ async function sendGiftBuyerReceipt(toEmail, recipientEmail, recipientName, amou
     const { data, error } = await resend.emails.send({
       from: RESEND_FROM,
       to: toEmail,
-      subject: 'Your Cycle gift is on its way',
+      subject: 'Your Calida gift is on its way',
       html,
     })
     if (error) { console.error('[Gift] Buyer email error:', error); return { ok: false, error } }
@@ -916,10 +916,10 @@ async function sendPasswordResetEmail(toEmail, token, baseUrl) {
     const html = `
       <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#FDF6F0;color:#1C0F0C;">
         <div style="text-align:center;margin-bottom:24px;">
-          <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Cycle</div>
+          <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;color:#C4614A;">Calida</div>
         </div>
         <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.2;margin:0 0 12px;">Reset your password</h1>
-        <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 20px;">You asked to reset the password for your Cycle account. Click the button below to choose a new one.</p>
+        <p style="font-size:15px;line-height:1.6;color:#3D1810;margin:0 0 20px;">You asked to reset the password for your Calida account. Click the button below to choose a new one.</p>
         <p style="text-align:center;margin:28px 0;"><a href="${resetUrl}" style="display:inline-block;background:#C4614A;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px;">Reset my password</a></p>
         <p style="font-size:13px;color:#9B7B74;line-height:1.6;margin:20px 0;">This link expires in 30 minutes. If you didn't request this, you can safely ignore this email — your password won't change.</p>
         <p style="font-size:11px;color:#9B7B74;margin-top:32px;">If the button doesn't work, paste this into your browser:<br/><span style="word-break:break-all;color:#C4614A;">${resetUrl}</span></p>
@@ -928,7 +928,7 @@ async function sendPasswordResetEmail(toEmail, token, baseUrl) {
     const { data, error } = await resend.emails.send({
       from: RESEND_FROM,
       to: toEmail,
-      subject: 'Reset your Cycle password',
+      subject: 'Reset your Calida password',
       html,
     })
     if (error) {

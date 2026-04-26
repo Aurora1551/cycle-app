@@ -34,24 +34,30 @@ if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
 
 function getBestVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices()
-  // Prefer Mac "Premium" / "Enhanced" / "Neural" voices first — they sound
-  // dramatically more human than the default basic voices. Then fall back to
-  // standard names.
-  const tiers = [
-    // Tier 1: neural / premium on Mac + Chrome Neural / Google neural
-    ['Ava (Premium)', 'Zoe (Premium)', 'Allison (Premium)', 'Serena (Premium)', 'Samantha (Enhanced)', 'Karen (Enhanced)', 'Moira (Enhanced)', 'Google UK English Female', 'Microsoft Aria', 'Microsoft Jenny'],
-    // Tier 2: standard names (fallback if premium not installed)
-    ['Samantha', 'Karen', 'Moira', 'Tessa', 'Serena', 'Fiona', 'Microsoft Zira'],
+  // Strict: female voices only. Tiered by quality (Premium > Enhanced > Standard).
+  // The voice must be explicitly known to be female — we don't fall back to
+  // "any English voice" because that often picks a male default voice.
+  const FEMALE_NAMES = [
+    // Premium / Neural (best sounding)
+    'Ava (Premium)', 'Zoe (Premium)', 'Allison (Premium)', 'Serena (Premium)', 'Nora (Premium)', 'Joanna (Premium)',
+    // Enhanced
+    'Samantha (Enhanced)', 'Karen (Enhanced)', 'Moira (Enhanced)', 'Serena (Enhanced)', 'Fiona (Enhanced)',
+    // Cloud (Microsoft Edge / Chrome Neural)
+    'Microsoft Aria Online (Natural)', 'Microsoft Jenny Online (Natural)', 'Microsoft Sonia Online (Natural)',
+    'Google UK English Female', 'Google US English',
+    // Standard Mac female voices
+    'Samantha', 'Karen', 'Moira', 'Tessa', 'Serena', 'Fiona', 'Allison', 'Ava', 'Zoe', 'Susan',
+    // Microsoft Windows
+    'Microsoft Zira', 'Microsoft Eva', 'Microsoft Heera',
   ]
-  for (const tier of tiers) {
-    for (const name of tier) {
-      const match = voices.find(v => v.name === name) || voices.find(v => v.name.includes(name))
-      if (match) return match
-    }
+  for (const name of FEMALE_NAMES) {
+    const exact = voices.find(v => v.name === name)
+    if (exact) return exact
+    const partial = voices.find(v => v.name.includes(name))
+    if (partial) return partial
   }
-  // Last resort: any English female-ish voice
-  const enFemale = voices.find(v => v.lang.startsWith('en') && /female|woman|samantha|karen|allison|zoe|serena/i.test(v.name))
-  if (enFemale) return enFemale
+  // No known female voice — return null so caller falls back to system default
+  // rather than picking the first voice which is often male.
   return voices.find(v => v.lang.startsWith('en')) || null
 }
 
@@ -309,9 +315,16 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, dayNumber, o
 
   const stopMoment = () => {
     stoppedRef.current = true
+    // Cancel speech twice in case the first call is queued behind a pending utterance
     try { window.speechSynthesis?.cancel() } catch {}
+    try { setTimeout(() => window.speechSynthesis?.cancel(), 0) } catch {}
+    // Kill ambient pad
     padRef.current?.kill()
     padRef.current = null
+    // Kill chime audio context (was playing oscillators on a 3.5s schedule)
+    try { (chimeRef.current as { ctx?: AudioContext } | null)?.ctx?.close() } catch {}
+    chimeRef.current = null
+    // Unmount immediately
     onStop()
   }
 
@@ -333,8 +346,9 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, dayNumber, o
 
     // Speak opening phrase after chime settles, then transition to breathing
     const run = async () => {
-      console.log('[Meditation] Waiting 2.5s for chime...')
-      await new Promise(r => setTimeout(r, 2500))
+      console.log('[Meditation] Waiting 1.2s for chime...')
+      // Reduced from 2.5s — voice should appear quickly
+      await new Promise(r => setTimeout(r, 1200))
       console.log('[Meditation] 2.5s done. stopped?', stoppedRef.current)
       if (stoppedRef.current) return
       // Duck ambient pad so voice is clearly heard
@@ -405,19 +419,31 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, dayNumber, o
     return () => clearInterval(interval)
   }, [stage, phaseIdx])
 
+  // Reusable explicit stop button that's always visible regardless of stage
+  const stopButton = (
+    <button onClick={stopMoment} aria-label="Stop meditation" className="btn-bare" style={{
+      position: 'absolute', top: 8, right: 8, zIndex: 20,
+      width: 32, height: 32, borderRadius: '50%',
+      background: 'rgba(0,0,0,0.08)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 16, color: vibe.accent, fontWeight: 500, lineHeight: 1,
+    }}>×</button>
+  )
+
   // --- Opening stage ---
   if (stage === 'opening') {
     return (
-      <div className="flex-col" style={{ alignItems: 'center', justifyContent: 'center', gap: 20, padding: '32px 12px', minHeight: 240, opacity: openingFade, transition: 'opacity 1.5s ease' }}>
-        <div onClick={stopMoment} style={{
+      <div onClick={stopMoment} className="flex-col" style={{ position: 'relative', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '32px 12px', minHeight: 240, opacity: openingFade, transition: 'opacity 1.5s ease', cursor: 'pointer' }}>
+        {stopButton}
+        <div style={{
           width: 100, height: 100, borderRadius: '50%',
           background: `radial-gradient(circle at 40% 40%, ${vibe.accent}60, ${vibe.accent}20)`,
           boxShadow: `0 0 40px ${vibe.accent}30, 0 0 80px ${vibe.accent}15`,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-          animation: 'float 3s ease-in-out infinite', cursor: 'pointer',
+          animation: 'float 3s ease-in-out infinite',
         }}>
           <div style={{ fontSize: 22, opacity: 0.8 }}>&#10024;</div>
-          <div style={{ fontFamily: typo.bodyFont, fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>tap to end</div>
+          <div style={{ fontFamily: typo.bodyFont, fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>tap anywhere to end</div>
         </div>
         <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontSize: 18, color: vibe.accent, textAlign: 'center', lineHeight: 1.6, maxWidth: 260, whiteSpace: 'pre-line' }}>
           {displayOpening}
@@ -481,7 +507,8 @@ function YourMoment({ vibe, typo, openingLine, closingLine, genres, dayNumber, o
   const ringCircumference = 2 * Math.PI * ringRadius
 
   return (
-    <div className="flex-col" style={{ alignItems: 'center', gap: 16, padding: '24px 0' }}>
+    <div onClick={stopMoment} className="flex-col" style={{ position: 'relative', alignItems: 'center', gap: 16, padding: '24px 0', cursor: 'pointer' }}>
+      {stopButton}
       {/* Breathing orb + circular progress ring */}
       <div style={{ position: 'relative', width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {/* Outer glow */}

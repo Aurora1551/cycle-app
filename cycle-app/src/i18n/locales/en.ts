@@ -1,7 +1,7 @@
 const en = {
   translation: {
     // Splash
-    appName: 'Cycle',
+    appName: 'Calida',
     tagline: 'Daily strength for your journey',
     begin: 'Begin →',
     or: 'or',
@@ -126,7 +126,7 @@ const en = {
       oneCycle: 'One Cycle',
       oneCyclePrice: '£9.99',
       oneCycleDetails: 'All days · all content · Spotify links · yours forever',
-      giftCycle: 'Gift a Cycle 🎁',
+      giftCycle: 'Gift Calida 🎁',
       giftPrice: '£9.99',
       giftDetails: 'Send to someone you love · personal message + WhatsApp share',
       giftBanner: 'Know someone in treatment? Gift them strength.',
@@ -268,7 +268,7 @@ const en = {
       privacySubtext: 'View our privacy policy',
       deleteAccount: 'Delete Account',
       deleteSubtext: 'Permanently delete all data',
-      footer: 'Cycle · v1.0 · GDPR compliant · EU data',
+      footer: 'Calida · v1.0 · GDPR compliant · EU data',
       language: 'Language',
       // Edit modals
       editName: 'Edit your name',
@@ -316,7 +316,7 @@ const en = {
       retention: 'Data retention',
       retentionText: 'Your data is kept only while your account is active. When you delete your account, all data is permanently removed from our servers immediately. There is no backup retention period.',
       children: "Children's privacy",
-      childrenText: 'Cycle is designed for adults undergoing fertility treatment. We do not knowingly collect data from anyone under 18.',
+      childrenText: 'Calida is designed for adults undergoing fertility treatment. We do not knowingly collect data from anyone under 18.',
       contact: 'Contact',
       contactText: 'For privacy questions, data requests, or deletion requests, contact us at hello@cycleapp.co.',
       inShort: 'In short',

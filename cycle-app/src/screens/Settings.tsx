@@ -457,7 +457,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
           <button onClick={() => setEditMode('about')} className="settings-row" style={{ cursor: 'pointer', borderBottom: `1px solid ${cardBorder}` }}>
             <div className="settings-icon" style={{ background: `${vibe.accent}15` }}>💛</div>
             <div style={{ flex: 1 }}>
-              <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>ABOUT CYCLE</div>
+              <div className="mono-hint" style={{ color: vibe.accent, marginBottom: 2, letterSpacing: '0.15em' }}>ABOUT CALIDA</div>
               <div style={{ fontSize: 13, color: textColor, fontFamily: typo.bodyFont }}>What this app is (and isn't).</div>
             </div>
             <div style={{ color: mutedColor, fontSize: 16 }}>›</div>
@@ -759,12 +759,12 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
             </div>
             <div style={{ marginBottom: 28 }}>
               <SectionLabel color={vibe.accent}>ABOUT</SectionLabel>
-              <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 28, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, margin: '0 0 6px' }}>About Cycle</h1>
+              <h1 style={{ fontFamily: typo.headingFont, fontStyle: typo.headingStyle, fontSize: 28, fontWeight: typo.headingWeight, color: textColor, lineHeight: 1.1, margin: '0 0 6px' }}>About Calida</h1>
               <div style={{ fontFamily: typo.bodyFont, fontSize: 11, color: mutedColor }}>A companion for your fertility journey</div>
             </div>
             <Card cardBg={cardBg} cardBorder={cardBorder}>
               <div style={{ fontFamily: typo.headingFont, fontStyle: 'italic', fontWeight: 700, fontSize: 16, color: textColor, lineHeight: 1.5, marginBottom: 10 }}>
-                Cycle is for emotional support, not medical advice.
+                Calida is for emotional support, not medical advice.
               </div>
               <div style={{ fontFamily: typo.bodyFont, fontSize: 13, color: textColor, lineHeight: 1.6, opacity: 0.85 }}>
                 The quotes, affirmations, prompts, breathing exercises, music and food ideas in this app are here to hold space for you — not to diagnose, treat, or replace medical guidance. Anything to do with your treatment, medication, symptoms, or body: always consult your clinic first.
@@ -780,7 +780,7 @@ const Settings: React.FC<Props> = ({ data, dayNumber, onUpdateData, onDeleteAcco
               </button>
             </div>
             <div className="mono" style={{ fontSize: 9, color: mutedColor, opacity: 0.6, textAlign: 'center', marginTop: 32, letterSpacing: '0.05em' }}>
-              Cycle · made with care
+              Calida · made with care
             </div>
             <button onClick={() => setEditMode(null)} className="btn-primary" style={{ background: vibe.accent, marginTop: 20 }}>{t('close')}</button>
           </div>
